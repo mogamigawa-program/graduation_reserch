@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}insert{% endblock %}
+{% block content %}
+<title>INSERT文を学ぼう</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            font-size: 1.2em;
+        }
+
+        code {
+            background-color: #eaeaea;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 1.1em;
+        }
+
+        .example-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .example-table th, .example-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .example-table th {
+            background-color: #f2f2f2;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .message {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>INSERT文を学ぼう</h1>
+        <p>
+            <strong>INSERT文</strong>は、新しいデータをテーブルに追加するために使用されます。テーブルの列に対応する値を指定することで、新しい行を挿入できます。
+        </p>
+        <p>
+            例えば、次のようにして <code>test</code> テーブルにデータを挿入します。
+        </p>
+        <div class="example-box">
+            <p><strong>例:</strong></p>
+            <code>
+                INSERT INTO test (num, name) VALUES (1, 'John');<br>
+                INSERT INTO test (name, num) VALUES ('John', 1);
+            </code>
+        </div>
+
+        <h2>練習問題</h2>
+        <p>以下の <code>{{ table_name }}</code> テーブルにデータを挿入してみましょう。</p>
+
+        <table class="example-table">
+            <caption>現在の{{ table_name }}の中身</caption>
+            <tr>
+                {% for row in desc %}
+                    <th>{{ row[0] }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in table %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
+        <h2>{{ table_name }}の定義</h2>
+        <table class="example-table">
+            <tr>
+                <th>カラム名</th>
+                <th>データ型</th>
+                <th>Null</th>
+                <th>キー</th>
+                <th>デフォルト値</th>
+                <th>EXTRA</th>
+            </tr>
+            {% for row in desc %}
+                <tr>
+                    {% for column in row %}
+                        <td>{{ column }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
+        <p>実際にテーブルにレコードを挿入してみよう！定義を見て制約に違反しないようにしよう！</p>
+
+        {% if error_message %}
+            <p class="error-message">エラー: {{ error_message }}</p>
+        {% endif %}
+
+        {% if message %}
+            <p class="message">更新: {{ message }}</p>
+        {% endif %}
+
+        <form action="{{ url_for('insert') }}" method="post" id="insert-form">
+            <p>INSERT INTO {{ table_name }}</p>
+            <label for="columns">(</label>
+            {% for row in desc %}
+                <input type="text" name="columns[]" placeholder="カラム名">
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
+            <label for="columns">)</label>
+        
+            <p>VALUES</p>
+            <div id="values-container">
+                <div class="value-input">
+                    <label for="values">(</label>
+                    {% for row in desc %}
+                        <input type="text" name="values[]" placeholder="値">
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                    <label for="values">);</label>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button type="submit" name="submit_button" value="result_btn" class="btn">結果を表示する</button><br>
+                <button type="submit" name="submit_button" value="table_init_btn" class="btn">テーブルを初期化する</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+<a href="/index">HOME</a>
+
+{% endblock  %}
