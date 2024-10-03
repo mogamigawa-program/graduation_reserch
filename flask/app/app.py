@@ -1282,7 +1282,7 @@ def signup():
             conn.close()
             
             # ユーザーのデータベースにdataset内にある、テーブルをいくつかコピーする
-            tables = ['users', 'employees']
+            tables = ['users', 'employees', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory']
             for table in tables:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)
                 cursor = conn.cursor()
