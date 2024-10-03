@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}CROSS JOINの実行例ページ{% endblock %}
+{% block content %}
+<h1>CROSS JOINの実行例</h1>
+
+<!-- productsテーブルの中身を表示 -->
+<table border="1">
+    <caption>products</caption>
+        <tr style="background-color: red;">
+            <th>商品ID</th>
+            <th>商品名</th>
+            <th>価格</th>
+            <th>在庫数</th>
+            <th>ステータス</th>
+        </tr>
+    <tr style="background-color: red;">
+        {% for col in products_desc %}
+            <th>{{ col[0] }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in products_data %}
+        <tr style="background-color: lightcoral;">
+            {% for item in row %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+<!-- customersテーブルの中身を表示 -->
+<table border="1">
+    <caption>customers</caption>
+        <tr style="background-color: blue;">
+            <th>購入者ID</th>
+            <th>商品ID</th>
+            <th>購入日</th>
+        </tr>
+    <tr style="background-color: blue;">
+        {% for col in customers_desc %}
+            <th>{{ col[0] }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in customers_data %}
+        <tr style="background-color: lightblue;">
+            {% for item in row %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+
+<!-- CROSS JOINの結果表示 -->
+{% if cross_join_result %}
+    <h2>CROSS JOINの結果</h2>
+    <p><strong>実行クエリ:</strong></p>
+    <p><code>
+        SELECT products.product_id, products.product_name, customers.customer_id, customers.order_date
+        FROM products
+        CROSS JOIN customers;
+        </code>
+    </p>
+    <p><strong>解説:</strong></p> 
+    <p>JOINを使用すると、2つのテーブルの全ての組み合わせが生成されます。<br>ここではproductsテーブルとcustomersテーブルをCROSS JOINするので、productsテーブルの各行がcustomersテーブルのすべての行と組み合わされます。</p>
+    <p>SELECTでproducts.product_id, products.product_name, customers.customer_id, customers.order_dateを選択しているので<br>表示されるカラムはこの4列であり、行数は3（productsの行数）×4（customersの行数） = 12行です。</p>
+    <table border="1">
+        <tr>
+            <!-- カラム名を動的に表示 -->
+            {% for col in columns.split(',') %}
+                <th 
+                    {% if 'products.' in col.strip() %} style="background-color: red;" {% endif %}
+                    {% if 'customers.' in col.strip() %} style="background-color: blue;" {% endif %}
+                >
+                    {{ col.strip() }}
+                </th>
+            {% endfor %}
+        </tr>
+        {% for row in cross_join_result %}
+            <tr>
+                {% for item in row %}
+                    <!-- 'columns'をスプリットしてループ中のカラム名に応じて背景色を設定 -->
+                    <td
+                        {% if 'products.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightcoral;" {% endif %}
+                        {% if 'customers.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightblue;" {% endif %}
+                    >
+                        {{ item }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+<hr>
+<a href="/cross_join_study">CROSS JOIN学習ページに戻る</a>
+{% endblock %}

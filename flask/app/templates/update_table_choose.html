@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}データを更新するテーブルを選択する{% endblock %}
+{% block content %}
+<h1>データを更新するテーブルを選択する</h1>
+
+<p>選択されたテーブルは更新前に自動的にバックアップが作成されます。</p>
+
+<form action="{{ url_for('update_table_choose') }}" method="post">
+    <label for="table_name">テーブルを選択してください:</label>
+    <select id="table_name" name="table_name" required>
+        {% for table in tables %}
+            <option value="{{ table }}">{{ table }}</option>
+        {% endfor %}
+    </select><br>
+    <button type="submit">テーブルを選択する</button>
+</form>
+
+<hr>
+<a href="/index">Home<a>
+{% endblock %}

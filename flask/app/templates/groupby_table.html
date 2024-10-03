@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}GROUP BY実行{% endblock %}
+{% block content %}
+<h1>{{ table_name }}でGROUP BYを実行</h1>
+
+<div class="groupby_data_form">
+    <p>GROUP BY文の例</p>
+    <pre>
+        <code>
+                    SELECT column1, COUNT(*) FROM {{ table_name }} GROUP BY column1;
+        </code>
+    </pre>
+
+    <table border="1">
+        <caption>現在の{{ table_name }}の中身</caption>
+        <tr>
+            {% for row in desc %}
+                <th>{{ row[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in table %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <table border="1">
+        <caption>{{ table_name }}の定義</caption>
+        <tr>
+            <th>カラム名</th>
+            <th>データ型</th>
+            <th>Null</th>
+            <th>キー</th>
+            <th>デフォルト値</th>
+            <th>EXTRA</th>
+        </tr>
+        {% for row in desc %}
+            <tr>
+                {% for column in row %}
+                    <td>{{ column }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <div>GROUP BYを実行するためのSQL文を入力してください</div>
+
+    {% if error_message %}
+        <p style="color: red;">エラー: {{ error_message }}</p>
+    {% endif %}
+
+    {% if result %}
+        <h2>GROUP BY結果</h2>
+        <table border="1">
+            <tr>
+                {% for column in result[0] %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in result[1:] %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    
+    <form action="{{ url_for('groupby_table') }}" method="post">
+        <p>SELECT</p>
+        <label for="select_clause">選択句 (例: column1, COUNT(*)):</label>
+        <input type="text" id="select_clause" name="select_clause" required><br><br>
+        
+        <label for="groupby_clause">GROUP BY句 (例: column1):</label>
+        <input type="text" id="groupby_clause" name="groupby_clause" required><br><br>
+        
+        <button type="submit">実行</button>
+    </form>
+</div>
+
+<hr>
+<a href="/groupby_table_choose">テーブル選択に戻る</a><br>
+<a href="/index">Home</a>
+{% endblock %}

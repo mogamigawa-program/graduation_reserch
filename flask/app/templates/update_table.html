@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}データ更新{% endblock %}
+{% block content %}
+<h1>{{ table_name }}のデータを更新</h1>
+
+<div class="update_data_form">
+    <p>UPDATE文の例</p>
+    <pre>
+        <code>
+            UPDATE test SET name = 'John' WHERE id = 1;
+        </code>
+    </pre>
+
+    <table border="1">
+        <caption>現在の{{ table_name }}の中身</caption>
+        <tr>
+            {% for row in desc %}
+                <th>{{ row[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in table %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <table border="1">
+        <caption>{{ table_name }}の定義</caption>
+        <tr>
+            <th>カラム名</th>
+            <th>データ型</th>
+            <th>Null</th>
+            <th>キー</th>
+            <th>デフォルト値</th>
+            <th>EXTRA</th>
+        </tr>
+        {% for row in desc %}
+            <tr>
+                {% for column in row %}
+                    <td>{{ column }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <div>テーブルを更新するためのSQL文を入力してください</div>
+
+    {% if error_message %}
+        <p style="color: red;">エラー: {{ error_message }}</p>
+    {% endif %}
+
+    {% if message %}
+        <p style="color: green;">更新: {{ message }}</p>
+    {% endif %}
+    
+    <form action="{{ url_for('update_table') }}" method="post">
+        <p>UPDATE {{ table_name }} SET</p>
+        <label for="set_clause">セット句 (例: name = 'higuchi'):</label>
+        <input type="text" id="set_clause" name="set_clause" required><br><br>
+        
+        <label for="condition">条件句 (例: id = 1):</label>
+        <input type="text" id="condition" name="condition" required><br><br>
+        
+        <label for="use_from_clause">FROM句を使用する:</label>
+        <input type="checkbox" id="use_from_clause" name="use_from_clause"><br><br>
+        
+        <button type="submit">更新</button>
+    </form>
+
+    
+    <form action="{{ url_for('rollback_table') }}" method="post">
+        <input type="hidden" name="rollback_type" value="backup">
+        <button type="submit">1つ前の状態に戻す</button>
+    </form>
+
+    <form action="{{ url_for('rollback_table') }}" method="post">
+        <input type="hidden" name="rollback_type" value="initial">
+        <button type="submit">初期状態に戻す</button>
+    </form>
+    
+    
+</div>
+
+<hr>
+<a href="/update_table_choose">テーブル選択に戻る</a><br>
+<a href="/index">Home</a>
+{% endblock %}

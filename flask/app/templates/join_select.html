@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}JOINの学習ページ選択{% endblock %}
+{% block content %}
+<h1>JOINの学習ページ</h1>
+<p>下記のJOINの学習項目を選んでください:</p>
+
+<ul>
+    <li><a href="{{ url_for('cross_join_study') }}">CROSS JOIN</a></li>
+    <li><a href="{{ url_for('inner_join_study') }}">INNER JOIN</a></li>
+    <li><a href="{{ url_for('left_outer_join_study') }}">LEFT OUTER JOIN</a></li>
+    <li><a href="{{ url_for('right_outer_join_study') }}">RIGHT OUTER JOIN</a></li>
+    <li><a href="{{ url_for('multiple_table_join_study') }}">複数のテーブルを用いたJOIN</a></li>
+    <li><a href="{{ url_for('update_join') }}">(応用)JOINを用いたUPDATE</a></li>
+</ul>
+
+<hr>
+<a href="/index">Home<a>
+{% endblock %}

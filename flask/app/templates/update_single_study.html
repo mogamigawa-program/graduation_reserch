@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}UPDATEの学習ページ{% endblock %}
+{% block content %}
+<h1>1つのカラムに対して1つの条件でレコードを更新する</h1>
+
+<p><strong>UPDATE文とは:</strong> UPDATE文は、データベースの既存のレコードを更新するために使用されます。特定の条件に基づいて、指定したカラムの値を変更できます。</p>
+
+<p><strong>基本的な構文:</strong>
+<code>
+UPDATE {テーブル名}
+SET {カラム名 = 新しい値}
+WHERE {条件};
+</code>
+</p>
+
+<!-- エラーメッセージの表示 -->
+{% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+{% endif %}
+
+<!-- 成功メッセージの表示 -->
+{% if message %}
+    <p style="color: green;">{{ message }}</p>
+{% endif %}
+
+<!-- productsテーブルの中身を表示 -->
+<table border="1">
+    <caption>productsテーブル</caption>
+    <tr>
+        {% for col in products_desc %}
+            <th>{{ col[0] }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in products_data %}
+        <tr>
+            {% for item in row %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+<form method="POST">
+    <h2>レコードを更新する</h2>
+    <p>UPDATE products</p>
+    <p>SET
+        <select name="column_to_update" required>
+            {% for col in products_desc %}
+                <option value="{{ col[0] }}">{{ col[0] }}</option>
+            {% endfor %}
+        </select>
+        =
+        <input type="text" name="new_value" placeholder="新しい値" required>
+    </p>
+    <p>WHERE
+        <select name="condition_column" required>
+            {% for col in products_desc %}
+                <option value="{{ col[0] }}">{{ col[0] }}</option>
+            {% endfor %}
+        </select>
+        =
+        <input type="text" name="condition_value" placeholder="条件の値" required>
+    </p>
+    <button type="submit" name="button_val" value="update_record_btn">実行する</button>
+
+    <!-- 1つ前の状態に戻すボタン -->
+    <button type="submit" name="button_val" value="restore_backup_btn" onclick="return handleReset()">1つ前の状態に戻す</button>
+
+    <!-- テーブルを初期化するボタン -->
+    <button type="submit" name="button_val" value="table_init_btn" onclick="return handleReset()">テーブルを初期状態に戻す</button>
+</form>
+
+<script>
+    function handleReset() { 
+        // すべての input と select フィールドを取得
+        const inputs = document.querySelectorAll('form input, form select');
+        
+        // 各フィールドから 'required' 属性を削除
+        inputs.forEach(input => input.removeAttribute('required'));
+
+        // フォームを送信する
+        return true;
+    }
+</script>
+
+<br>
+<a href="/update_select">戻る</a>
+{% endblock %}
