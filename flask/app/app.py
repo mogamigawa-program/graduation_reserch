@@ -7,25 +7,32 @@ from flask_bcrypt import Bcrypt
 
 import mysql.connector
 
+from .config import Config
 from DataStore.MySQL import MySQL
+
+#Flaskオブジェクトの生成
+app = Flask(__name__)
+
+app.config.from_object(Config)
+
 dns = {
-    'user': 'root',
-    'host': 'localhost',
-    'password': '0734',
+    'user': app.config['MYSQL_DATABASE_USER'],
+    'host': app.config['MYSQL_DATABASE_HOST'],
+    'password': app.config['MYSQL_DATABASE_PASSWORD'],
     'database': 'dataset',
     'auth_plugin': 'mysql_native_password'
 }
 user_dns = {
-    'user': 'root',
-    'host': 'localhost',
-    'password': '0734',
+    'user': app.config['MYSQL_DATABASE_USER'],
+    'host': app.config['MYSQL_DATABASE_HOST'],
+    'password': app.config['MYSQL_DATABASE_PASSWORD'],
     'database': 'user_info',
     'auth_plugin': 'mysql_native_password'
 }
 this_users_dns = {
-    'user': 'root',
-    'host': 'localhost',
-    'password': '0734',
+    'user': app.config['MYSQL_DATABASE_USER'],
+    'host': app.config['MYSQL_DATABASE_HOST'],
+    'password': app.config['MYSQL_DATABASE_PASSWORD'],
     'auth_plugin': 'mysql_native_password',
     'database': None 
 }
@@ -34,8 +41,8 @@ db = MySQL(**dns)
 user_db = MySQL(**user_dns)
 this_users_db = MySQL(**this_users_dns)
 
-#Flaskオブジェクトの生成
-app = Flask(__name__)
+
+
 
 app.config['SECRET_KEY'] = os.urandom(24)
 bcrypt = Bcrypt(app)
@@ -2583,7 +2590,8 @@ def update_all_column_study():
 
 #おまじない
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.secret_key = app.config['SECRET_KEY']
+    app.run(debug=app.config['DEBUG'])
 
 
 #汎用関数
