@@ -13,32 +13,31 @@
 <body>
     <h1>{{ title }}</h1>
     <div class="menu">
-        {% for category, items in index_item.items() %}
-            {% if items[0] is mapping and 'url' in items[0] %}
-                <!-- URLを持つアイテムの場合、リストのみ表示 -->
-                <ul>
-                    {% for item in items %}
-                        <li class="menu-item">
-                            {% if item['url'] %}
-                                <a href="{{ item['url'] }}">{{ item['name'] }}</a>
-                            {% else %}
-                                {{ item['name'] }}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <!-- URLを持たないアイテムの場合、h2とリストを表示 -->
-                <h2>{{ category }}</h2>
-                <ul>
-                    {% for item in items %}
-                        <li class="menu-item">
-                            <a href="{{ url_for('index_item', item=item) }}">{{ item }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endfor %}
+        {% if index_item %}
+        <ul>
+            {% for item in index_item %}
+                <li class="menu-item">
+                    <a href="/index/{{ item }}?flag=normal">{{ item }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% elif normal_index_item %}
+        <ul>
+            {% for item in normal_index_item %}
+                <li class="menu-item">
+                    <a href="/index/{{ item }}?flag=min">{{ item }}</a>
+                </li>
+            {% endfor %}
+        </ul>            
+        {% elif min_index_item %}
+        <ul>
+            {% for item in min_index_item %}
+                <li class="menu-item">
+                    <a href="{{ item['url'] }}">{{ item['name'] }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </div>
     
     <hr>

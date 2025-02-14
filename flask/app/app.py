@@ -60,121 +60,128 @@ def check_login():
 @app.route("/index")
 def main():
     index_item = {
-        "データベースの基礎": ["データベースとは", "関係データベースとは"],
-        "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
-        "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
-        "高度な検索": ["自己結合", "更新操作"],
-        "集約と分析": ["集約関数", "ソートとグループ化"],
-        "集合演算": ["union", "except", "intersect"],
-        "テーブル制約と管理": ["テーブルに対する制約", "alter"],
-        "トランザクション": ["トランザクションにおける基本操作", "acid特性"]
+        "データベースの基礎",
+        "データベースの要素",
+        "基本操作",
+        "高度な検索",
+        "集約と分析",
+        "集合演算",
+        "テーブル制約と管理",
+        "トランザクション"
     }
     return render_template('index_main.html', title="学習項目", index_item=index_item)
     
 @app.route("/index/<item>")
 def index_item(item):
-    data_index = {
-        "データベースの基礎": ["データベースとは", "関係データベースとは"],
-        "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
-        "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
-        "高度な検索": ["自己結合", "更新操作"],
-        "集約と分析": ["集約関数", "ソートとグループ化"],
-        "集合演算": ["union", "except", "intersect"],
-        "テーブル制約と管理": ["テーブルに対する制約", "alter"],
-        "トランザクション": ["トランザクションにおける基本操作", "acid特性"]
-    }
-    data_item={
-        "データベースとは": [
-            {"name": "データベースとは", "url": ""}
-        ],
-        "関係データベースとは": [
-            {"name": "関係データベースとは", "url": ""}
-        ],
-        "キー": [
-            {"name": "キー", "url": ""}
-        ],
-        "テーブルの定義": [
-            {"name": "テーブルの定義", "url": ""}
-        ],
-        "テーブルの作成": [
-            {"name": "テーブルの作成", "url": ""}
-        ],
-        "select": [
-            {"name": "単一条件", "url": "/basic/select/single"},
-            {"name": "複数条件", "url": "/basic/select/multiple"}
-        ],
-        "join": [
-            {"name": "cross", "url": "/cross_join_study"},
-            {"name": "inner", "url": "/inner_join_study"},
-            {"name": "left", "url": "/left_outer_join_study"},
-            {"name": "right", "url": "/right_outer_join_study"},
-            {"name": "3つのテーブルの結合", "url": "/multiple_table_join_study"}
-        ],
-        "insert": [
-            {"name": "挿入", "url": "/basic/insert/insert"},
-            {"name": "select文を利用したデータの挿入", "url": "/basic/insert/select-insert"}
-        ],
-        "update": [
-            {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column"},
-            {"name": "二つのカラム一つの条件", "url": "/basic/update/two-columns"},
-            {"name": "全レコード更新、計算", "url": "/basic/update/all-records"},
-            {"name": "join", "url": "/basic/update/join"}
-        ],
-        "upsert": [
-            {"name": "replace構文", "url": "/basic/upsert/replace"},
-            {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key"}
-        ],
-        "delete": [
-            {"name": "単一条件", "url": "/basic/delete/single-condition"},
-            {"name": "複数条件", "url": "/basic/delete/multiple-conditions"},
-            {"name": "全レコード削除", "url": "/basic/delete/all-records"},
-            {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple"}
-        ],
-        "自己結合": [
-            {"name": "self join", "url": "/advanced/self-join"}
-        ],
-        "更新操作": [
-            {"name": "副問い合わせを用いた更新", "url": "/advanced/update/subquery"},
-            {"name": "副問い合わせを用いた挿入", "url": "/advanced/insert/subquery"},
-            {"name": "副問い合わせを用いた削除", "url": "/advanced/delete/subquery"}
-        ],
-        "集約関数": [
-            {"name": "count", "url": "/aggregation/count"},
-            {"name": "sum", "url": "/aggregation/sum"},
-            {"name": "avg", "url": "/aggregation/avg"},
-            {"name": "min", "url": "/aggregation/min"},
-            {"name": "max", "url": "/aggregation/max"}
-        ],
-        "ソートとグループ化": [
-            {"name": "order by", "url": "/aggregation/order-by"},
-            {"name": "group by", "url": "/aggregation/group-by"},
-            {"name": "having", "url": "/aggregation/having"}
-        ],
-        "テーブルに対する制約": [
-            {"name": "主キー", "url": "/constraints/primary-key"},
-            {"name": "一意性制約", "url": "/constraints/unique"},
-            {"name": "NOT NULL制約", "url": "/constraints/not-null"},
-            {"name": "外部キー制約", "url": "/constraints/foreign-key"},
-            {"name": "DEFAULT値", "url": "/constraints/default"}
-        ],
-        "alter": [
-            {"name": "カラムの追加", "url": "/table-management/alter/add-column"},
-            {"name": "カラムの削除", "url": "/table-management/alter/drop-column"},
-            {"name": "カラムの変更", "url": "/table-management/alter/modify-column"},
-            {"name": "制約の追加", "url": "/table-management/alter/add-constraint"},
-            {"name": "制約の削除", "url": "/table-management/alter/drop-constraint"},
-            {"name": "制約の変更", "url": "/table-management/alter/modify-constraint"}
-        ],
-        "トランザクションにおける基本操作": [
-            {"name": "start→commit or rollback", "url": "/transaction/basic-operations"}
-        ],
-        "acid特性": [
-            {"name": "原始性", "url": "/transaction/acid/atomicity"}
-        ]
-    }    
-    
-    index_item = data[item]
-    return render_template('index_main.html', title=item, index_item=index_item)
+    flag = request.args.get('flag')
+    try:
+        if flag == "normal":
+            normal_index_item = {
+            "データベースの基礎": ["データベースとは", "関係データベースとは"],
+            "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
+            "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
+            "高度な検索": ["自己結合", "更新操作"],
+            "集約と分析": ["集約関数", "ソートとグループ化"],
+            "集合演算": ["union", "except", "intersect"],
+            "テーブル制約と管理": ["テーブルに対する制約", "alter"],
+            "トランザクション": ["トランザクションにおける基本操作", "acid特性"]    
+        }
+            index_item = normal_index_item[item]
+            return render_template('index_main.html', title=item, normal_index_item=index_item)
+        if flag == "min":
+            min_index_item = {
+                "データベースとは": [
+                    {"name": "データベースとは", "url": ""}
+            ],
+            "関係データベースとは": [
+                {"name": "関係データベースとは", "url": ""}
+            ],
+            "キー": [
+                {"name": "キー", "url": ""}
+            ],
+            "テーブルの定義": [
+                {"name": "テーブルの定義", "url": ""}
+            ],
+            "テーブルの作成": [
+                {"name": "テーブルの作成", "url": ""}
+            ],
+            "select": [
+                {"name": "単一条件", "url": "/basic/select/single"},
+                {"name": "複数条件", "url": "/basic/select/multiple"}
+            ],
+            "join": [
+                {"name": "cross", "url": "/cross_join_study"},
+                {"name": "inner", "url": "/inner_join_study"},
+                {"name": "left", "url": "/left_outer_join_study"},
+                {"name": "right", "url": "/right_outer_join_study"},
+                {"name": "3つのテーブルの結合", "url": "/multiple_table_join_study"}
+            ],
+            "insert": [
+                {"name": "挿入", "url": "/basic/insert/insert"},
+                {"name": "select文を利用したデータの挿入", "url": "/basic/insert/select-insert"}
+            ],
+            "update": [
+                {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column"},
+                {"name": "二つのカラム一つの条件", "url": "/basic/update/two-columns"},
+                {"name": "全レコード更新、計算", "url": "/basic/update/all-records"},
+                {"name": "join", "url": "/basic/update/join"}
+            ],
+            "upsert": [
+                {"name": "replace構文", "url": "/basic/upsert/replace"},
+                {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key"}
+            ],
+            "delete": [
+                {"name": "単一条件", "url": "/basic/delete/single-condition"},
+                {"name": "複数条件", "url": "/basic/delete/multiple-conditions"},
+                {"name": "全レコード削除", "url": "/basic/delete/all-records"},
+                {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple"}
+            ],
+            "自己結合": [
+                {"name": "self join", "url": "/advanced/self-join"}
+            ],
+            "更新操作": [
+                {"name": "副問い合わせを用いた更新", "url": "/advanced/update/subquery"},
+                {"name": "副問い合わせを用いた挿入", "url": "/advanced/insert/subquery"},
+                {"name": "副問い合わせを用いた削除", "url": "/advanced/delete/subquery"}
+            ],
+            "集約関数": [
+                {"name": "count", "url": "/aggregation/count"},
+                {"name": "sum", "url": "/aggregation/sum"},
+                {"name": "avg", "url": "/aggregation/avg"},
+                {"name": "min", "url": "/aggregation/min"},
+                {"name": "max", "url": "/aggregation/max"}
+            ],
+            "ソートとグループ化": [
+                {"name": "order by", "url": "/aggregation/order-by"},
+                {"name": "group by", "url": "/aggregation/group-by"},
+                {"name": "having", "url": "/aggregation/having"}
+            ],
+            "テーブルに対する制約": [
+                {"name": "主キー", "url": "/constraints/primary-key"},
+                {"name": "一意性制約", "url": "/constraints/unique"},
+                {"name": "NOT NULL制約", "url": "/constraints/not-null"},
+                {"name": "外部キー制約", "url": "/constraints/foreign-key"},
+                {"name": "DEFAULT値", "url": "/constraints/default"}
+            ],
+            "alter": [
+                {"name": "カラムの追加", "url": "/table-management/alter/add-column"},
+                {"name": "カラムの削除", "url": "/table-management/alter/drop-column"},
+                {"name": "カラムの変更", "url": "/table-management/alter/modify-column"},
+                {"name": "制約の追加", "url": "/table-management/alter/add-constraint"},
+                {"name": "制約の削除", "url": "/table-management/alter/drop-constraint"},
+                {"name": "制約の変更", "url": "/table-management/alter/modify-constraint"}
+            ],
+            "トランザクションにおける基本操作": [
+                {"name": "start→commit or rollback", "url": "/transaction/basic-operations"}
+            ],
+            "acid特性": [
+                {"name": "原始性", "url": "/transaction/acid/atomicity"}
+            ]
+        }    
+        index_item = min_index_item[item]
+        return render_template('index_main.html', title=item, min_index_item=index_item)
+    except Exception as e:
+        return render_template('error.html', title="エラー", error_message=e)
 
 #「/hello」へアクセスがあった場合に、「hello.html」を返す
 @app.route('/hello')
