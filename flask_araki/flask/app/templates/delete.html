@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}DELETE文を学ぼう{% endblock %}
+{% block content %}
+
+    <div class="container">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            font-size: 1.2em;
+        }
+
+        code {
+            background-color: #eaeaea;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 1.1em;
+        }
+
+        .example-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .example-table th, .example-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .example-table th {
+            background-color: #f2f2f2;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+    </head>
+    <body>
+    <div class="container">
+        <h1>DELETE文を学ぼう</h1>
+        <p>
+            <strong>DELETE文</strong>は、テーブルから不要なデータを削除するために使用されます。特定の条件に一致する行だけを削除することができます。
+        </p>
+        <p>
+            例えば、次のようにして <code>employees</code> テーブルから <code>id</code> が 3 の行を削除します。加えて、andやorを利用して複数条件での削除も可能です。
+        </p>
+        <div class="example-box">
+            <p><strong>例:</strong></p>
+            <code>DELETE FROM employees WHERE id = 3;</code>
+        </div>
+
+        <h2>練習してみよう</h2>
+        <p>以下の <code>{{ table_name }}</code> テーブルからレコードを削除してみよう。</p>
+
+        <table class="example-table">
+            <caption>現在の{{ table_name }}の中身</caption>
+                <tr>
+                    {% for row in desc %}
+                        <th>{{ row[0] }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in table %}
+                    <tr>
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+        </table>
+
+        {% if error_message %}
+            <p class="error-message">エラー: {{ error_message }}</p>
+        {% endif %}
+
+        {% if message %}
+            <p class="message">更新: {{ message }}</p>
+        {% endif %}
+
+
+        <form action="{{ url_for('delete', type='single') }}" method="post" id="delete-form">
+            <p>DELETE FROM {{ table_name }} WHERE</p>
+            <label for="conditions"></label>
+                <input type="text" name="condition_1" placeholder="条件">
+            <label for="conditions">;</label>
+            <div class="btn-container">
+                <button type="submit" name="submit_button" value="result_btn" class="btn">結果を表示する</button><br>
+                <button type="submit" name="submit_button" value="table_init_btn" class="btn">テーブルを初期化する</button>
+            </div>
+        </form>
+    </div>
+</div>
+<a href="/delete/multiple">複数条件での削除をやってみる</a>
+<hr>
+<a href="/index">HOME</a>
+{% endblock  %}

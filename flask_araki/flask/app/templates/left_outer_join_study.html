@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}LEFT OUTER JOINの学習ページ{% endblock %}
+{% block content %}
+
+    <div class="container">
+
+    <h1>LEFT OUTER JOIN</h1>
+
+    <p><strong>LEFT OUTER JOINとは:</strong> LEFT OUTER JOIN(左外部結合)は、左側のテーブルのすべての行を取得し、右側のテーブルに対応する行があれば結合し、なければNULLを返す結合方法です。このため、左側のテーブルにあるデータは必ず取得され、右側に対応するデータが存在しない場合でも結果に含まれます。</p>
+
+    <p><strong>WHERE句の使用:</strong> LEFT OUTER JOINの結果に対してWHERE句を使用することで、条件に一致する行のみを絞り込むことができます。ただし、WHERE句を使うときには、NULL値を考慮する必要があります。</p>
+
+    <p><strong>基本的な構文:</strong>
+        <code>
+        SELECT {カラム名}
+        FROM {テーブル名1}
+        LEFT OUTER JOIN {テーブル名2}
+        ON {結合条件};
+        </code>
+    </p>
+
+    <p><strong>例:</strong> 例えば、<code>products</code>テーブルと<code>customers</code>テーブルに対してLEFT OUTER JOINを実行し、その結果を<code>WHERE products.price > 50000</code>という条件で絞り込むと、全ての<code>products</code>のデータが取得され、対応する<code>customers</code>データが無い場合はNULLとして表示されます。</p>
+
+    <p><strong><a href="/left_outer_join_study_example">LEFT OUTER JOINの実行例はこちら<a></a></strong></p>
+
+    <p><strong><a href="/left_outer_join_advance">LEFT OUTER JOINのクエリを全文書いてみよう！<a></a></strong></p>
+
+    <p><strong><a href="/left_outer_join_quiz">LEFT OUTER JOINの理解度チェック！<a></a></strong></p>
+
+    <!-- エラーメッセージの表示 -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- productsテーブルの中身を表示 -->
+    <table border="1">
+        <caption>products</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            <th>商品ID</th>
+            <th>商品名</th>
+            <th>価格</th>
+            <th>在庫数</th>
+            <th>ステータス</th>
+        </tr>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- customersテーブルの中身を表示 -->
+    <table border="1">
+        <caption>customers</caption>
+        <tr style="background-color: rgb(0, 128, 255);">
+            <th>購入者ID</th>
+            <th>商品ID</th>
+            <th>購入日</th>
+        </tr>
+        <tr style="background-color: rgb(0, 128, 255);">
+            {% for col in customers_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in customers_data %}
+            <tr style="background-color: lightblue;">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST">
+        <p>SELECT</p>
+        <label for="columns"></label>
+        <input type="text" id="columns" name="columns" placeholder="カラム:products.product_id, customers.order_date" required>
+        <p>FROM</p>
+        <label for="table1_name"></label>
+        <input type="text" id="table1_name" name="table1_name" placeholder="テーブル名:products or customers" value="{{ table1_name if table1_name else '' }}" required>
+        <p>LEFT OUTER JOIN </p>
+        <label for="table2_name"></label>
+        <input type="text" id="table2_name" name="table2_name" placeholder="テーブル名:products or customers" value="{{ table2_name if table2_name else '' }}" required>
+        <p>ON </p>
+        <input type="text" name="on_clause" placeholder="条件:products.product_id = customers.product_id" required>
+        <br><br>
+
+        <!-- WHERE条件を使用するかを選択 -->
+        <input type="checkbox" id="use_where" name="use_where" onclick="toggleWhereCondition()">
+        <label for="use_where">WHEREを使用する</label>
+
+        <!-- WHERE条件入力フィールド（デフォルトは非表示） -->
+        <div id="where_condition_container" style="display: none;">
+        <p>WHERE</p>
+            <input type="text" name="where_condition" placeholder="(例) products.price > 50000">
+        </div>
+
+        <br><br>
+
+        <button type="submit">LEFT OUTER JOINを実行</button>
+    </form>
+
+    <script>
+        function toggleWhereCondition() {
+            var whereContainer = document.getElementById('where_condition_container');
+            if (whereContainer.style.display === 'none') {
+                whereContainer.style.display = 'block';
+            } else {
+                whereContainer.style.display = 'none';
+            }
+        }
+    </script>
+
+    <!-- LEFT OUTER JOINの結果表示 -->
+    {% if left_outer_join_result %}
+        <h2>LEFT OUTER JOINの結果</h2>
+        <p><strong>実行クエリ:</strong> {{ left_outer_join_query }}</p>
+        <table border="1">
+            <tr>
+                <!-- カラム名を動的に表示 -->
+                {% for col in columns.split(',') %}
+                    <th
+                        {% if 'products.' in col.strip() %} style="background-color: rgb(255, 123, 0);" {% endif %}
+                        {% if 'customers.' in col.strip() %} style="background-color: rgb(0, 128, 255);" {% endif %}
+                    >
+                        {{ col.strip() }}
+                    </th>
+                {% endfor %}
+            </tr>
+            {% for row in left_outer_join_result %}
+                <tr>
+                    {% for item in row %}
+                        <td
+                            {% if 'products.' in columns.split(',')[loop.index0].strip() %} style="background-color: rgb(240, 184, 128);" {% endif %}
+                            {% if 'customers.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightblue;" {% endif %}
+                        >
+                            {{ item }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+    
+
+<hr>
+<a href="/join_select">戻る<a>
+{% endblock %}

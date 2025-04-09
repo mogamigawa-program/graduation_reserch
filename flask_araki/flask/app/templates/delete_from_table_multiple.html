@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}データ削除{% endblock %}
+{% block content %}
+<h1>データ削除</h1>
+<div class="delete_data_form_multiple">
+    <!-- テーブル削除の例 -->
+    <p>テーブル削除例</p>
+    <pre>
+        <code>
+            DELETE FROM test WHERE id <= 2 and name = 'tanaka';
+        </code>
+    </pre>
+
+    <!-- テーブル表示 -->
+    <table border="1">
+        <caption>現在の{{ table_name }}の中身</caption>
+        <tr>
+            {% for row in desc %}
+                <th>{{ row[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in table %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% if error_message %}
+        <p style="color: red;">エラー: {{ error_message }}</p>
+    {% endif %}
+
+    {% if message %}
+        <p style="color: red;">更新: {{ message }}</p>
+    {% endif %}
+    
+    <!-- テーブルからデータ削除するためのSQL文を入力 -->
+    <form action="{{ url_for('delete_from_table_multiple') }}" method="post" id="delete-form_multiple">
+        <p>DELETE FROM {{ table_name }} WHERE</p>
+        <input type="text" name="conditions[]" placeholder="条件" required>
+        <select id="and_or" name="and_or" required>
+            <option>and</option>
+            <option>or</option>
+        </select>
+        <input type="text" name="conditions[]" placeholder="条件" required>
+        <br>
+        <button type="submit">データを削除</button>
+    </form>
+</div>
+
+<hr>
+<a href="/delete_from_table">単一条件へ</a><br>
+<a href="/delete_table_choose">テーブル選択に戻る</a><br>
+<a href="/index">Home</a>
+</div>
+{% endblock %}

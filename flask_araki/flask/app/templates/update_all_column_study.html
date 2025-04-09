@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}全レコード更新の学習ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>全レコード更新の体験</h1>
+
+    <p><strong style="color: red;">
+        ここでは、全レコードを更新することの危険性を体験してもらいます！
+        <br>学習ページでは、"1つ前の状態に戻す"や"テーブルを初期状態に戻す"といったボタンを用意していますが、
+        <br>実際のデータベースではそのようなリセット操作ができません。必ずバックアップを取り、内容を確認した上で慎重にUPDATE文を実行するようにしてください。
+    </strong></p>
+    
+
+    <p><strong>警告:</strong> WHERE句がないUPDATE文は全レコードを更新します。実行すると、全てのレコードが同じ値に更新され、データが失われるリスクがあります。</p>
+    
+    <p><strong><a href="/update_all_column_study_example">実行例はこちら<a></a></strong></p>
+
+    <!-- エラーメッセージの表示 -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- 成功メッセージの表示 -->
+    {% if message %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %}
+
+    <!-- productsテーブルの中身を表示 -->
+    <table border="1">
+        <caption>productsテーブル</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST">
+        <!-- 更新するカラムと値の入力フォーム -->
+        <div id="columns-container">
+            <p>UPDATE products SET
+                <select name="column_to_update_0" required>
+                    {% for col in products_desc %}
+                        <option value="{{ col[0] }}">{{ col[0] }}</option>
+                    {% endfor %}
+                </select>
+                =
+                <input type="text" name="new_value_0" placeholder="新しい値" required>
+            </p>
+        </div>
+
+        <!-- カラムを追加するボタン -->
+        <button type="button" onclick="addColumn()">カラムを追加</button>
+
+        <!-- 全レコード更新ボタン -->
+        <button type="submit" name="button_val" value="update_all_records_btn">全レコード更新を実行</button>
+
+        <!-- テーブルを初期状態に戻すボタン -->
+        <button type="submit" name="button_val" value="table_init_btn" onclick="return handleReset()">テーブルを初期状態に戻す</button>
+    </form>
+</div>
+
+<script>
+    let columnIndex = 1;
+
+    function addColumn() {
+        const container = document.getElementById('columns-container');
+        const newField = document.createElement('div');
+        newField.innerHTML = `
+            <p>SET
+                <select name="column_to_update_${columnIndex}" required>
+                    {% for col in products_desc %}
+                        <option value="{{ col[0] }}">{{ col[0] }}</option>
+                    {% endfor %}
+                </select>
+                =
+                <input type="text" name="new_value_${columnIndex}" placeholder="新しい値" required>
+            </p>`;
+        container.appendChild(newField);
+        columnIndex++;
+    }
+
+    function handleReset() { 
+    // テーブルを初期状態に戻すボタンが押されたとき
+    const inputs = document.querySelectorAll('#columns-container input, #columns-container select');
+    inputs.forEach(input => input.removeAttribute('required'));
+    return true; // フォームを送信する
+    }
+
+</script>
+
+<br>
+<a href="/update_select">戻る</a>
+{% endblock %}

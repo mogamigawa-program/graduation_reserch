@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{props.title}}</title>
+    </head>
+    <body>
+        <div id="contents">
+            <p>{{props.msg}}</p>
+	    <p>データベース名:dataset</p>
+	    <p>テーブル名:cities</p>
+
+	    <TABLE BORDER="0" CELLPADDING="10">
+	      <TR>
+		<TD>
+		  <table border="3">
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+		      <th>Population</th>
+                    </tr>
+                    {% for user in users %}
+                    <tr>
+                      <td>{{user[0]}}</td>
+		      <td>{{user[1]}}</td>
+		      <td>{{user[2]}}</td>
+                    </tr>
+                    {% endfor %}
+		  </table>
+		</TD>
+	      </TR>
+	    </TABLE>
+
+        </div>
+	<form action="/multiple_users" method="POST">
+          <label for="name1">SELECT * FROM  </label><input type="text" name="name1" style="width:200px;" placeholder="テーブル名を入力してください">
+	  <label for="name2">  WHERE  </label><input type="text" name="name2" style="width:200px;" placeholder="検索条件を入力してください">
+	  <label for="name3"></label><select name="name3">
+	    <option value=""></option>
+	    <option value="or">or</option>
+	    <option value="and">and</option>
+	  </select>
+	  <label for="name4"></label><input type="text" name="name4" style="width:200px;" placeholder="検索条件2を入力してください">
+	  <div>
+            <input type="submit" value="検証">
+	  </div>
+	</form>
+        <hr>
+        <a href="/">Home</a>
+	<p><a href="/users">単一条件へ</a></p>
+    </body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+import sys
+import site
+
+# Add the site-packages of the chosen virtualenv to work with
+site.addsitedir('c:/python36/Lib/site-packages')
+
+# Add the app's directory to the PYTHONPATH
+sys.path.insert(0, 'C:/Users/kogaa/myproject/flask/app')
+
+from app import app as application

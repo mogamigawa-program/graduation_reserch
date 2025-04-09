@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}JOINまとめクイズ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>JOINまとめクイズ</h1>
+    <p>これまで学習した各種JOINの知識を確認しましょう！</p>
+
+    {% if submitted %}
+        <h2>結果</h2>
+        <p>あなたのスコア: <strong>{{ score }}/{{ total }}</strong></p>
+        <hr>
+    {% endif %}
+
+    <form method="POST">
+        {% for idx, question in enumerate(questions) %}
+            <div class="question">
+                <h3>問題 {{ idx + 1 }}</h3>
+                <p>{{ question['question'] }}</p>
+                <div class="choices">
+                    {% for i, choice in enumerate(question['choices']) %}
+                        <div class="choice-item">
+                            <input 
+                                type="radio" 
+                                name="answer_{{ idx }}" 
+                                id="answer_{{ idx }}_{{ i }}" 
+                                value="{{ choice }}"
+                                {% if submitted and user_answers.get("answer_" ~ idx) == choice %}checked{% endif %}
+                            >
+                            <label for="answer_{{ idx }}_{{ i }}">
+                                {{ ['A', 'B', 'C', 'D'][i] }}. {{ choice }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if submitted %}
+                    <div class="explanation">
+                        <p><strong>正解: </strong>{{ question['answer'] }}</p>
+                        <p><strong>解説: </strong>{{ question['explanation'] }}</p>
+                    </div>
+                {% endif %}
+            </div>
+            <hr>
+        {% endfor %}
+        {% if not submitted %}
+            <button type="submit">回答を送信</button>
+        {% else %}
+            <a href="/join_quiz" class="btn btn-primary">再挑戦</a>
+        {% endif %}
+    </form>
+</div>
+
+<hr>
+<a href="/multiple_table_join_study">戻る</a>
+
+{% endblock %}

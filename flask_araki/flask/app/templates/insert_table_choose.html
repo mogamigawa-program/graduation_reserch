@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}データを挿入するテーブルを選択する{% endblock %}
+{% block content %}
+<h1>データを挿入するテーブルを選択する</h1>
+
+<form action="{{ url_for('insert_table_choose') }}" method="post">
+    <select id="table_name" name="table_name" required>
+        {% for table in tables %}
+            <option value="{{ table }}">{{ table }}</option>
+        {% endfor %}
+    </select><br>
+    <button type="submit">テーブルを選択する</button>
+</form>
+
+<hr>
+<a href="/index">Home<a>
+{% endblock  %}

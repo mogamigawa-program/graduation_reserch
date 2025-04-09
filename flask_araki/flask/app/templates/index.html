@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>{{props.title}}</title>
+            <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        </head>
+        <body>
+            <!-- キャラクターと吹き出し -->
+            <div class="character-container">
+                <img src="{{ url_for('static', filename='character.png') }}" alt="キャラクター" class="character-img">
+                <div class="speech-bubble">
+                    <div class="scrolling-text">
+                        <p>{{props.msg}}</p>
+                    </div>
+                </div>                
+            </div>
+            <hr>
+
+            <!-- リンク一覧 -->
+            <ul>
+                <h1>学習</h1>
+                <li><a href="/choose">テーブル選択ページ</a></li>
+                <li><a href="/join">テーブル結合ページ</a></li>
+                <li><a href="/insert">INSERT文</a></li>
+                <li><a href="/delete/single">DELETE文</a></li>
+                <li><a href="/join_select">JOIN</a></li>
+                <li><a href="/update_select">UPDATE</a></li>
+                <li><a href="/aggregate_select">集約関数</a></li>
+                <li><a href="/organize_select">ソートとグループ化</a></li>
+            </ul>
+
+            <ul>
+                <h1>演習</h1>
+                <li><a href="/create_table">テーブル作成</a></li>
+                <li><a href="/insert_table_choose">データ挿入</a></li>
+                <li><a href="/delete_table_choose">データ削除</a></li>
+            </ul>
+
+            <ul>
+                <h1>クイズ</h1>
+                <li><a href="/quiz_progress">クイズ一覧・達成状況</a></li>
+            </ul>
+            
+            <hr>
+            <a href="/logout">ログアウト</a>
+        </body>
+    </html>
+</div>
+
+{% endblock %}

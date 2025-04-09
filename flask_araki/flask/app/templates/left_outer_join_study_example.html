@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}LEFT OUTER JOINの実行例ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>LEFT OUTER JOINの実行例</h1>
+
+    <!-- productsテーブルの中身を表示 -->
+    <table border="1">
+        <caption>products</caption>
+            <tr style="background-color: rgb(255, 123, 0);">
+                <th>商品ID</th>
+                <th>商品名</th>
+                <th>価格</th>
+                <th>在庫数</th>
+                <th>ステータス</th>
+            </tr>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- customersテーブルの中身を表示 -->
+    <table border="1">
+        <caption>customers</caption>
+            <tr style="background-color: rgb(0, 128, 255);">
+                <th>購入者ID</th>
+                <th>商品ID</th>
+                <th>購入日</th>
+            </tr>
+        <tr style="background-color: rgb(0, 128, 255);">
+            {% for col in customers_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in customers_data %}
+            <tr style="background-color: lightblue;">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+
+    <!-- LEFT OUTER JOINの結果表示 -->
+    {% if left_outer_join_result %}
+        <h2>LEFT OUTER JOINの結果</h2>
+        <p><strong>実行クエリ:</strong></p>
+        <p><code>
+            SELECT products.product_id, products.product_name, customers.customer_id, customers.order_date<br>
+            FROM products<br>
+            LEFT OUTER JOIN customers ON products.product_id = customers.product_id;
+        </code></p>
+        <p><strong>解説:</strong></p> 
+        <p>LEFT OUTER JOINを使用すると、左側のテーブル（ここではproducts）の全ての行が保持され、右側のテーブル（ここではcustomers）に一致する行がない場合はNULLが入ります。<br>そのため、productsテーブルの全ての行が結果に表示され、一部のcustomersテーブルに対応するデータがない場合はNULLが含まれる行が表示されます。</p>
+ 
+        <table border="1">
+            <tr>
+                <!-- カラム名を動的に表示 -->
+                {% for col in columns.split(',') %}
+                    <th 
+                        {% if 'products.' in col.strip() %} style="background-color: rgb(255, 123, 0);" {% endif %}
+                        {% if 'customers.' in col.strip() %} style="background-color: rgb(0, 128, 255);" {% endif %}
+                    >
+                        {{ col.strip() }}
+                    </th>
+                {% endfor %}
+            </tr>
+            {% for row in left_outer_join_result %}
+                <tr>
+                    {% for item in row %}
+                        <!-- 'columns'をスプリットしてループ中のカラム名に応じて背景色を設定 -->
+                        <td
+                            {% if 'products.' in columns.split(',')[loop.index0].strip() %} style="background-color: rgb(240, 184, 128);" {% endif %}
+                            {% if 'customers.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightblue;" {% endif %}
+                        >
+                            {{ item }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/left_outer_join_study">LEFT OUTER JOIN学習ページに戻る</a>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}GROUP BYの実行例ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>GROUP BYの実行例</h1>
+
+    <!-- salesテーブルの中身を表示 -->
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            <th>id</th>
+            <th>sale_date</th>
+            <th>product_name</th>
+            <th>category</th>
+            <th>quantity</th>
+            <th>price</th>
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- GROUP BYの結果表示 -->
+    {% if groupby_result %}
+        <h2>GROUP BYの結果</h2>
+        <p><strong>実行クエリ:</strong></p>
+        <p><code>
+            SELECT category, COUNT(*) AS total_items, SUM(quantity) AS total_quantity<br>
+            FROM sales<br>
+            GROUP BY category;
+        </code></p>
+        <p><strong>解説:</strong></p>
+    <p>GROUP BYを使用すると、指定したカラム（ここではcategory）ごとにデータをまとめ、各グループに対して集約関数を適用できます。この例では、カテゴリーごとの商品数（COUNT）と総数量（SUM）を計算しています。</p>
+
+    <h3>注意点:</h3>
+    <ul>
+        <li>
+            <strong>GROUP BYで使用するカラム:</strong><br>
+            SELECT句で指定するカラムは、以下のいずれかでなければなりません:
+            <ul>
+                <li>GROUP BY句で指定したカラム（ここでは<code>category</code>）。</li>
+                <li>集約関数（COUNT、SUM、AVG、MIN、MAXなど）が適用されているカラム。</li>
+            </ul>
+            それ以外のカラムをSELECT句に追加すると、エラーが発生します（SQLモードによります）。
+        </li>
+        <li>
+            <strong>集約関数の役割:</strong><br>
+            集約関数はグループ内のデータを集計するために使用されます。例えば:
+            <ul>
+                <li><code>COUNT(*)</code>: グループ内の行数を数える。</li>
+                <li><code>SUM(quantity)</code>: グループ内の<code>quantity</code>列の合計を計算する。</li>
+                <li><code>AVG(price)</code>: グループ内の<code>price</code>列の平均を計算する。</li>
+            </ul>
+        </li>
+        <li>
+            <strong>GROUP BYを使用しない場合との違い:</strong><br>
+            GROUP BYを使わない場合、集約関数はテーブル全体を対象にします。一方、GROUP BYを使うと、各グループごとに集約結果が計算されます。
+        </li>
+        <li>
+            <strong>GROUP BYの順序:</strong><br>
+            グループ化したいカラムは、必ずGROUP BY句に指定する必要があります。<br>
+            例: <code>GROUP BY category</code>では、<code>category</code>ごとにデータがグループ化されます。
+        </li>
+        <li>
+            <strong>HAVING句との違い:</strong><br>
+            WHERE句は集計前のデータにフィルタをかけますが、<code>HAVING</code>句は集計後のデータにフィルタをかけるために使用します。<br>
+            例: <code>HAVING SUM(quantity) > 100</code> は、<code>quantity</code>の合計が100を超えるグループのみを取得します。
+        </li>
+    </ul>
+
+        <table border="1">
+            <tr style="background-color: rgb(0, 128, 255);">
+                <th>category</th>
+                <th>total_items</th>
+                <th>total_quantity</th>
+            </tr>
+            {% for row in groupby_result %}
+                <tr style="background-color: lightblue;">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_groupby">GROUP BY学習ページに戻る</a>
+{% endblock %}

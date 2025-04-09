@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}insert{% endblock %}
+{% block content %}
+<h1>INSERT文</h1>
+<div class="insert">
+    <p>テーブルインサート例</p>
+    <pre>
+        <code>
+            INSERT INTO test (num, name) VALUES (1, 'John'); #カラム名の順番は任意で指定できる。
+            INSERT INTO test (name, num) VALUES ('John', 1); #これらのSQL文は同じ意味となる。
+        </code>
+    </pre>
+
+    <table border="1">
+        <caption>現在の{{ table_name }}の中身</caption>
+        <tr>
+            {% for row in desc %}
+                <th>{{ row[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in table %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <table border="1">
+        <caption>{{ table_name }}の定義</caption>
+        <tr>
+            <th>カラム名</th>
+            <th>データ型</th>
+            <th>Null</th>
+            <th>キー</th>
+            <th>デフォルト値</th>
+            <th>EXTRA</th>
+        </tr>
+        {% for row in desc %}
+            <tr>
+                {% for column in row %}
+                    <td>{{ column }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <p>実際にテーブルにレコードを挿入してみよう！</p>
+    <p>定義を見て制約に違反しないようにしよう！</p>
+    {% if error_message %}
+        <p style="color: red;">エラー: {{ error_message }}</p>
+    {% endif %}
+
+    {% if message %}
+        <p style="color: red;">更新: {{ message }}</p>
+    {% endif %}
+
+    <form action="{{ url_for('insert') }}" method="post" id="insert-form">
+        <p>INSERT INTO {{ table_name }}</p>
+        <label for="columns">(</label>
+        {% for row in desc %}
+            <input type="text" name="columns[]" placeholder="カラム名">
+            {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        <label for="columns">)</label>
+    
+        <p>VALUES </p>
+        <div id="values-container">
+            <div class="value-input">
+                <label for="values">(</label>
+                {% for row in desc %}
+                    <input type="text" name="values[]" placeholder="値">
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
+                <label for="values">);</label>
+            </div>
+        </div>
+        <p>SELECT * FROM {{ table_name }};</p>
+        <button type="submit" name="submit_button" value="result_btn">結果を表示する</button><br>
+        <button type="submit" name="submit_button" value="table_init_btn">テーブルを初期化する</button>
+    </form>
+</div>
+
+<hr>
+<a href="/index">Home<a>
+
+{% endblock  %}

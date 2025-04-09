@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}データ挿入{% endblock %}
+{% block content %}
+<h1>データ挿入</h1>
+<div class="insert_data_form">
+    <p>テーブルインサート例</p>
+    <pre>
+        <code>
+            INSERT INTO test (num, name) VALUES (1, 'John');
+        </code>
+    </pre>
+
+    <table border="1">
+        <caption>現在の{{ table_name }}の中身</caption>
+        <tr>
+            {% for row in desc %}
+                <th>{{ row[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in table %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <table border="1">
+        <caption>{{ table_name }}の定義</caption>
+        <tr>
+            <th>カラム名</th>
+            <th>データ型</th>
+            <th>Null</th>
+            <th>キー</th>
+            <th>デフォルト値</th>
+            <th>EXTRA</th>
+        </tr>
+        {% for row in desc %}
+            <tr>
+                {% for column in row %}
+                    <td>{{ column }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <div>テーブルに挿入するためのSQL文を入力してください</div>
+
+    {% if error_message %}
+        <p style="color: red;">エラー: {{ error_message }}</p>
+    {% endif %}
+
+    {% if message %}
+        <p style="color: red;">更新: {{ message }}</p>
+    {% endif %}
+    
+    <form action="{{ url_for('insert_table') }}" method="post" id="insert-form">
+        <p>INSERT INTO {{ table_name }}</p>
+        <label for="columns">(</label>
+        {% for row in desc %}
+            <input type="text" name="columns[]" placeholder="カラム名" required>
+            {% if not loop.last %}, {% endif %}
+        {% endfor %}
+        <label for="columns">)</label>
+    
+        <p>VALUES </p>
+        <div id="values-container">
+            <div class="value-input">
+                <label for="values">(</label>
+                {% for row in desc %}
+                    <input type="text" name="values[]" placeholder="値" required>
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
+                <label for="values">)</label>
+            </div>
+        </div>
+    
+        <button type="button" onclick="addValue()">値を追加</button>
+        <button type="submit">データを挿入</button>
+    </form>
+    
+    <script>
+        const numColumns = {{ desc|length }};
+        const valuesContainer = document.getElementById('values-container');
+        const form = document.getElementById('insert-form');  // 修正: フォームを正しく取得
+    
+        function addValue() {
+            const newValueDiv = document.createElement('div');
+            newValueDiv.className = 'value-input';
+    
+            const labelValue = document.createElement('label');
+            labelValue.textContent = ', (';
+            newValueDiv.appendChild(labelValue);
+    
+            for (let i = 0; i < numColumns; i++) {
+                const inputValue = document.createElement('input');
+                inputValue.type = 'text';
+                inputValue.name = `values[]`;
+                inputValue.placeholder = '値';
+                newValueDiv.appendChild(inputValue);
+    
+                if (i < numColumns - 1) {
+                    const comma = document.createElement('span');
+                    comma.textContent = ', ';
+                    newValueDiv.appendChild(comma);
+                }
+            }
+    
+            const labelClose = document.createElement('label');
+            labelClose.textContent = ')';
+            newValueDiv.appendChild(labelClose);
+    
+            const removeValueBtn = document.createElement('button');
+            removeValueBtn.type = 'button';
+            removeValueBtn.textContent = '値を削除';
+            removeValueBtn.onclick = function() {
+                removeValue(newValueDiv);
+            };
+            newValueDiv.appendChild(removeValueBtn);
+    
+            valuesContainer.appendChild(newValueDiv);
+        }
+    
+        function removeValue(valueDiv) {
+            valuesContainer.removeChild(valueDiv);
+        }
+    
+        // 修正: フォームが送信される前に null を設定
+        form.addEventListener('submit', function() {
+            const inputValues = form.querySelectorAll('input[name="values[]"]');
+            inputValues.forEach(function(inputValue) {
+                if (inputValue.value.trim() === '') {
+                    inputValue.value = null;
+                }
+            });
+        });
+    </script>
+</div>
+
+
+<hr>
+<a href="/insert_table_choose">テーブル選択に戻る<a><br>
+<a href="/index">Home<a>
+{% endblock  %}

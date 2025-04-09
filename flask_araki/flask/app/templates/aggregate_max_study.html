@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}MAX関数の学習ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>MAX関数</h1>
+    
+    <p><strong>MAX関数とは:</strong> MAX関数は、指定した列の中で最大値を返すSQL集約関数です。</p>
+
+    <p><strong>基本的な構文:</strong>
+        <code>
+        SELECT MAX({カラム名}) AS `{エイリアス名}` FROM {テーブル名};
+        </code>
+    </p>
+
+    <p><strong>例:</strong> 例えば、<code>sales</code>テーブルで価格の最大値を取得する場合、<br><code>SELECT MAX(price) AS 'max_price' FROM sales;</code>のように実行します。</p>
+
+    <p><strong><a href="/aggregate_max_advance">MAX関数のクエリを全文書いてみよう！<a></a></strong></p>
+
+    <p><strong><a href="/aggregate_max_quiz">MAX関数の理解度チェック！<a></a></strong></p>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST">
+        <p>SELECT MAX(</p>
+        <div id="max-columns-container">
+            <div class="max-column-group">
+                <select name="max_column" required>
+                    {% for col in sales_desc %}
+                        <option value="{{ col[0] }}">{{ col[0] }}</option>
+                    {% endfor %}
+                </select>
+                <label for="as_column"><p>) AS</p></label>
+                <input type="text" name="as_column" placeholder="例: Max Value" required>
+            </div>
+        </div>
+        <p>FROM sales</p>
+
+        <!-- WHEREを使用するチェックボックス -->
+        <div>
+            <input type="checkbox" id="use_where" onclick="toggleWhereInput()">
+            <label for="use_where">WHEREを使用する</label>
+        </div>
+
+        <!-- WHERE句の入力ボックス（デフォルトでは非表示） -->
+        <div id="where-condition" style="display: none;">
+            <label for="where_clause">WHERE</label>
+            <input type="text" id="where_clause" name="where_clause" placeholder="例: price > 1000">
+            <p style="color: red; font-size: 0.9em;">
+                注意: WHERE句には集約関数（COUNT、SUM、AVGなど）は使用できません。<br>
+                集約関数に条件を適用する場合、HAVING句を使用してください。HAVING句は"ソートとグループ化"で学びます。
+            </p>
+            <p style="color: red; font-size: 0.9em;">
+            集約関数に条件を適用する場合の例：<br>SELECT MAX(price) AS max_price 
+            FROM sales 
+            GROUP BY category 
+            HAVING MAX(price) > 1000;
+            </p>
+        </div>
+        <button type="button" onclick="addMaxColumn()">カラムを追加</button>
+        <br><br>
+        <button type="submit">MAXを実行</button>
+    </form>
+
+   {% if max_result %}
+    <h2>MAXの結果</h2>
+    <p><strong>実行クエリ:</strong> {{ max_query }}</p>
+    <table border="1">
+        <tr style="background-color: rgba(238, 0, 255, 0.664);">
+            {% for col in max_query.split('FROM')[0].split(',') %}
+                {% set alias = col.split('AS')[-1].strip().strip('` ') %}
+                <th>{{ alias }}</th>
+            {% endfor %}
+        </tr>        
+        <tr style="background-color: rgba(238, 0, 255, 0.313);">
+            {% for item in max_result[0] %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+    {% endif %}
+</div>
+
+<script>
+    function addMaxColumn() {
+        const container = document.getElementById('max-columns-container');
+        const newMaxColumn = document.createElement('div');
+        newMaxColumn.classList.add('max-column-group');
+        newMaxColumn.innerHTML = `
+            <p>, MAX(</p>
+            <select name="max_column" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+            <label for="as_column"><p>)AS</p></label>
+            <input type="text" name="as_column" placeholder="例: Max Value" required>
+        `;
+        container.appendChild(newMaxColumn);
+    }
+
+    function toggleWhereInput() {
+        const whereCondition = document.getElementById('where-condition');
+        whereCondition.style.display = whereCondition.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+
+<hr>
+<a href="/aggregate_select">戻る</a>
+{% endblock %}

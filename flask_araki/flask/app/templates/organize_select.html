@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}ソートとグループ化の学習ページ選択{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>ソートとグループ化の学習ページ</h1>
+    <p>下記の学習項目を選んでください:</p>
+
+    <ul>
+        <li><a href="{{ url_for('organize_groupby') }}">GROUP BY句</a></li>
+        <li><a href="{{ url_for('organize_having') }}">HAVING句</a></li>
+        <li><a href="{{ url_for('organize_orderby') }}">ORDER BY句</a></li>
+    </ul>
+</div>
+
+<hr>
+<a href="/index">Home<a>
+{% endblock %}

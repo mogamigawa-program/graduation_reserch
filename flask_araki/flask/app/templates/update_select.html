@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}UPDATEの学習ページ選択{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>UPDATEの学習ページ</h1>
+    <p>下記のUPDATEの学習項目を選んでください:</p>
+
+    <ul>
+        <li><a href="{{ url_for('update_single_study') }}">1つのカラムに1つの条件</a></li>
+        <li><a href="{{ url_for('update_multiple_study') }}">複数のカラムに複数の条件</a></li>
+        <li><a href="{{ url_for('update_all_column_study') }}">全レコード更新</a></li>
+        <li><a href="{{ url_for('update_join') }}">(応用)JOINを用いたUPDATE</a></li>
+    </ul>
+</div>
+
+<hr>
+<a href="/index">Home<a>
+{% endblock %}
