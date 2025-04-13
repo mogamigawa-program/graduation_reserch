@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}UPDATEの学習ページ{% endblock %}
+{% block content %}
+    <div class="container">
+
+    <h1>1つのカラムに対して1つの条件でレコードをUPDATE</h1>
+
+    <p><strong>UPDATE文とは:</strong> UPDATE文は、データベース内の既存のデータを変更するためのSQLコマンドです。指定したテーブルの行に対して、新しい値を設定する際に使用されます。UPDATEは、条件を指定することで、特定のデータのみを更新することが可能です。</p>
+
+    <p><strong>基本的な構文:</strong>
+    <code>
+    UPDATE {テーブル名}
+    SET {カラム名 = 新しい値}
+    WHERE {条件};
+    </code>
+    </p>
+
+    <p><strong>SET句の使用:</strong> 更新したいカラムと新しい値を指定します。複数カラムを一度に更新することが可能です。</p>
+
+    <p><strong>WHERE句の使用:</strong> 更新対象の行を絞り込む条件を指定します。これを省略すると、すべての行が更新されるため、注意が必要です。</p>
+
+    <p><strong><a href="/update_single_study_example">実行例はこちら<a></a></strong></p>
+
+    <!-- エラーメッセージの表示 -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- 成功メッセージの表示 -->
+    {% if message %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %}
+
+    <!-- productsテーブルの中身を表示 -->
+    <table border="1">
+        <caption>productsテーブル</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST">
+        <p>UPDATE products</p>
+        <p>SET
+            <select name="column_to_update" required>
+                {% for col in products_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+            =
+            <input type="text" name="new_value" placeholder="新しい値" required>
+        </p>
+        <p>WHERE
+            <select name="condition_column" required>
+                {% for col in products_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+            =
+            <input type="text" name="condition_value" placeholder="条件の値" required>
+        </p>
+        <button type="submit" name="button_val" value="update_record_btn">実行する</button>
+
+        <!-- 1つ前の状態に戻すボタン -->
+        <button type="submit" name="button_val" value="restore_backup_btn" onclick="return handleReset()">1つ前の状態に戻す</button>
+
+        <!-- テーブルを初期化するボタン -->
+        <button type="submit" name="button_val" value="table_init_btn" onclick="return handleReset()">テーブルを初期状態に戻す</button>
+    </form>
+</div>
+
+<script>
+    function handleReset() { 
+        // すべての input と select フィールドを取得
+        const inputs = document.querySelectorAll('form input, form select');
+        
+        // 各フィールドから 'required' 属性を削除
+        inputs.forEach(input => input.removeAttribute('required'));
+
+        // フォームを送信する
+        return true;
+    }
+</script>
+
+<br>
+<a href="/update_select">戻る</a>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}集約関数に関する注意事項{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>集約関数に関する注意事項</h1>
+
+    <p>SQLの集約関数（COUNT、SUM、AVG、MIN、MAXなど）を使用する際には、いくつかの重要な注意点があります。以下にその注意事項を示します。</p>
+
+    <h2 style="color: red;">1. WHERE句で集約関数は使用できない</h2>
+    <p>WHERE句は、行単位で条件を指定するためのものであり、集約関数を直接使用することはできません。集約関数に条件を適用する場合は、<strong>HAVING句</strong>を使用する必要があります。</p>
+    <p>例えば、次のようなクエリはエラーになります:</p>
+    <pre>
+    SELECT MAX(price) FROM sales WHERE MAX(price) > 1000;
+    </pre>
+    <p>代わりに、<strong>HAVING句</strong>を使用して条件を指定します:</p>
+    <pre>
+    SELECT MAX(price) AS max_price FROM sales GROUP BY category HAVING MAX(price) > 1000;
+    </pre>
+
+    <h3>WHERE句とHAVING句の違い</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>WHERE句</th>
+                <th>HAVING句</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>行単位で条件を指定</td>
+                <td>集約結果に条件を指定</td>
+            </tr>
+            <tr>
+                <td>集約関数は使用できない</td>
+                <td>集約関数を使用可能</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 style="color: red;">2. 集約関数と通常のカラムを同時に使用できない</h2>
+    <p>集約関数を使用する場合、その結果と通常のカラムを同時に選択するには、GROUP BY句を使用する必要があります。</p>
+    <p>例えば、次のクエリはエラーになります:</p>
+    <pre>
+    SELECT MAX(price), product_name FROM sales;
+    </pre>
+    <p>このような場合、GROUP BY句を使用して、どのカラムでグループ化するかを指定します:</p>
+    <pre>
+    SELECT MAX(price), category FROM sales GROUP BY category;
+    </pre>
+
+    <h3>集約関数とGROUP BYの使用例</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>誤ったクエリ</th>
+                <th>正しいクエリ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SELECT MAX(price), product_name FROM sales;</td>
+                <td>SELECT MAX(price), category FROM sales GROUP BY category;</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 style="color: red;">3. GROUP BY句との組み合わせ</h2>
+    <p>集約関数を使用する場合、通常はGROUP BY句と組み合わせて使います。GROUP BY句は、指定したカラムごとにデータをグループ化し、そのグループごとに集約関数を適用します。</p>
+    <p>例えば、カテゴリーごとに最小価格を求めるには、次のように書きます:</p>
+    <pre>
+    SELECT category, MIN(price) AS min_price FROM sales GROUP BY category;
+    </pre>
+
+    <h2 style="color: red;">4. 集約関数の使用時にORDER BYを使いたい場合</h2>
+    <p>集約関数を使う場合、ORDER BY句を使用して結果を並べ替えることも可能です。例えば、カテゴリーごとの最小価格を降順で表示する場合:</p>
+    <pre>
+    SELECT category, MIN(price) AS min_price FROM sales GROUP BY category ORDER BY min_price DESC;
+    </pre>
+
+</div>
+
+<hr>
+<a href="/aggregate_select">戻る</a>
+{% endblock %}

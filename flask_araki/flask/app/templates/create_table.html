@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}テーブル作成{% endblock %}
+{% block content %}
+<h1>テーブル作成</h1>
+<div class="create_table_form">
+    <p>テーブル作成例</p>
+    <pre>
+        <code>
+            create table test
+            (
+                num int, # カラム名 データ型
+                name char(32), # カラム名 データ型
+                PRIMARY KEY(num) # 制約
+            );
+        </code>
+    </pre>
+    
+    <div>テーブル作成のSQL文を入力してください</div>
+    <form action="{{ url_for('create_table') }}" method="post">
+        <label for="table_name">create table</label>
+        <input type="text" id="table_name" name="table_name" placeholder="テーブル名" required><br>
+        <p> (</p>
+        <div id="columns-container">
+            <div class="column-input">
+                <label for="columns"></label>
+                <input type="text" name="columns[]" placeholder="カラム名" required>
+
+                <label for="data_types"></label>
+                <input type="text" name="data_types[]" placeholder="データ型" required>
+            </div>
+        </div>
+
+        <div id="constraints-container">
+             <div class="constraint-input">
+                <label for="constraints"></label>
+                
+             </div>
+        </div>
+
+        <p>);</p>
+        <p>(注)カラム名とデータ型の間には半角スペースを追加します。</p>
+
+        <button type="button" onclick="addColumn()">カラムを追加</button>
+        <button type="button" onclick="addConstraint()">制約を追加</button>
+        <button type="submit">テーブルを作成</button>
+    </form>
+
+    <script>
+        function addColumn() {
+            const columnsContainer = document.getElementById('columns-container');
+            const newColumnDiv = document.createElement('div');
+            newColumnDiv.className = 'column-input';
+            
+            const labelColumnName = document.createElement('label');
+            labelColumnName.textContent = ',';
+            newColumnDiv.appendChild(labelColumnName);
+    
+            const inputColumnName = document.createElement('input');
+            inputColumnName.type = 'text';
+            inputColumnName.name = 'columns[]';
+            inputColumnName.placeholder = 'カラム名';
+            inputColumnName.required = true;
+            newColumnDiv.appendChild(inputColumnName);
+    
+            const labelDataType = document.createElement('label');
+            labelDataType.textContent = '';
+            newColumnDiv.appendChild(labelDataType);
+    
+            const inputDataType = document.createElement('input');
+            inputDataType.type = 'text';
+            inputDataType.name = 'data_types[]';
+            inputDataType.placeholder = 'データ型';
+            inputDataType.required = true;
+            newColumnDiv.appendChild(inputDataType);
+    
+            const removeColumnBtn = document.createElement('button');
+            removeColumnBtn.type = 'button';
+            removeColumnBtn.textContent = 'カラムを削除';
+            removeColumnBtn.onclick = function() {
+                removeColumn(newColumnDiv);
+            };
+            newColumnDiv.appendChild(removeColumnBtn);
+    
+            columnsContainer.appendChild(newColumnDiv);
+        }
+    
+        function addConstraint() {
+            const constraintsContainer = document.getElementById('constraints-container');
+            const newConstraintDiv = document.createElement('div');
+            newConstraintDiv.className = 'constraint-input';
+    
+            const labelConstraint = document.createElement('label');
+            labelConstraint.textContent = ',';
+            newConstraintDiv.appendChild(labelConstraint);
+    
+            const inputConstraint = document.createElement('input');
+            inputConstraint.type = 'text';
+            inputConstraint.name = 'constraints[]';
+            inputConstraint.placeholder = '制約';
+            newConstraintDiv.appendChild(inputConstraint);
+    
+            const removeConstraintBtn = document.createElement('button');
+            removeConstraintBtn.type = 'button';
+            removeConstraintBtn.textContent = '制約を削除';
+            removeConstraintBtn.onclick = function() {
+                removeConstraint(newConstraintDiv);
+            };
+            newConstraintDiv.appendChild(removeConstraintBtn);
+    
+            constraintsContainer.appendChild(newConstraintDiv);
+        }
+    
+        function removeConstraint(constraintDiv) {
+            const constraintsContainer = document.getElementById('constraints-container');
+            constraintsContainer.removeChild(constraintDiv);
+        }
+    
+        function removeColumn(columnDiv) {
+            const columnsContainer = document.getElementById('columns-container');
+            columnsContainer.removeChild(columnDiv);
+        }
+    </script>
+    
+</div>
+
+
+<hr>
+<a href="/index">Home<a>
+{% endblock  %}

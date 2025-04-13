@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}ORDER BY句の実行例ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>ORDER BY句の実行例</h1>
+
+    <!-- salesテーブルの中身を表示 -->
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            <th>id</th>
+            <th>sale_date</th>
+            <th>product_name</th>
+            <th>category</th>
+            <th>quantity</th>
+            <th>price</th>
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- ORDER BY句の結果表示 -->
+    {% if orderby_result %}
+        <h2>ORDER BY句の結果</h2>
+        <p><strong>実行クエリ:</strong></p>
+        <p><code>
+            SELECT product_name, category, quantity, price<br>
+            FROM sales<br>
+            ORDER BY price DESC, quantity ASC;
+        </code></p>
+        <p><strong>解説:</strong></p>
+        <p>ORDER BY句を使用すると、指定したカラムを基準にしてデータを並び替えることができます。この例では、まず<code>price</code>（価格）を降順（DESC）で並べ、次に<code>quantity</code>（数量）を昇順（ASC）で並べています。</p>
+
+        <table border="1">
+            <tr style="background-color: rgb(0, 128, 255);">
+                <th>product_name</th>
+                <th>category</th>
+                <th>quantity</th>
+                <th>price</th>
+            </tr>
+            {% for row in orderby_result %}
+                <tr style="background-color: lightblue;">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_orderby">ORDER BY句学習ページに戻る</a>
+{% endblock %}

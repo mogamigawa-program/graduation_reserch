@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}HAVINGの学習ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>HAVING</h1>
+
+    <p><strong>HAVINGとは:</strong> HAVING句は、GROUP BY句でグループ化された結果に対して条件を指定するためのSQLの構文です。WHERE句と異なり、集約関数を使用した条件を指定できます。</p>
+
+    <p><strong>基本的な構文:</strong>
+        <code>
+        SELECT {カラム1}, {集約関数(カラム2)} FROM sales GROUP BY {カラム1} HAVING {条件};
+        </code>
+    </p>
+
+    <p><strong>例:</strong> salesテーブルでカテゴリごとの平均数量が10以上のグループを表示する場合:<br>
+    <code>SELECT category, AVG(quantity) AS 'avg_quantity' FROM sales GROUP BY category HAVING AVG(quantity) >= 10;</code></p>
+
+    <p><strong><a href="/organize_having_example">HAVING句の実行例はこちら<a></a></strong></p>
+    
+    <p><strong><a href="/organize_having_advance">HAVING句のクエリを全文書いてみよう！<a></a></strong></p>
+    
+    <p><strong><a href="/organize_having_quiz">HAVING句の理解度チェック！<a></a></strong></p>
+
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST" id="havingForm">
+        <p>SELECT</p>
+        <div id="select-columns-container">
+            <!-- カラムや集約関数を動的に追加する領域 -->
+        </div>
+        <p>FROM sales</p>
+
+        <p>GROUP BY</p>
+        <select name="group_column" required>
+            {% for col in sales_desc %}
+                <option value="{{ col[0] }}">{{ col[0] }}</option>
+            {% endfor %}
+        </select>
+
+        <p><input type="checkbox" id="havingCheckbox" onclick="toggleHaving()"> HAVINGを使用する</p>
+
+        <div id="havingClauseContainer" style="display:none;">
+            <label for="havingCondition"><p>HAVING</p></label>
+            <input type="text" name="having_condition" placeholder="例: AVG(quantity) >= 10">
+        </div>
+
+        <button type="button" onclick="addColumn()">カラムを追加</button>
+        <button type="button" onclick="addAggregateFunction()">集約関数を追加</button>
+        <br><br>
+        <button type="submit">HAVINGを実行</button>
+    </form>
+
+    {% if having_result %}
+    <h2>HAVINGの結果</h2>
+    <p><strong>実行クエリ:</strong> {{ having_query }}</p>
+    <table border="1">
+        <tr style="background-color: rgba(0, 123, 255, 0.664);">
+            {% for col in having_query.split('SELECT')[1].split('FROM')[0].split(',') %}
+                {% set alias = col.split('AS')[-1].strip().strip('` ') %}
+                <th>{{ alias }}</th>
+            {% endfor %}
+        </tr>        
+        {% for row in having_result %}
+            <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>    
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_select">戻る</a>
+
+<script>
+    // カラムと集約関数のカウンター
+    let columnCount = 0;
+    let aggregateCount = 0;
+
+    function addColumn() {
+        columnCount++;
+        const container = document.getElementById('select-columns-container');
+        const newColumn = document.createElement('div');
+        newColumn.classList.add('column-group');
+        newColumn.innerHTML = `
+            <p>${columnCount > 1 ? ',' : ''}</p>
+            <select name="columns[]" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+        `;
+        container.appendChild(newColumn);
+    }
+
+    function addAggregateFunction() {
+        aggregateCount++;
+        const container = document.getElementById('select-columns-container');
+        const newAggregate = document.createElement('div');
+        newAggregate.classList.add('aggregate-group');
+        newAggregate.innerHTML = `
+            <p>${columnCount + aggregateCount > 1 ? ',' : ''}</p>
+            <select name="aggregate_function[]" required>
+                <option value="COUNT">COUNT</option>
+                <option value="SUM">SUM</option>
+                <option value="AVG">AVG</option>
+                <option value="MIN">MIN</option>
+                <option value="MAX">MAX</option>
+            </select>
+            <select name="aggregate_column[]" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+            <label for="as_column"><p>AS</p></label>
+            <input type="text" name="as_column[]" placeholder="例: Aggregated Result" required>
+        `;
+        container.appendChild(newAggregate);
+    }
+
+    // HAVING句を表示/非表示にする関数
+    function toggleHaving() {
+        const havingContainer = document.getElementById('havingClauseContainer');
+        havingContainer.style.display = document.getElementById('havingCheckbox').checked ? 'block' : 'none';
+    }
+</script>
+
+{% endblock %}

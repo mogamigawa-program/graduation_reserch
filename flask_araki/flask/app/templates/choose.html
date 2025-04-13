@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{props.title}}</title>
+    </head>
+    <body>
+        <div id="contents">
+            <p>{{props.msg}}</p>
+        </div>
+
+	<table>
+	  <tr>
+	    <td><h>SELECT * FROM</h></td>
+	    <form action="/choose" method="post">
+	    <p>
+	    <td><select name="table" required>
+	    <option value="cities">cities</option>
+	    <option value="primary school">pschool</option>
+	    <option value="sisya">sisya</option></td>
+	    </select>
+	    </p>
+	  </tr>
+	</table>
+	<p><input type="submit" value="送信する"></p>
+	</form>
+
+	<hr>
+        <a href="/">Home</a>
+    </body>
+</html>
+
+{% endblock %}

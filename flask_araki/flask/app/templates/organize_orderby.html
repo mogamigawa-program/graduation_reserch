@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}ORDER BYの学習ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>ORDER BY</h1>
+
+    <p><strong>ORDER BYとは:</strong> ORDER BY句は、クエリの結果を特定のカラムに基づいて昇順または降順に並べ替えるためのSQLの構文です。</p>
+
+    <p><strong>基本的な構文:</strong>
+        <code>
+        SELECT {カラム1}, {カラム2} FROM sales ORDER BY {カラム1} ASC, {カラム2} DESC;
+        </code>
+    </p>
+
+    <p><strong>例:</strong> salesテーブルを数量（quantity）で昇順、価格（price）で降順に並べ替える場合:<br>
+    <code>SELECT * FROM sales ORDER BY quantity ASC, price DESC;</code></p>
+
+    <p><strong><a href="/organize_orderby_example">ORDER BY句の実行例はこちら<a></a></strong></p>
+
+    <p><strong><a href="/organize_orderby_advance">ORDER BY句のクエリを全文書いてみよう！<a></a></strong></p>
+
+    <p><strong><a href="/organize_orderby_quiz">ORDER BY句の理解度チェック！<a></a></strong></p>
+
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST" id="orderForm">
+        <p>SELECT</p>
+        <div id="select-columns-container">
+            <!-- 動的にカラムを追加する領域 -->
+        </div>
+
+        <p>FROM sales</p>
+
+        <p>ORDER BY</p>
+        <div id="order-by-container">
+            <!-- 動的にORDER BY句を追加する領域 -->
+        </div>
+
+        <button type="button" onclick="addColumn()">カラムを追加</button>
+        <button type="button" onclick="addOrderBy()">ORDER BY句を追加</button>
+        <br><br>
+        <button type="submit">ORDER BYを実行</button>
+    </form>
+
+    {% if order_result %}
+    <h2>ORDER BYの結果</h2>
+    <p><strong>実行クエリ:</strong> {{ order_query }}</p>
+    <table border="1">
+        <tr style="background-color: rgba(0, 123, 255, 0.664);">
+            {% for col in order_query.split('SELECT')[1].split('FROM')[0].split(',') %}
+                <th>{{ col.strip() }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in order_result %}
+            <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_select">戻る</a>
+
+<script>
+    let columnCount = 0;
+    let orderCount = 0;
+
+    function addColumn() {
+        columnCount++;
+        const container = document.getElementById('select-columns-container');
+        const newColumn = document.createElement('div');
+        newColumn.innerHTML = `
+            <select name="columns[]" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+        `;
+        container.appendChild(newColumn);
+    }
+
+    function addOrderBy() {
+        orderCount++;
+        const container = document.getElementById('order-by-container');
+        const newOrderBy = document.createElement('div');
+        newOrderBy.innerHTML = `
+            <select name="order_columns[]" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+            <select name="order_directions[]" required>
+                <option value="ASC">ASC</option>
+                <option value="DESC">DESC</option>
+            </select>
+        `;
+        container.appendChild(newOrderBy);
+    }
+</script>
+
+{% endblock %}

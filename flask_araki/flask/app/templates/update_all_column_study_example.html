@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}全レコード更新の実行例ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>全レコード更新の実行例</h1>
+
+    <!-- productsテーブルの中身を表示 -->
+    <table border="1">
+        <caption>products (更新前)</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+<div class="container">
+    <!-- UPDATEクエリの実行結果表示 -->
+    {% if update_result %}
+        <h2>UPDATEの実行結果</h2>
+        <p><strong>実行クエリ:</strong></p>
+        <p><code>
+            UPDATE products<br>
+            SET {{ update_column }} = '{{ new_value }}';
+        </code></p>
+
+        <p><strong>解説:</strong></p>
+        <p>このUPDATEクエリは、`products`テーブルの全てのレコードに対して`{{ update_column }}`カラムの値を`{{ new_value }}`に更新します。
+            <br>今回の例では、全てのレコードの`status`が`discontinued`に設定されます。
+        </p>
+
+        <!-- 更新後のproductsテーブルの中身を表示 -->
+        <table border="1">
+            <caption>products (更新後)</caption>
+            <tr style="background-color: rgb(255, 123, 0);">
+                {% for col in products_desc %}
+                    <th>{{ col[0] }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in updated_products_data %}
+                <tr style="background-color: rgb(240, 184, 128);">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/update_select">戻る</a>
+{% endblock %}

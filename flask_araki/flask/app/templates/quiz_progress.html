@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}クイズ進捗状況{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>クイズ進捗状況</h1>
+
+    <!-- 全体の進捗率を表示 -->
+    <h2>全体の達成率: {{ progress_rate }}%</h2>
+    <h2>{{ progress_dict|length }}/{{ quiz_list|length }} クイズ完了</h2>
+
+    <!-- クイズごとの進捗詳細 -->
+    <table border="1" class="table table-striped">
+        <thead>
+            <tr>
+                <th>クイズ名</th>
+                <th>スコア</th>
+                <th>正答率 (%)</th>
+                <th>挑戦</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz in quiz_list %}
+                <tr>
+                    <td>{{ quiz.quiz_name }}</td>
+                    <td>
+                        {% if quiz.id in progress_dict %}
+                            {{ progress_dict[quiz.id].score }}/{{ quiz.total_questions }}
+                        {% else %}
+                            0/{{ quiz.total_questions }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if quiz.id in progress_dict %}
+                        {{ ("%.2f"|format((progress_dict[quiz.id].score / quiz.total_questions) * 100)) }}%
+
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if quiz.id in quiz_files %}
+                            <a href="/{{ quiz_files[quiz.id] }}" class="btn btn-primary">挑戦する</a>
+                        {% else %}
+                            <span class="text-danger">ファイルが見つかりません</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+<a href="/">トップに戻る</a>
+
+{% endblock %}

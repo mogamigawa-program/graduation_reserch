@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}GROUP BYの学習ページ（高度版）{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>GROUP BY句（実践）</h1>
+
+    <p><strong>このページでは、SQLクエリを自由に記述して実行できます。</strong></p>
+    <p style="color: red;"><strong>GROUP BY句を用いたクエリをヒントを参考に書いてみましょう！</strong></p>
+    <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
+
+
+    <!-- salesテーブルの中身を表示 -->
+    <h2>salesテーブルの内容</h2>
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- ヒントの追加 -->
+     <div class="hints">
+        <h2>ヒント</h2>
+        
+        <!-- ヒント1: SELECTについて -->
+        <details>
+            <summary style="color: blue;">ヒント1</summary>
+            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
+            <p>例：SELECT ...;</p>
+        </details>
+    
+        <!-- ヒント2: カラムとASについて -->
+        <details>
+            <summary style="color: blue;">ヒント2</summary>
+            <p>カラムは、テーブルから選択するフィールドです。ASはエイリアスを指定するために使用します。<br>
+                複数のカラムを使用するときは、","で区切りましょう。</p>
+            <p>例：SELECT category, AVG(quantity) AS 'avg_quantity', AVG(price) AS 'avg_price' ...;</p>
+        </details>
+    
+        <!-- ヒント3: FROM salesについて -->
+        <details>
+            <summary style="color: blue;">ヒント3</summary>
+            <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではsalesテーブルを使っています。</p>
+            <p>例：SELECT category, AVG(quantity) AS 'avg_quantity', AVG(price) AS 'avg_price' FROM sales ...;</p>
+        </details>
+    
+        <!-- ヒント4: GROUP BYについて -->
+        <details>
+            <summary style="color: blue;">ヒント4</summary>
+            <p>GROUP BYは、データを特定のカラムでグループ化するために使用されます。</p>
+            <p>例：SELECT category, AVG(quantity) AS 'avg_quantity', AVG(price) AS 'avg_price' FROM sales GROUP BY category;</p>
+        </details>
+    </div>
+    
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
+        <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
+        <br>
+        <button type="submit">クエリを実行</button>
+    </form>
+
+    {% if query %}
+        <h2>実行したクエリ</h2>
+        <p><code>{{ query }}</code></p>
+    {% endif %}
+
+    {% if query_result %}
+        <h2>クエリ結果</h2>
+        <table border="1">
+            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+                {% for col in query_result["columns"] %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in query_result["data"] %}
+                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_groupby">戻る</a>
+
+{% endblock %}

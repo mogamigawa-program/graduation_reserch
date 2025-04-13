@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+    body { font-family: Arial, sans-serif; }
+    .menu { margin: 20px; }
+    .menu-item { cursor: pointer; color: blue; text-decoration: underline; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <div class="menu">
+        {% if index_item %}
+        <ul>
+            {% for item in index_item %}
+                <li class="menu-item">
+                    <a href="/index/{{ item }}?flag=normal">{{ item }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% elif normal_index_item %}
+        <ul>
+            {% for item in normal_index_item %}
+                <li class="menu-item">
+                    <a href="/index/{{ item }}?flag=min">{{ item }}</a>
+                </li>
+            {% endfor %}
+        </ul>            
+        {% elif min_index_item %}
+        <ul>
+            {% for item in min_index_item %}
+                <li class="menu-item">
+                    <a href="{{ item['url'] }}">{{ item['name'] }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    
+    <hr>
+    <a href="/index">ホーム</a><br>
+    <a href="/logout">ログアウト</a>
+</body>
+</html>

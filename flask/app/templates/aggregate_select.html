@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}集約関数の学習ページ選択{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>集約関数の学習ページ</h1>
+    <p>下記の学習項目を選んでください:</p>
+
+    <ul>
+        <li><a href="{{ url_for('aggregate_notes') }}">集約関数の注意事項</a></li>
+        <li><a href="{{ url_for('aggregate_count_study') }}">COUNT</a></li>
+        <li><a href="{{ url_for('aggregate_sum_study') }}">SUM</a></li>
+        <li><a href="{{ url_for('aggregate_avg_study') }}">AVG</a></li>
+        <li><a href="{{ url_for('aggregate_max_study') }}">MAX</a></li>
+        <li><a href="{{ url_for('aggregate_min_study') }}">MIN</a></li>
+    </ul>
+</div>
+
+<hr>
+<a href="/index">Home<a>
+{% endblock %}
