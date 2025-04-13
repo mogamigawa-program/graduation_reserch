@@ -1,0 +1,190 @@
+/* 全体のスタイル調整 */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* コンテナのスタイリング */
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* タイトル */
+h1 {
+    font-size: 24px;
+    color: #0056b3;
+    border-bottom: 2px solid #0056b3;
+    padding-bottom: 10px;
+}
+
+/* テーブルのスタイル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table caption {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+}
+
+table th {
+    background-color: #007bff;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* ボタンのスタイル */
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* フォーム内の要素 */
+form input, form select, form textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form input[type="checkbox"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+/* ヒントのスタイル */
+.hints details {
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.hints summary {
+    font-weight: bold;
+    cursor: pointer;
+    color: #007bff;
+}
+
+/*index.htmlにキャラクターを表示*/
+.character-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.character-img {
+    width: 100px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.speech-bubble {
+    position: relative;
+    background: #f1f1f1;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 16px;
+    color: #333;
+    max-width: 70%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -20px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-right-color: #f1f1f1;
+    transform: translateY(-50%);
+}
+
+.scrolling-text {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%; /* 吹き出し全体の幅に合わせる */
+    height: 1.5em; /* テキストの高さに合わせる */
+}
+
+.scrolling-text p {
+    display: inline-block;
+    margin: 0;
+    padding-left: 0%; /* スクロール開始位置を設定 */
+    animation: scroll-text 8s linear infinite; /* アニメーションを設定 */
+}
+
+/* アニメーション設定 */
+@keyframes scroll-text {
+    0% {
+        transform: translateX(100%); /* テキストが右端にある状態 */
+    }
+    100% {
+        transform: translateX(-100%); /* テキストが左端に流れる状態 */
+    }
+}
+
+/* クイズ用 */
+/* クイズ用 */
+.choices {
+    margin-left: 0; /* 左寄せ */
+    padding-left: 0; /* 左寄せ */
+}
+
+.choice-item {
+    display: flex;
+    align-items: center;
+    padding-left: 0; /* 左寄せ */
+    margin-bottom: 10px; /* 選択肢間の間隔 */
+}
+
+.choice-item input[type="radio"] {
+    margin-right: 10px; /* チェックボックスとラベルの間隔 */
+}
+
+.choice-item label {
+    margin: 0; /* ラベルの余白をリセット */
+    display: inline-block;
+}
+
+/* チェックボックスのデザイン調整 */
+.choice-item input[type="radio"] {
+    width: auto;
+    height: auto;
+}
+

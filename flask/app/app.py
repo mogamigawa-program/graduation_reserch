@@ -59,7 +59,7 @@ def check_login():
 #「/」へアクセスがあった場合に、"Hello World"の文字列を返す
 @app.route("/index")
 def main():
-    index_item = {
+    index_item = [
         "データベースの基礎",
         "データベースの要素",
         "基本操作",
@@ -68,8 +68,9 @@ def main():
         "集合演算",
         "テーブル制約と管理",
         "トランザクション"
-    }
-    return render_template('index_main.html', title="学習項目", index_item=index_item)
+    ]
+    
+    return render_template('index_main.html', title="SQL学習の森", index_item=index_item)
     
 @app.route("/index/<item>")
 def index_item(item):
@@ -131,8 +132,8 @@ def index_item(item):
                 {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key"}
             ],
             "delete": [
-                {"name": "単一条件", "url": "/basic/delete/single-condition"},
-                {"name": "複数条件", "url": "/basic/delete/multiple-conditions"},
+                {"name": "単一条件", "url": "/basic/delete/single"},
+                {"name": "複数条件", "url": "/basic/delete/multiple"},
                 {"name": "全レコード削除", "url": "/basic/delete/all-records"},
                 {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple"}
             ],
@@ -844,7 +845,7 @@ def post():
         return html
 
 #insert文
-@app.route('/insert', methods=['GET', 'POST'])
+@app.route('/basic/insert/insert', methods=['GET', 'POST'])
 def insert():
     if 'submit_button' in request.form:
         button_val = request.form['submit_button']
@@ -980,7 +981,7 @@ def insert():
     return render_template('insert.html', table_name=insert_table_name, desc=table_desc, table=table)
 
 #DELETE文の学習ページ
-@app.route('/delete/<type>', methods=['GET', 'POST'])
+@app.route('/basic/delete/<type>', methods=['GET', 'POST'])
 def delete(type):
     table_name = "employees"
     if type == 'single':
