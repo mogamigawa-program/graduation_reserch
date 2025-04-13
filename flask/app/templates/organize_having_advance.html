@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}HAVING句の学習ページ（高度版）{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>HAVING句（実践）</h1>
+
+    <p><strong>このページでは、HAVING句を使用したSQLクエリを自由に記述して実行できます。</strong></p>
+    <p style="color: red;"><strong>HAVING句を使って、集計後のデータに条件を適用してみましょう！</strong></p>
+    <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
+
+    <!-- salesテーブルの中身を表示 -->
+    <h2>salesテーブルの内容</h2>
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- ヒントの追加 -->
+    <div class="hints">
+        <h2>ヒント</h2>
+
+        <!-- ヒント1: SELECTについて -->
+        <details>
+            <summary style="color: blue;">ヒント1</summary>
+            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
+            <p>例：SELECT ...;</p>
+        </details>
+    
+        <!-- ヒント2: カラムとASについて -->
+        <details>
+            <summary style="color: blue;">ヒント2</summary>
+            <p>カラムは、テーブルから選択するフィールドです。ASはエイリアスを指定するために使用します。<br>
+                複数のカラムを使用するときは、","で区切りましょう。</p>
+            <p>例：SELECT category, SUM(price) AS 'sum_price' ...;</p>
+        </details>
+    
+        <!-- ヒント3: FROM salesについて -->
+        <details>
+            <summary style="color: blue;">ヒント3</summary>
+            <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではsalesテーブルを使っています。</p>
+            <p>例：SELECT category, SUM(price) AS 'sum_price' FROM sales ...;</p>
+        </details>
+    
+        <!-- ヒント4: GROUP BYについて -->
+        <details>
+            <summary style="color: blue;">ヒント4</summary>
+            <p>GROUP BYは、データを特定のカラムでグループ化するために使用されます。</p>
+            <p>例：SELECT category, SUM(price) AS 'sum_price' FROM sales GROUP BY category;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント5</summary>
+            <p>HAVING句は、GROUP BYで集計した結果に条件を適用する際に使用します。</p>
+            <p>例：SELECT category, SUM(price) AS 'sum_price' FROM sales GROUP BY category HAVING SUM(price) > 1000;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント6</summary>
+            <p>HAVING句は、集約関数と組み合わせて使用することが一般的です。</p>
+            <p>例：SELECT category, COUNT(*) FROM sales GROUP BY category HAVING COUNT(*) > 5;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント7</summary>
+            <p>HAVING句を使用する際、GROUP BY句を忘れないようにしましょう。</p>
+            <p>例：SELECT product_name, AVG(price) FROM sales GROUP BY product_name HAVING AVG(price) < 350;</p>
+        </details>
+    </div>
+
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
+        <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
+        <br>
+        <button type="submit">クエリを実行</button>
+    </form>
+
+    {% if query %}
+        <h2>実行したクエリ</h2>
+        <p><code>{{ query }}</code></p>
+    {% endif %}
+
+    {% if query_result %}
+        <h2>クエリ結果</h2>
+        <table border="1">
+            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+                {% for col in query_result["columns"] %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in query_result["data"] %}
+                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_having">戻る</a>
+
+{% endblock %}

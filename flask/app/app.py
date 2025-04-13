@@ -91,30 +91,30 @@ def index_item(item):
         if flag == "min":
             min_index_item = {
                 "データベースとは": [
-                    {"name": "データベースとは", "url": ""}
+                    {"name": "データベースとは", "url": "/databasebasic/whatdatabase"}
             ],
             "関係データベースとは": [
-                {"name": "関係データベースとは", "url": ""}
+                {"name": "関係データベースとは", "url": "/databasebasic/whatrelationaldatabase"}
             ],
             "キー": [
-                {"name": "キー", "url": ""}
+                {"name": "キー", "url": "/partofdatabase/key"}
             ],
             "テーブルの定義": [
-                {"name": "テーブルの定義", "url": ""}
+                {"name": "テーブルの定義", "url": "/partofdatabase/definition"}
             ],
             "テーブルの作成": [
-                {"name": "テーブルの作成", "url": ""}
+                {"name": "テーブルの作成", "url": "/partofdatabase/create"}
             ],
             "select": [
                 {"name": "単一条件", "url": "/basic/select/single"},
                 {"name": "複数条件", "url": "/basic/select/multiple"}
             ],
             "join": [
-                {"name": "cross", "url": "/cross_join_study"},
-                {"name": "inner", "url": "/inner_join_study"},
-                {"name": "left", "url": "/left_outer_join_study"},
-                {"name": "right", "url": "/right_outer_join_study"},
-                {"name": "3つのテーブルの結合", "url": "/multiple_table_join_study"}
+                {"name": "cross", "url": "/basic/join/cross_join_study"},
+                {"name": "inner", "url": "/basic/join/inner_join_study"},
+                {"name": "left", "url": "/basic/join/left_outer_join_study"},
+                {"name": "right", "url": "/basic/join/right_outer_join_study"},
+                {"name": "3つのテーブルの結合", "url": "/basic/join/multiple_table_join_study"}
             ],
             "insert": [
                 {"name": "挿入", "url": "/basic/insert/insert"},

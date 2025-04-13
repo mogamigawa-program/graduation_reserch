@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}GROUP BYの学習ページ{% endblock %}
+{% block content %}
+
+
+<div class="container">
+    <h1>GROUP BY</h1>
+
+    <p><strong>GROUP BYとは:</strong> GROUP BY句は、指定したカラムごとにデータをグループ化し、そのグループごとに集約関数を適用するSQLの構文です。</p>
+
+    <p><strong>基本的な構文:</strong>
+        <code>
+        SELECT {カラム1}, {集約関数(カラム2)} FROM sales GROUP BY {カラム1};
+        </code>
+    </p>
+
+    <p><strong>例:</strong> salesテーブルでカテゴリごとの平均数量を求める場合:<br>
+    <code>SELECT category, AVG(quantity) AS 'avg_quantity' FROM sales GROUP BY category;</code></p>
+    
+    <p><strong><a href="/organize_groupby_example">GROUP BY句の実行例はこちら<a></a></strong></p>
+
+    <p><strong><a href="/organize_groupby_advance">GROUP BY句のクエリを全文書いてみよう！<a></a></strong></p>
+
+    <p><strong><a href="/organize_groupby_quiz">GROUP BY句の理解度チェック！<a></a></strong></p>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <form method="POST" id="groupbyForm">
+        <p>SELECT</p>
+        <div id="select-columns-container">
+            <!-- カラムや集約関数を動的に追加する領域 -->
+        </div>
+        <p>FROM sales</p>
+
+        <div id="whereClauseContainer" style="display:none;">
+            <label for="whereCondition"><p>WHERE</p></label>
+            <input type="text" name="where_condition" placeholder="例: price > 150">
+        </div>
+
+        <p>GROUP BY</p>
+        <select name="group_column" required>
+            {% for col in sales_desc %}
+                <option value="{{ col[0] }}">{{ col[0] }}</option>
+            {% endfor %}
+        </select>
+
+        <p><input type="checkbox" id="whereCheckbox" onclick="toggleWhere()"> WHEREを使用する</p>
+
+        <button type="button" onclick="addColumn()">カラムを追加</button>
+        <button type="button" onclick="addAggregateFunction()">集約関数を追加</button>
+        <br><br>
+        <button type="submit">GROUP BYを実行</button>
+    </form>
+
+    {% if groupby_result %}
+    <h2>GROUP BYの結果</h2>
+    <p><strong>実行クエリ:</strong> {{ groupby_query }}</p>
+    <table border="1">
+        <tr style="background-color: rgba(0, 123, 255, 0.664);">
+            {% for col in groupby_query.split('SELECT')[1].split('FROM')[0].split(',') %}
+                {% set alias = col.split('AS')[-1].strip().strip('` ') %}
+                <th>{{ alias }}</th>
+            {% endfor %}
+        </tr>        
+        {% for row in groupby_result %}
+            <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>    
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_select">戻る</a>
+
+<script>
+    // カラムと集約関数のカウンター
+    let columnCount = 0;
+    let aggregateCount = 0;
+
+    function addColumn() {
+        columnCount++;
+        const container = document.getElementById('select-columns-container');
+        const newColumn = document.createElement('div');
+        newColumn.classList.add('column-group');
+        newColumn.innerHTML = `
+            <p>${columnCount > 1 ? ',' : ''}</p>
+            <select name="columns[]" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+        `;
+        container.appendChild(newColumn);
+    }
+
+    function addAggregateFunction() {
+        aggregateCount++;
+        const container = document.getElementById('select-columns-container');
+        const newAggregate = document.createElement('div');
+        newAggregate.classList.add('aggregate-group');
+        newAggregate.innerHTML = `
+            <p>${columnCount + aggregateCount > 1 ? ',' : ''}</p>
+            <select name="aggregate_function[]" required>
+                <option value="COUNT">COUNT</option>
+                <option value="SUM">SUM</option>
+                <option value="AVG">AVG</option>
+                <option value="MIN">MIN</option>
+                <option value="MAX">MAX</option>
+            </select>
+            <select name="aggregate_column[]" required>
+                {% for col in sales_desc %}
+                    <option value="{{ col[0] }}">{{ col[0] }}</option>
+                {% endfor %}
+            </select>
+            <label for="as_column"><p>AS</p></label>
+            <input type="text" name="as_column[]" placeholder="例: Aggregated Result" required>
+        `;
+        container.appendChild(newAggregate);
+    }
+
+    // WHERE句を表示/非表示にする関数
+    function toggleWhere() {
+        const whereContainer = document.getElementById('whereClauseContainer');
+        whereContainer.style.display = document.getElementById('whereCheckbox').checked ? 'block' : 'none';
+    }
+</script>
+
+{% endblock %}

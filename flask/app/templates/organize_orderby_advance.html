@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}ORDER BYの学習ページ（高度版）{% endblock %}
+{% block content %}
+
+<div class="container">
+    <h1>ORDER BY句（実践）</h1>
+
+    <p><strong>このページでは、SQLクエリを自由に記述して実行できます。</strong></p>
+    <p style="color: red;"><strong>ORDER BY句を使って、データの並び順を制御してみましょう！</strong></p>
+    <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
+
+    <!-- salesテーブルの中身を表示 -->
+    <h2>salesテーブルの内容</h2>
+    <table border="1">
+        <caption>sales</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <!-- ヒントの追加 -->
+    <div class="hints">
+        <h2>ヒント</h2>
+
+        <!-- ヒント1: SELECTについて -->
+        <details>
+            <summary style="color: blue;">ヒント1</summary>
+            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
+            <p>例：SELECT ...;</p>
+        </details>
+    
+        <!-- ヒント2: カラムとASについて -->
+        <details>
+            <summary style="color: blue;">ヒント2</summary>
+            <p>カラムは、テーブルから選択するフィールドです。ASはエイリアスを指定するために使用します。<br>
+                複数のカラムを使用するときは、","で区切りましょう。<br>
+                *はテーブルsalesの全てのカラム(id, sale_date, product_name, category, quantity, price)を選択します。</p>
+            <p>例：SELECT *, (quantity * price) AS 'total_sales'  ...;</p>
+        </details>
+    
+        <!-- ヒント3: FROM salesについて -->
+        <details>
+            <summary style="color: blue;">ヒント3</summary>
+            <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではsalesテーブルを使っています。</p>
+            <p>例：SELECT *, (quantity * price) AS 'total_sales' FROM sales ...;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント4</summary>
+            <p>ORDER BYは、指定されたカラムでデータを並び替えるSQL文です。<br>
+                昇順(ASC)で並び替えるには、ASCキーワードを使用します。</p>
+            <p>例：SELECT *, (quantity * price) AS 'total_sales' FROM sales ORDER BY total_sales ASC;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント5</summary>
+            <p>降順(DESC)で並び替えるには、DESCキーワードを使用します。</p>
+            <p>例：SELECT *, (quantity * price) AS 'total_sales' FROM sales ORDER BY total_sales DESC;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント6(応用)</summary>
+            <p>ORDER BY句を複数使用する場合：<br>
+                この例では、カテゴリ順（category ASC）→ 価格順（price DESC）に並べ替えています。<br>
+                category ASCはアルファベットの昇順になります。(A → Z)</p>
+            <p>例：SELECT * FROM sales ORDER BY category ASC, price DESC;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント7(応用)</summary>
+            <p>LIMIT句と組み合わせ：<br>
+                並び替えた結果の上から指定した数の行のみを取得できます。</p>
+            <p>例：SELECT * FROM sales ORDER BY price DESC LIMIT 5;</p>
+        </details>
+
+        <details>
+            <summary style="color: blue;">ヒント8(応用)</summary>
+            <p>GROUP BY句とORDER BY句の組み合わせ：<br>
+                GROUP BY句で商品ごとの価格を集計し、その結果をORDER BYで価格の降順に並べています。</p>
+            <p>例：SELECT product_name, SUM(price) FROM sales GROUP BY product_name ORDER BY SUM(price) DESC;</p>
+        </details>
+    </div>
+
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
+        <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
+        <br>
+        <button type="submit">クエリを実行</button>
+    </form>
+
+    {% if query %}
+        <h2>実行したクエリ</h2>
+        <p><code>{{ query }}</code></p>
+    {% endif %}
+
+    {% if query_result %}
+        <h2>クエリ結果</h2>
+        <table border="1">
+            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+                {% for col in query_result["columns"] %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in query_result["data"] %}
+                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<hr>
+<a href="/organize_orderby">戻る</a>
+
+{% endblock %}
