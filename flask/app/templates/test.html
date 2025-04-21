@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>テーブル制約の学習テンプレート</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.7; padding: 2rem; background: #f7f9fc; }
+    h1, h2, h3 { color: #2c3e50; }
+    code { background: #eee; padding: 2px 4px; border-radius: 4px; }
+    pre { background: #f0f0f0; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    th { background: #e3e3e3; }
+    .section { background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  </style>
+</head>
+<body>
+  <h1>💡 テーブル制約の学習テンプレート</h1>
+
+  <div class="section">
+    <h2>🔹 主キー制約（PRIMARY KEY）</h2>
+    <p>テーブル内で一意に識別できる列（または列の組）に設定。NULLは許されない。</p>
+    <pre><code>-- 単一列
+CREATE TABLE users (
+  id INT PRIMARY KEY,
+  name VARCHAR(50)
+);
+
+-- 複合主キー
+CREATE TABLE enrollments (
+  student_id INT,
+  course_id INT,
+  PRIMARY KEY (student_id, course_id)
+);</code></pre>
+    <p><strong>よくあるミス：</strong> 重複、NULLのINSERTなど</p>
+  </div>
+
+  <div class="section">
+    <h2>🔹 外部キー制約（FOREIGN KEY）</h2>
+    <p>他テーブルの主キーと整合性を保つ。<code>ON DELETE</code>や<code>ON UPDATE</code>で動作指定可能。</p>
+    <pre><code>CREATE TABLE orders (
+  order_id INT PRIMARY KEY,
+  user_id INT,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT
+);</code></pre>
+    <p><strong>よくあるミス：</strong> 存在しないIDの参照、RESTRICTの誤使用など</p>
+  </div>
+
+  <div class="section">
+    <h2>🔹 CHECK制約</h2>
+    <p>値が一定の条件を満たすかを制限。</p>
+    <pre><code>CREATE TABLE products (
+  id INT PRIMARY KEY,
+  price INT CHECK (price >= 0 AND price <= 100000),
+  stock INT CHECK (stock >= 0)
+);</code></pre>
+    <p><strong>注意：</strong> SELECT文を条件に使うのは不可（PostgreSQL）</p>
+  </div>
+
+  <div class="section">
+    <h2>🔹 UNIQUE制約</h2>
+    <p>列の値の重複を禁止。NULLは複数可。</p>
+    <pre><code>CREATE TABLE emails (
+  id INT PRIMARY KEY,
+  address VARCHAR(100) UNIQUE
+);</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>🔹 NOT NULL制約</h2>
+    <p>NULLの値の入力を禁止する。</p>
+    <pre><code>CREATE TABLE items (
+  id INT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+);</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>🔹 DEFAULT値</h2>
+    <p>値を指定しなかった時に自動で代入される。</p>
+    <pre><code>CREATE TABLE logs (
+  id INT PRIMARY KEY,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>🔸 補足：定義方法の違い</h2>
+    <table>
+      <thead>
+        <tr><th>タイプ</th><th>カラム定義内</th><th>テーブル定義末尾</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>単一カラム制約</td><td><code>id INT PRIMARY KEY</code></td><td>–</td></tr>
+        <tr><td>複数カラム制約</td><td>–</td><td><code>PRIMARY KEY (id, name)</code></td></tr>
+        <tr><td>制約名の指定</td><td colspan="2"><code>CONSTRAINT pk_user PRIMARY KEY (id)</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>🔸 補足：制約違反と操作別エラーまとめ</h2>
+    <table>
+      <thead>
+        <tr><th>操作</th><th>制約違反例</th><th>発生エラー</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>INSERT</td><td>存在しないIDの外部キー</td><td>foreign key violation</td></tr>
+        <tr><td>UPDATE</td><td>重複するUNIQUE値</td><td>unique constraint violation</td></tr>
+        <tr><td>DELETE</td><td>参照されている親を削除</td><td>restrict violation / cascade</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>
