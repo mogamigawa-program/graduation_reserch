@@ -6,9 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SQL learning app{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='dropdown.js') }}" defer></script> 
+    {# dropdown.jsを後で追加するならここに #}
 </head>
 <body>
-    {% block content %}
-    {% endblock %}
+
+    <!-- ヘッダー -->
+    <header>
+        <h1><a href="/index">SQL学習の森</a></h1>
+
+        {% if session.get('username') %}
+            <div class="user-menu">
+                <span class="username" id="dropdownButton">{{ session['username'] }}さん</span>
+                <div class="dropdown-content" id="dropdownContent">
+                    <a href="{{ url_for('logout') }}">ログアウト</a>
+                    <a href="/quiz_progress">クイズ一覧・進捗管理</a>
+                </div>
+            </div>
+        {% endif %}
+
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- フッター -->
+    <footer>
+        <p>© 2025 SQL学習の森</p>
+    </footer>
+
 </body>
 </html>

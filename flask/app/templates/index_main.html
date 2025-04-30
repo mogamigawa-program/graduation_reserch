@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <style>
-    body { font-family: Arial, sans-serif; }
-    .menu { margin: 20px; }
-    .menu-item { cursor: pointer; color: blue; text-decoration: underline; margin: 5px 0; }
-    </style>
-</head>
+{% extends "base.html" %}
+{% block title %}SQL学習の森トップページ{% endblock %}
+{% block content %}
 <body>
-    <h1>{{ title }}</h1>
+    
     <div class="menu">
         {% if index_item %}
         <ul>
@@ -40,12 +31,6 @@
         {% endif %}
     </div>
 
-    <div class="quiz">
-        <a href="/quiz_progress">クイズ一覧・進捗管理</a>
-    </div>
-    
-    <hr>
-    <a href="/index">ホーム</a><br>
-    <a href="/logout">ログアウト</a>
 </body>
 </html>
+{% endblock %}

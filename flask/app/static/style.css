@@ -1,5 +1,5 @@
 /* static/style.css */
-body {
+html, body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f9;
     margin: 0;
@@ -9,7 +9,7 @@ body {
 h1 {
     color: #333;
     text-align: center;
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 form {
@@ -32,14 +32,15 @@ input[type="password"] {
 
 button {
     display: block;
-    width: 100%;
-    padding: 10px;
+    text-align: center;
     background-color: #28a745;
-    color: #fff;
-    border: none;
+    color: white;
+    padding: 10px;
     border-radius: 4px;
-    cursor: pointer;
-    margin-top: 20px;
+    text-decoration: none;
+    margin: 10px auto;
+    width: 100%;
+    max-width: 300px;
 }
 
 button:hover {
@@ -126,4 +127,109 @@ code {
 label {
     display: block;
     margin: 10px 0 5px;
+}
+
+header {
+    position: relative; /* 基準にする */
+    height: 80px; /* ヘッダー高さ、好きに調整してOK */
+    background-color: #3426f1; /* 背景色（例） */
+    padding: 0 20px;
+}
+
+header h1 a {
+    color: white;
+    text-decoration: none;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1em;
+    padding: 0;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+footer {
+    background-color: #f2f2f2;
+    text-align: center;
+    padding: 1em;
+    margin-top: 2em;
+}
+
+
+/* ドロップダウン用のスタイル */
+.user-menu {
+    position: absolute;
+    right: 20px;
+    bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+#dropdownButton {
+    font-weight: bold;
+    font-size: 20px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0; /* 親要素の右端に */
+    top: 120%;
+    background-color: white;
+    min-width: 100px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    padding: 0;
+}
+
+.dropdown-content a {
+    color: rgb(0, 0, 0);
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+}
+
+.show {
+    display: block;
+}
+
+/*signup画面*/
+.success {
+    color: green;
+}
+
+.danger {
+    color: red;
+}
+
+.or-separator {
+    text-align: center;
+    margin: 20px 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.link-button {
+    display: block;
+    text-align: center;
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin: 10px auto;
+    width: 100%;
+    max-width: 300px;
+}
+
+.link-button:hover {
+    background-color: #28a745;
 }

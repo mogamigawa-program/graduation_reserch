@@ -45,16 +45,18 @@ this_users_db = MySQL(**this_users_dns)
 app.config['SECRET_KEY'] = os.urandom(24)
 bcrypt = Bcrypt(app)
 
-# ログインが必要なページ
-protected_pages = ['/index', '/users', '/multiple_users', '/primary_school', '/multiple_primary_school', '/sisya',
-                   '/multiple_sisya', '/choose', '/join', '/cross_join', '/inner_join', '/left_join', '/create_table']
+# ログイン不要ページのリスト（ホワイトリスト）
+public_pages = ['/login', '/signup']
 
-# before_request フィルタでログインの確認を行う
 @app.before_request
 def check_login():
-    # ログインが必要なページにアクセスする場合、ログインしているか確認
-    if request.path in protected_pages and 'user_id' not in session:
+    if request.path.startswith('/static') or request.path in public_pages:
+        return
+
+    # ログインしていない場合、ログインページへリダイレクト
+    if 'user_id' not in session:
         return redirect(url_for('login'))
+
 
 #「/」へアクセスがあった場合に、"Hello World"の文字列を返す
 @app.route("/index")
@@ -107,77 +109,77 @@ def index_item(item):
                 {"name": "テーブルの作成", "url": "/partofdatabase/create"}
             ],
             "select": [
-                {"name": "単一条件", "url": "/basic/select/single"},
-                {"name": "複数条件", "url": "/basic/select/multiple"}
+                {"name": "単一条件", "url": "/basic/select/single/study"},
+                {"name": "複数条件", "url": "/basic/select/multiple/study"}
             ],
             "join": [
-                {"name": "cross", "url": "/basic/join/cross_join_study"},
-                {"name": "inner", "url": "/basic/join/inner_join_study"},
-                {"name": "left", "url": "/basic/join/left_outer_join_study"},
-                {"name": "right", "url": "/basic/join/right_outer_join_study"},
-                {"name": "複数のテーブルの結合", "url": "/basic/join/multiple_table_join_study"}
+                {"name": "cross", "url": "/basic/join/cross_join/study"},
+                {"name": "inner", "url": "/basic/join/inner_join/study"},
+                {"name": "left", "url": "/basic/join/left_outer_join/study"},
+                {"name": "right", "url": "/basic/join/right_outer_join/study"},
+                {"name": "複数のテーブルの結合", "url": "/basic/join/multiple_table_join/study"}
             ],
             "insert": [
-                {"name": "挿入", "url": "/basic/insert/insert"},
-                {"name": "select文を利用したデータの挿入", "url": "/basic/insert/select-insert"}
+                {"name": "挿入", "url": "/basic/insert/insert/study"},
+                {"name": "select文を利用したデータの挿入", "url": "/basic/insert/select-insert/study"}
             ],
             "update": [
-                {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column"},
-                {"name": "複数のカラムに対して複数の条件", "url": "/basic/update/multiple-columns"},
-                {"name": "全レコード更新、計算", "url": "/basic/update/all-records"},
-                {"name": "join", "url": "/basic/update/join"}
+                {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column/study"},
+                {"name": "複数のカラムに対して複数の条件", "url": "/basic/update/multiple-columns/study"},
+                {"name": "全レコード更新、計算", "url": "/basic/update/all-records/study"},
+                {"name": "join", "url": "/basic/update/join/study"}
             ],
             "upsert": [
-                {"name": "replace構文", "url": "/basic/upsert/replace"},
-                {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key"}
+                {"name": "replace構文", "url": "/basic/upsert/replace/study"},
+                {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key/study"}
             ],
             "delete": [
-                {"name": "単一条件", "url": "/basic/delete/single"},
-                {"name": "複数条件", "url": "/basic/delete/multiple"},
-                {"name": "全レコード削除", "url": "/basic/delete/all-records"},
-                {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple"}
+                {"name": "単一条件", "url": "/basic/delete/single/study"},
+                {"name": "複数条件", "url": "/basic/delete/multiple/study"},
+                {"name": "全レコード削除", "url": "/basic/delete/all-records/study"},
+                {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple/study"}
             ],
             "自己結合": [
-                {"name": "self join", "url": "/advanced/self-join"}
+                {"name": "self join", "url": "/advanced/self-join/study"}
             ],
             "更新操作": [
-                {"name": "副問い合わせを用いた更新", "url": "/advanced/update/subquery"},
-                {"name": "副問い合わせを用いた挿入", "url": "/advanced/insert/subquery"},
-                {"name": "副問い合わせを用いた削除", "url": "/advanced/delete/subquery"}
+                {"name": "副問い合わせを用いた更新", "url": "/advanced/update/subquery/study"},
+                {"name": "副問い合わせを用いた挿入", "url": "/advanced/insert/subquery/study"},
+                {"name": "副問い合わせを用いた削除", "url": "/advanced/delete/subquery/study"}
             ],
             "集約関数": [
                 {"name": "集約関数の注意書き", "url": "/aggregation/warning_message"},
-                {"name": "count", "url": "/aggregation/count"},
-                {"name": "sum", "url": "/aggregation/sum"},
-                {"name": "avg", "url": "/aggregation/avg"},
-                {"name": "min", "url": "/aggregation/min"},
-                {"name": "max", "url": "/aggregation/max"}
+                {"name": "count", "url": "/aggregation/count/study"},
+                {"name": "sum", "url": "/aggregation/sum/study"},
+                {"name": "avg", "url": "/aggregation/avg/study"},
+                {"name": "min", "url": "/aggregation/min/study"},
+                {"name": "max", "url": "/aggregation/max/study"}
             ],
             "ソートとグループ化": [
-                {"name": "order by", "url": "/aggregation/order-by"},
-                {"name": "group by", "url": "/aggregation/group-by"},
-                {"name": "having", "url": "/aggregation/having"}
+                {"name": "order by", "url": "/aggregation/order-by/study"},
+                {"name": "group by", "url": "/aggregation/group-by/study"},
+                {"name": "having", "url": "/aggregation/having/study"}
             ],
             "テーブルに対する制約": [
-                {"name": "主キー", "url": "/constraints/primary-key"},
-                {"name": "一意性制約", "url": "/constraints/unique"},
-                {"name": "NOT NULL制約", "url": "/constraints/not-null"},
-                {"name": "外部キー制約", "url": "/constraints/foreign-key"},
-                {"name": "DEFAULT値", "url": "/constraints/default"}
+                {"name": "主キー", "url": "/constraints/primary-key/study"},
+                {"name": "一意性制約", "url": "/constraints/unique/study"},
+                {"name": "NOT NULL制約", "url": "/constraints/not-null/study"},
+                {"name": "外部キー制約", "url": "/constraints/foreign-key/study"},
+                {"name": "DEFAULT値", "url": "/constraints/default/study"}
             ],
             "alter": [
-                {"name": "カラムの追加", "url": "/table-management/alter/add-column"},
-                {"name": "カラムの削除", "url": "/table-management/alter/drop-column"},
-                {"name": "カラムの変更", "url": "/table-management/alter/modify-column"},
-                {"name": "制約の追加", "url": "/table-management/alter/add-constraint"},
-                {"name": "制約の削除", "url": "/table-management/alter/drop-constraint"},
-                {"name": "制約の変更", "url": "/table-management/alter/modify-constraint"}
+                {"name": "カラムの追加", "url": "/table-management/alter/add-column/study"},
+                {"name": "カラムの削除", "url": "/table-management/alter/drop-column/study"},
+                {"name": "カラムの変更", "url": "/table-management/alter/modify-column/study"},
+                {"name": "制約の追加", "url": "/table-management/alter/add-constraint/study"},
+                {"name": "制約の削除", "url": "/table-management/alter/drop-constraint/study"},
+                {"name": "制約の変更", "url": "/table-management/alter/modify-constraint/study"}
             ],
             "トランザクションにおける基本操作": [
-                {"name": "start→commit or rollback", "url": "/transaction/basic-operations"}
+                {"name": "start→commit or rollback", "url": "/transaction/basic-operations/study"}
             ],
             "acid特性": [
-                {"name": "原始性", "url": "/transaction/acid/atomicity"}
+                {"name": "原始性", "url": "/transaction/acid/atomicity/study"}
             ]
         }    
         index_item = min_index_item[item]
@@ -845,9 +847,14 @@ def post():
         html = render_template('join.html', props=props, team=team, user=user)
         return html
 
-#insert文
-@app.route('/basic/insert/insert', methods=['GET', 'POST'])
-def insert():
+#insert 学習
+@app.route('/basic/insert/insert/study', methods=['GET', 'POST'])
+def insert_study():
+    return 0
+
+#insert文 演習
+@app.route('/basic/insert/insert/practice', methods=['GET', 'POST'])
+def insert_practice():
     if 'submit_button' in request.form:
         button_val = request.form['submit_button']
         insert_table_name = "users"
@@ -980,6 +987,17 @@ def insert():
         return render_template('error.html', error_message=error_message)
     
     return render_template('insert.html', table_name=insert_table_name, desc=table_desc, table=table)
+
+#insert 実行例
+@app.route('/basic/insert/insert/example', methods=['GET', 'POST'])
+def insert_example():
+    return 0
+
+#insert クイズ
+@app.route('/basic/insert/insert/quiz', methods=['GET', 'POST'])
+def insert_quiz():
+    return 0
+
 
 #DELETE文の学習ページ
 @app.route('/basic/delete/<type>', methods=['GET', 'POST'])
@@ -1438,7 +1456,8 @@ def signup():
             conn.commit()
             conn.close()
             
-            print('ユーザー登録が完了しました。')
+            flash("ユーザー登録が完了しました", "success")
+            print('ユーザー登録が完了しました')
             return redirect(url_for('login'))
 
     return render_template('signup.html')
@@ -1450,29 +1469,31 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # ユーザーテーブルからユーザー情報を取得
+        session['username'] = username
+
+        # パラメータ化でSQLインジェクション対策
         select_user_query = "SELECT * FROM users WHERE username = '" + username + "'"
         users = user_db.query(select_user_query)
-        print(users)
+
         try:
             if users and bcrypt.check_password_hash(users[0][2], password):
                 session['user_id'] = users[0][0]
-                
-                # ユーザー専用のデータベース名を生成して追加
                 user_db_name = f"{username}_db"
                 this_users_dns['database'] = user_db_name
-
-                
                 return redirect(url_for('main'))
+            else:
+                flash("パスワードかユーザー名が違います", "danger")
         except Exception as e:
             print(f"Login Error: {e}")
+            flash("ログイン中にエラーが発生しました", "danger")
 
     return render_template('login.html')
+
 
 #ログアウト
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
+    session.clear()
     this_users_dns['database'] = None
     return redirect(url_for('login'))
 
@@ -1507,7 +1528,7 @@ def create_initial_state_and_backup(table_name):
     conn.close()
 
 #update table chooseのページ
-@app.route('/basic/update/single-column', methods=['GET', 'POST'])
+@app.route('/basic/update/single-column/study', methods=['GET', 'POST'])
 def update_table_choose():
     if request.method == 'POST':
         update_table_name = request.form.get('table_name')
