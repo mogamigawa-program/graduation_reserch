@@ -117,7 +117,8 @@ def index_item(item):
                 {"name": "inner", "url": "/basic/join/inner_join/study"},
                 {"name": "left", "url": "/basic/join/left_outer_join/study"},
                 {"name": "right", "url": "/basic/join/right_outer_join/study"},
-                {"name": "複数のテーブルの結合", "url": "/basic/join/multiple_table_join/study"}
+                {"name": "複数のテーブルの結合", "url": "/basic/join/multiple_table_join/study"},
+                {"name": "まとめクイズ", "url": "/basic/join/join_quiz"}
             ],
             "insert": [
                 {"name": "挿入", "url": "/basic/insert/insert/study"},
@@ -998,9 +999,38 @@ def insert_example():
 def insert_quiz():
     return 0
 
+#delete single 学習
+@app.route('/basic/delete/single/study', methods=['GET', 'POST'])
+def delete_single_study():
+    return 0
 
-#DELETE文の学習ページ
-@app.route('/basic/delete/<type>', methods=['GET', 'POST'])
+#delete single 実行例
+@app.route('/basic/delete/single/example', methods=['GET', 'POST'])
+def delete_single_example():
+    return 0
+
+#delete single クイズ
+@app.route('/basic/delete/single/quiz', methods=['GET', 'POST'])
+def delete_single_quiz():
+    return 0
+
+#delete multiple 学習
+@app.route('/basic/delete/multiple/study', methods=['GET', 'POST'])
+def delete_multiple_study():
+    return 0
+
+#delete multiple 実行例
+@app.route('/basic/delete/multiple/example', methods=['GET', 'POST'])
+def delete_multiple_example():
+    return 0
+
+#delete multiple クイズ
+@app.route('/basic/delete/multiple/quiz', methods=['GET', 'POST'])
+def delete_multiple_quiz():
+    return 0
+
+#DELETE文 演習ページ
+@app.route('/basic/delete/<type>/practice', methods=['GET', 'POST'])
 def delete(type):
     table_name = "employees"
     if type == 'single':
@@ -1528,7 +1558,7 @@ def create_initial_state_and_backup(table_name):
     conn.close()
 
 #update table chooseのページ
-@app.route('/basic/update/single-column/study', methods=['GET', 'POST'])
+@app.route('/basic/update/single-column', methods=['GET', 'POST'])
 def update_table_choose():
     if request.method == 'POST':
         update_table_name = request.form.get('table_name')
@@ -1951,7 +1981,7 @@ def update_join():
 
 # 以下は各JOINページ
 #CROSS JOIN 学習ページ
-@app.route('/basic/join/cross_join_study', methods=['GET', 'POST'])
+@app.route('/basic/join/cross_join/study', methods=['GET', 'POST'])
 def cross_join_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -2018,7 +2048,7 @@ def cross_join_study():
                            products_data=products_data, customers_data=customers_data)
 
 # CROSS JOINの実行例ページ
-@app.route('/cross_join_study_example', methods=['GET'])
+@app.route('/basic/join/cross_join/example', methods=['GET'])
 def cross_join_study_example():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -2061,7 +2091,7 @@ def cross_join_study_example():
                            cross_join_result=cross_join_result, columns=columns)
 
 # CROSS JOIN 演習ページ
-@app.route('/cross_join_advance', methods=['GET', 'POST'])
+@app.route('/basic/join/cross_join/practice', methods=['GET', 'POST'])
 def cross_join_advance():
     query = None
     query_result = None
@@ -2143,7 +2173,7 @@ def cross_join_advance():
 
 
 # CROSS JOIN クイズページ(cross_join_quiz.html)
-@app.route('/cross_join_quiz', methods=['GET', 'POST'])
+@app.route('/basic/join/cross_join/quiz', methods=['GET', 'POST'])
 def cross_join_quiz():
     questions = [
         {
@@ -2290,7 +2320,7 @@ def cross_join_quiz():
 
 
 #INNER JOIN 学習ページ(inner_join_study.html)
-@app.route('/basic/join/inner_join_study', methods=['GET', 'POST'])
+@app.route('/basic/join/inner_join/study', methods=['GET', 'POST'])
 def inner_join_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -2357,8 +2387,8 @@ def inner_join_study():
     return render_template('inner_join_study.html', products_desc=products_desc, customers_desc=customers_desc,
                            products_data=products_data, customers_data=customers_data)
 
-#INNER JOIN 学習ページ(inner_join_advance.html)
-@app.route('/inner_join_advance', methods=['GET', 'POST'])
+#INNER JOIN 演習ページ(inner_join_advance.html)
+@app.route('/basic/join/inner_join/practice', methods=['GET', 'POST'])
 def inner_join_advance():
     query = None
     query_result = None
@@ -2439,7 +2469,7 @@ def inner_join_advance():
     )
 
 # INNER JOIN 実行例ページ
-@app.route('/inner_join_study_example', methods=['GET'])
+@app.route('/basic/join/inner_join/example', methods=['GET'])
 def inner_join_study_example():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -2482,7 +2512,7 @@ def inner_join_study_example():
                            inner_join_result=inner_join_result, columns=columns)
 
 # INNER JOIN クイズページ(inner_join_quiz.html)
-@app.route('/inner_join_quiz', methods=['GET', 'POST'])
+@app.route('/basic/join/inner_join/quiz', methods=['GET', 'POST'])
 def inner_join_quiz():
     questions = [
         {
@@ -2629,7 +2659,7 @@ def inner_join_quiz():
 
 
 #LEFT OUTER JOIN 学習ページ(left_outer_join_study.html)
-@app.route('/basic/join/right_outer_join_study', methods=['GET', 'POST'])
+@app.route('/basic/join/left_outer_join/study', methods=['GET', 'POST'])
 def left_outer_join_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -2697,7 +2727,7 @@ def left_outer_join_study():
                            products_data=products_data, customers_data=customers_data)
 
 #LEFT OUTER JOIN 演習ページ(left_outer_join_advance.html)
-@app.route('/left_outer_join_advance', methods=['GET', 'POST'])
+@app.route('/basic/join/left_outer_join/practice', methods=['GET', 'POST'])
 def left_outer_join_advance():
     query = None
     query_result = None
@@ -2780,7 +2810,7 @@ def left_outer_join_advance():
 
 
 # LEFT OUTER JOINの実行例ページ
-@app.route('/left_outer_join_study_example', methods=['GET'])
+@app.route('/basic/join/left_outer_join/example', methods=['GET'])
 def left_outer_join_study_example():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -2823,7 +2853,7 @@ def left_outer_join_study_example():
                            left_outer_join_result=left_outer_join_result, columns=columns)
 
 # LEFT OUTER JOIN クイズページ(left_outer_join_quiz.html)
-@app.route('/left_outer_join_quiz', methods=['GET', 'POST'])
+@app.route('/basic/join/left_outer_join/quiz', methods=['GET', 'POST'])
 def left_outer_join_quiz():
     questions = [
         {
@@ -2970,7 +3000,7 @@ def left_outer_join_quiz():
 
 
 #RIGHT OUTER JOIN 学習ページ(right_outer_join_study.html)
-@app.route('/basic/join/right_outer_join_study', methods=['GET', 'POST'])
+@app.route('/basic/join/right_outer_join/study', methods=['GET', 'POST'])
 def right_outer_join_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -3039,7 +3069,7 @@ def right_outer_join_study():
 
 
 #RIGHT OUTER JOIN 演習ページ(right_outer_join_advance.html)
-@app.route('/right_outer_join_advance', methods=['GET', 'POST'])
+@app.route('/basic/join/right_outer_join/practice', methods=['GET', 'POST'])
 def right_outer_join_advance():
     query = None
     query_result = None
@@ -3121,7 +3151,7 @@ def right_outer_join_advance():
 
 
 # RIGHT OUTER JOINの実行例ページ
-@app.route('/right_outer_join_study_example', methods=['GET'])
+@app.route('/basic/join/right_outer_join/example', methods=['GET'])
 def right_outer_join_study_example():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -3164,7 +3194,7 @@ def right_outer_join_study_example():
                            right_outer_join_result=right_outer_join_result, columns=columns)
 
 # RIGHT OUTER JOIN クイズページ(right_outer_join_quiz.html)
-@app.route('/right_outer_join_quiz', methods=['GET', 'POST'])
+@app.route('/basic/join/right_outer_join/quiz', methods=['GET', 'POST'])
 def right_outer_join_quiz():
     questions = [
         {
@@ -3311,7 +3341,7 @@ def right_outer_join_quiz():
 
 
 #複数のテーブルJOIN 学習ページ(multiple_table_join_study.html)
-@app.route('/basic/join/multiple_table_join_study', methods=['GET', 'POST'])
+@app.route('/basic/join/multiple_table_join/study', methods=['GET', 'POST'])
 def multiple_table_join_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -3405,7 +3435,7 @@ def multiple_table_join_study():
                            products_data=products_data, customers_data=customers_data, discounts_data=discounts_data, inventory_data=inventory_data,)
 
 #複数のテーブルJOIN 演習ページ(multiple_table_join_advance.html)
-@app.route('/multiple_table_join_advance', methods=['GET', 'POST'])
+@app.route('/basic/join/multiple_table_join/practice', methods=['GET', 'POST'])
 def multiple_table_join_advance():
     query = None
     query_result = None
@@ -3510,7 +3540,7 @@ def multiple_table_join_advance():
 
 
 # JOINのまとめクイズページ(quiz.html)
-@app.route('/join_quiz', methods=['GET', 'POST'])
+@app.route('/basic/join/join_quiz', methods=['GET', 'POST'])
 def join_quiz():
     questions = [
         {   # INNER JOINの基本的な知識問題
@@ -3675,7 +3705,7 @@ def update_select():
     return render_template('update_select.html')
 
 #1つのカラムに対して1つの条件でレコードをUPDATEする(update_single_study)
-@app.route('/basic/update/single-column', methods=['GET', 'POST'])
+@app.route('/basic/update/single-column/study', methods=['GET', 'POST'])
 def update_single_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -3794,8 +3824,8 @@ def update_single_study():
     return render_template('update_single_study.html', products_desc=products_desc, products_data=products_data)
 
 # 1つのカラムに対して1つの条件でレコードをUPDATEする実行例ページ
-@app.route('/update_single_study_example', methods=['GET', 'POST'])
-def update_single_study_example():
+@app.route('/basic/update/single-column/example', methods=['GET', 'POST'])
+def update_single_example():
     target_product_id = 1  # 更新する商品のID
     new_price = 100000       # 設定する新しい価格
     update_result = False
@@ -3857,9 +3887,8 @@ def update_single_study_example():
                            updated_products_data=updated_products_data, update_result=update_result, 
                            target_product_id=target_product_id, new_price=new_price)
 
-
 #複数のカラムに対して複数の条件でレコードをUPDATEする(update_multiple_study)
-@app.route('/basic/update/multiple-columns', methods=['GET', 'POST'])
+@app.route('/basic/update/multiple-columns/study', methods=['GET', 'POST'])
 def update_multiple_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -3995,7 +4024,7 @@ def update_multiple_study():
     return render_template('update_multiple_study.html', products_desc=products_desc, products_data=products_data)
 
 # 複数のカラムに対して複数の条件でレコードをUPDATEする実行例ページ
-@app.route('/update_multiple_study_example', methods=['GET', 'POST'])
+@app.route('/basic/update/multiple-columns/example', methods=['GET', 'POST'])
 def update_multiple_study_example():
     target_product_id = 2      # 更新する商品のID
     target_status = 'active'   # 更新対象のステータス
@@ -4066,7 +4095,7 @@ def update_multiple_study_example():
     )
 
 # UPDATE文 演習ページ(update_advance.html)
-@app.route('/update_advance', methods=['GET', 'POST'])
+@app.route('/basic/update/practice', methods=['GET', 'POST'])
 def update_advance():
     query = None
     query_result = None
@@ -4142,7 +4171,7 @@ def update_advance():
 
 
 # UPDATE文 クイズページ(update_quiz.html)
-@app.route('/update_quiz', methods=['GET', 'POST'])
+@app.route('/basic/update/quiz', methods=['GET', 'POST'])
 def update_quiz():
     questions = [
         {
@@ -4267,7 +4296,7 @@ def update_quiz():
 
 
 # 全レコードUPDATE (update_all_column_study)
-@app.route('/basic/update/all-records', methods=['GET', 'POST'])
+@app.route('/basic/update/all-records/study', methods=['GET', 'POST'])
 def update_all_column_study():
     try:
         # productsテーブルのデータとカラム情報を取得
@@ -4377,7 +4406,7 @@ def aggregate_notes():
     return render_template('aggregate_notes.html')
 
 # COUNT 学習ページ(aggregate_count_study.html)
-@app.route('/aggregation/count', methods=['GET', 'POST'])
+@app.route('/aggregation/count/study', methods=['GET', 'POST'])
 def aggregate_count_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -4437,7 +4466,7 @@ def aggregate_count_study():
     return render_template('aggregate_count_study.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # COUNT 演習ページ(aggregate_count_advance.html)
-@app.route('/aggregate_count_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/count/practice', methods=['GET', 'POST'])
 def aggregate_count_advance():
     query = None
     query_result = None
@@ -4506,8 +4535,12 @@ def aggregate_count_advance():
         sales_desc=sales_desc
     )
 
+# COUNT 実行例
+@app.route('/aggregation/count/example', methods=['GET', 'POST'])
+def aggregate_count_example():
+    return 0
 # COUNT クイズページ(aggregate_count_quiz.html)
-@app.route('/aggregate_count_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/count/quiz', methods=['GET', 'POST'])
 def aggregate_count_quiz():
     questions = [
         {
@@ -4621,7 +4654,7 @@ def aggregate_count_quiz():
 
 
 # SUM 学習ページ(aggregate_sum_study.html)
-@app.route('/aggregation/sum', methods=['GET', 'POST'])
+@app.route('/aggregation/sum/study', methods=['GET', 'POST'])
 def aggregate_sum_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -4681,8 +4714,9 @@ def aggregate_sum_study():
     return render_template('aggregate_sum_study.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # SUM 演習ページ(aggregate_sum_advance.html)
-@app.route('/aggregate_sum_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/sum/practice', methods=['GET', 'POST'])
 def aggregate_sum_advance():
+
     query = None
     query_result = None
     error_message = None
@@ -4749,6 +4783,11 @@ def aggregate_sum_advance():
         sales_data=sales_data,
         sales_desc=sales_desc
     )
+
+# SUM 実行例
+@app.route('/aggregation/sum/example', methods=['GET', 'POST'])
+def aggregate_sum_example():
+    return 0
 
 # SUM クイズページ(aggregate_sum_quiz.html)
 @app.route('/aggregate_sum_quiz', methods=['GET', 'POST'])
@@ -4864,7 +4903,7 @@ def aggregate_sum_quiz():
 
 
 # AVG 学習ページ (aggregate_avg_study.html)
-@app.route('/aggregation/avg', methods=['GET', 'POST'])
+@app.route('/aggregation/avg/study', methods=['GET', 'POST'])
 def aggregate_avg_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -4924,7 +4963,7 @@ def aggregate_avg_study():
     return render_template('aggregate_avg_study.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # AVG 演習ページ(aggregate_avg_advance.html)
-@app.route('/aggregate_avg_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/avg/practice', methods=['GET', 'POST'])
 def aggregate_avg_advance():
     query = None
     query_result = None
@@ -4993,8 +5032,13 @@ def aggregate_avg_advance():
         sales_desc=sales_desc
     )
 
+# AVG 実行例
+@app.route('/aggregation/avg/example', methods=['GET', 'POST'])
+def aggregate_avg_example():
+    return 0
+
 # AVG クイズページ(aggregate_avg_quiz.html)
-@app.route('/aggregate_avg_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/avg/quiz', methods=['GET', 'POST'])
 def aggregate_avg_quiz():
     questions = [
         {
@@ -5107,7 +5151,7 @@ def aggregate_avg_quiz():
 
 
 # MAX 学習ページ (aggregate_max_study.html)
-@app.route('/aggregation/max', methods=['GET', 'POST'])
+@app.route('/aggregation/max/study', methods=['GET', 'POST'])
 def aggregate_max_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -5167,7 +5211,7 @@ def aggregate_max_study():
     return render_template('aggregate_max_study.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # MAX 演習ページ (aggregate_max_study.html)
-@app.route('/aggregate_max_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/max/practice', methods=['GET', 'POST'])
 def aggregate_max_advance():
     query = None
     query_result = None
@@ -5236,8 +5280,13 @@ def aggregate_max_advance():
         sales_desc=sales_desc
     )
 
+# MAX 実行例
+@app.route('/aggregation/max/example', methods=['GET', 'POST'])
+def aggregate_max_example():
+    return 0
+
 # MAX クイズページ(aggregate_max_quiz.html)
-@app.route('/aggregate_max_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/max/quiz', methods=['GET', 'POST'])
 def aggregate_max_quiz():
     questions = [
         {
@@ -5349,7 +5398,7 @@ def aggregate_max_quiz():
     )
 
 # MIN 学習ページ (aggregate_min_study.html)
-@app.route('/aggregation/min', methods=['GET', 'POST'])
+@app.route('/aggregation/min/study', methods=['GET', 'POST'])
 def aggregate_min_study():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -5409,7 +5458,7 @@ def aggregate_min_study():
     return render_template('aggregate_min_study.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # MIN 演習ページ (aggregate_min_advance.html)
-@app.route('/aggregate_min_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/min/practice', methods=['GET', 'POST'])
 def aggregate_min_advance():
     query = None
     query_result = None
@@ -5478,8 +5527,13 @@ def aggregate_min_advance():
         sales_desc=sales_desc
     )
 
+# MIN 実行例
+@app.route('/aggregation/min/example', methods=['GET', 'POST'])
+def aggregate_min_example():
+    return 0
+
 # MIN クイズページ(aggregate_min_quiz.html)
-@app.route('/aggregate_min_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/min/quiz', methods=['GET', 'POST'])
 def aggregate_min_quiz():
     questions = [
         {
@@ -5597,7 +5651,7 @@ def organize_select():
     return render_template('organize_select.html')
 
 # GROUP BY句 学習ページ(organize_groupby.html)
-@app.route('/aggregation/group-by', methods=['GET', 'POST'])
+@app.route('/aggregation/group-by/study', methods=['GET', 'POST'])
 def organize_groupby():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -5654,7 +5708,7 @@ def organize_groupby():
     return render_template('organize_groupby.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # GROUP BY句 実行例のページ(organize_groupby_example.html)
-@app.route('/organize_groupby_example', methods=['GET'])
+@app.route('/aggregation/group-by/example', methods=['GET'])
 def organize_groupby_example():
     try:
         # データベース接続
@@ -5684,7 +5738,7 @@ def organize_groupby_example():
     return render_template('organize_groupby_example.html', sales_data=sales_data, groupby_result=groupby_result)
 
 # GROUP BY句 演習のページ(organize_groupby_advance.html)
-@app.route('/organize_groupby_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/group-by/practice', methods=['GET', 'POST'])
 def organize_groupby_advance():
     query = None
     query_result = None
@@ -5755,7 +5809,7 @@ def organize_groupby_advance():
 
 
 # GROUP BY句 クイズページ(organize_groupby_quiz.html)
-@app.route('/organize_groupby_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/group-by/quiz', methods=['GET', 'POST'])
 def organize_groupby_quiz():
     questions = [
         {
@@ -5918,7 +5972,7 @@ def organize_groupby_quiz():
 
 
 # HAVING句 学習ページ(organize_having.html)
-@app.route('/aggregation/having', methods=['GET', 'POST'])
+@app.route('/aggregation/having/study', methods=['GET', 'POST'])
 def organize_having():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -5971,7 +6025,7 @@ def organize_having():
     return render_template('organize_having.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # HAVING句 実行例ページ(organize_having_example.html)
-@app.route('/organize_having_example', methods=['GET'])
+@app.route('/aggregation/having/example', methods=['GET'])
 def organize_having_example():
     try:
         # データベース接続
@@ -6002,7 +6056,7 @@ def organize_having_example():
     return render_template('organize_having_example.html', sales_data=sales_data, having_result=having_result)
 
 # HAVING句 演習ページ(organize_having_advance.html)
-@app.route('/organize_having_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/having/practice', methods=['GET', 'POST'])
 def organize_having_advance():
     query = None
     query_result = None
@@ -6072,7 +6126,7 @@ def organize_having_advance():
     )
 
 # HAVING句 クイズページ(organize_having_quiz.html)
-@app.route('/organize_having_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/having/quiz', methods=['GET', 'POST'])
 def organize_having_quiz():
     questions = [
         {
@@ -6232,7 +6286,7 @@ def organize_having_quiz():
 
 
 # ORDER BY句 学習ページ(organize_orderby.html)
-@app.route('/aggregation/order-by', methods=['GET', 'POST'])
+@app.route('/aggregation/order-by/study', methods=['GET', 'POST'])
 def organize_orderby():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -6279,7 +6333,7 @@ def organize_orderby():
     return render_template('organize_orderby.html', sales_desc=sales_desc, sales_data=sales_data)
 
 # ORDER BY句 実行例ページ(organize_orderby_example.html)
-@app.route('/organize_orderby_example', methods=['GET'])
+@app.route('/aggregation/order-by/example', methods=['GET'])
 def organize_orderby_example():
     try:
         # データベース接続
@@ -6310,7 +6364,7 @@ def organize_orderby_example():
 
 
 # ORDER BY句 演習ページ(organize_orderby_advance.html)
-@app.route('/organize_orderby_advance', methods=['GET', 'POST'])
+@app.route('/aggregation/order-by/practice', methods=['GET', 'POST'])
 def organize_orderby_advance():
     query = None
     query_result = None
@@ -6380,7 +6434,7 @@ def organize_orderby_advance():
     )
 
 # ORDER BY句 クイズページ(organize_orderby_quiz.html)
-@app.route('/organize_orderby_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/order-by/quiz', methods=['GET', 'POST'])
 def organize_orderby_quiz():
     questions = [
         {
