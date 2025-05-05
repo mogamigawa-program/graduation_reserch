@@ -4539,6 +4539,8 @@ def aggregate_count_advance():
 @app.route('/aggregation/count/example', methods=['GET', 'POST'])
 def aggregate_count_example():
     return 0
+
+
 # COUNT クイズページ(aggregate_count_quiz.html)
 @app.route('/aggregation/count/quiz', methods=['GET', 'POST'])
 def aggregate_count_quiz():
