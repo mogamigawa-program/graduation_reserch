@@ -851,7 +851,7 @@ def post():
 #insert 学習
 @app.route('/basic/insert/insert/study', methods=['GET', 'POST'])
 def insert_study():
-    return 0
+    return render_template('insert_study.html')
 
 #insert文 演習
 @app.route('/basic/insert/insert/practice', methods=['GET', 'POST'])
@@ -992,12 +992,12 @@ def insert_practice():
 #insert 実行例
 @app.route('/basic/insert/insert/example', methods=['GET', 'POST'])
 def insert_example():
-    return 0
+    return render_template('insert_example.html')
 
 #insert クイズ
 @app.route('/basic/insert/insert/quiz', methods=['GET', 'POST'])
 def insert_quiz():
-    return 0
+    return render_template('insert_quiz.html')
 
 #delete single 学習
 @app.route('/basic/delete/single/study', methods=['GET', 'POST'])
@@ -1420,6 +1420,85 @@ def delete_from_table_multiple():
         return render_template('error.html', error_message=error_message)
     return render_template('delete_from_table_multiple.html', table_name=delete_table_name, desc=table_desc, table=table)
 
+#quiz 管理
+@app.route('/quiz/<quiz_type>', methods=['GET', 'POST'])
+def quiz(quiz_type):
+    # データベース接続
+    conn = mysql.connector.MySQLConnection(**dns)
+    cursor = conn.cursor(dictionary=True)
+
+    # 質問と選択肢をJOINで取得
+    cursor.execute("""
+        SELECT q.id AS question_id, q.question_text, q.explanation,
+               c.id AS choice_id, c.choice_text, c.is_correct
+        FROM questions AS q
+        JOIN choices AS c ON q.id = c.question_id
+        WHERE q.category = %s
+        ORDER BY q.id, c.id
+    """, (quiz_type,))
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    # クイズが存在しない場合
+    if not rows:
+        return "クイズが見つかりません", 404
+
+    # 問題を構造化（choicesを辞書で保持）
+    questions = []
+    current_qid = None
+    q_data = {}
+
+    for row in rows:
+        if row["question_id"] != current_qid:
+            if q_data:
+                questions.append(q_data)
+            q_data = {
+                "id": row["question_id"],
+                "question": row["question_text"],
+                "explanation": row["explanation"],
+                "choices": [],
+                "answer": None
+            }
+            current_qid = row["question_id"]
+
+        choice_data = {
+            "id": row["choice_id"],
+            "text": row["choice_text"],
+            "is_correct": row["is_correct"]
+        }
+        q_data["choices"].append(choice_data)
+
+        if row["is_correct"]:
+            q_data["answer"] = row["choice_text"]
+
+    if q_data:
+        questions.append(q_data)
+
+
+    # POST送信時の処理
+    submitted = False
+    score = 0
+    user_answers = {}
+
+    if request.method == 'POST':
+        submitted = True
+        for i, question in enumerate(questions):
+            key = f"answer_{i}"
+            selected = request.form.get(key)
+            user_answers[key] = selected
+            if selected == question["answer"]:
+                score += 1
+
+
+    return render_template("quiz_base.html",
+                           quiz_type=quiz_type,
+                           questions=questions,
+                           submitted=submitted,
+                           user_answers=user_answers,
+                           score=score,
+                           total=len(questions))
 
 
 
@@ -4792,7 +4871,7 @@ def aggregate_sum_example():
     return 0
 
 # SUM クイズページ(aggregate_sum_quiz.html)
-@app.route('/aggregate_sum_quiz', methods=['GET', 'POST'])
+@app.route('/aggregation/sum/quiz', methods=['GET', 'POST'])
 def aggregate_sum_quiz():
     questions = [
         {
@@ -6617,20 +6696,20 @@ def quiz_progress():
 
         # クイズIDに対応するファイル名をマッピング
         quiz_files = {
-            1: "cross_join_quiz",
-            2: "inner_join_quiz",
-            3: "left_outer_join_quiz",
-            4: "right_outer_join_quiz",
-            5: "join_quiz",
-            6: "update_quiz",
-            7: "aggregate_count_quiz",
-            8: "aggregate_sum_quiz",
-            9: "aggregate_avg_quiz",
-            10: "aggregate_max_quiz",
-            11: "aggregate_min_quiz",
-            12: "organize_groupby_quiz",
-            13: "organize_having_quiz",
-            14: "organize_orderby_quiz"
+            1: "basic/join/cross_join/quiz",
+            2: "basic/join/inner_join/quiz",
+            3: "basic/join/left_outer_join/quiz",
+            4: "basic/join/right_outer_join/quiz",
+            5: "basic/join/join_quiz",
+            6: "basic/update/quiz",
+            7: "aggregation/count/quiz",
+            8: "aggregation/sum/quiz",
+            9: "aggregation/avg/quiz",
+            10: "aggregation/max/quiz",
+            11: "aggregation/min/quiz",
+            12: "aggregation/group-by/quiz",
+            13: "aggregation/having/quiz",
+            14: "aggregation/order-by/quiz"
         }
 
         # 完了したクイズの数を計算

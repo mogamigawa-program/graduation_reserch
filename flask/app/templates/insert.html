@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block title %}insert{% endblock %}
 {% block content %}
-<title>INSERT文を学ぼう</title>
+<div class="flex justify-between mt-8">
+    <a href="/basic/insert/insert/example" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/quiz/insert" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">クイズに挑戦しよう ▶</a>
+</div>
+<title>INSERT文を使ってみよう</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -155,7 +159,7 @@
             <p class="message">更新: {{ message }}</p>
         {% endif %}
 
-        <form action="{{ url_for('insert') }}" method="post" id="insert-form">
+        <form action="{{ url_for('insert_practice') }}" method="post" id="insert-form">
             <p>INSERT INTO {{ table_name }}</p>
             <label for="columns">(</label>
             {% for row in desc %}
@@ -183,6 +187,9 @@
     </div>
 </body>
 
-<a href="/index">HOME</a>
+<div class="flex justify-between mt-8">
+    <a href="/basic/insert/insert/example" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/quiz/insert" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">クイズに挑戦しよう ▶</a>
+</div>
 
 {% endblock  %}

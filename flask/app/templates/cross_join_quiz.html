@@ -46,12 +46,10 @@
         {% if not submitted %}
             <button type="submit">回答を送信</button>
         {% else %}
-            <a href="/cross_join_quiz" class="btn btn-primary">再挑戦</a>
+            <a href="/cross_join_quiz" class="btn btn-primary">再挑戦</a><br>
+            <a href="/index" class="btn btn-primary">ホーム</a>
         {% endif %}
     </form>
 </div>
-
-<hr>
-<a href="/cross_join_study">戻る</a>
 
 {% endblock %}

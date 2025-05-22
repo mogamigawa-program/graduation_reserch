@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz_type|upper }} クイズ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ quiz_type|upper }} クイズ</h1>
+    <p>{{ quiz_type|capitalize }} に関する理解度をチェックしましょう！</p>
+
+    {% if submitted %}
+        <h2>結果</h2>
+        <p>スコア: {{ score }}/{{ total }} 正答率: {{ '%.2f' % (score / total * 100) }}%</p>
+        <hr>
+    {% endif %}
+
+    <form action="{{ url_for('quiz', quiz_type=quiz_type) }}" method="post" id="quiz_result">
+        {% for idx, question in enumerate(questions) %}
+            <div class="question-block">
+                <h3>問題 {{ idx + 1 }}</h3>
+                <p>{{ question['question'] }}</p>
+
+                {% for i, choice in enumerate(question['choices']) %}
+                    <div>
+                        <input type="radio"
+                            id="answer_{{ idx }}_{{ i }}"
+                            name="answer_{{ idx }}"
+                            value="{{ choice['text'] }}"
+                            {% if submitted and user_answers.get("answer_" ~ idx) == choice['text'] %}checked{% endif %}>
+                        <label for="answer_{{ idx }}_{{ i }}">
+                            {{ ['A','B','C','D'][i] }}. {{ choice['text'] }}
+                        </label>
+                    </div>
+                {% endfor %}
+
+                {% if submitted %}
+                    <p><strong>正解:</strong> {{ question['answer'] }}</p>
+                    <p><strong>解説:</strong> {{ question['explanation'] }}</p>
+                {% endif %}
+            </div>
+            <hr>
+        {% endfor %}
+
+        {% if not submitted %}
+            <button type="submit" class="btn btn-primary">送信</button>
+        {% else %}
+            <a href="{{ url_for('quiz', quiz_type=quiz_type) }}" class="btn btn-primary">再挑戦</a>
+            <a href="/index" class="btn btn-secondary">ホームに戻る</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
