@@ -20,13 +20,12 @@
 
                 {% for i, choice in enumerate(question['choices']) %}
                     <div>
-                        <input type="radio"
-                            id="answer_{{ idx }}_{{ i }}"
-                            name="answer_{{ idx }}"
-                            value="{{ choice['text'] }}"
-                            {% if submitted and user_answers.get("answer_" ~ idx) == choice['text'] %}checked{% endif %}>
+                        <input type="radio" 
+                            id="answer_{{ idx }}_{{ i }}" 
+                            name="answer_{{ idx }}" 
+                            value="{{ choice.text }}">
                         <label for="answer_{{ idx }}_{{ i }}">
-                            {{ ['A','B','C','D'][i] }}. {{ choice['text'] }}
+                            {{ ['A','B','C','D'][i] }}. {{ choice.text }}
                         </label>
                     </div>
                 {% endfor %}

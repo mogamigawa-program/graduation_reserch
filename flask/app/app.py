@@ -1491,6 +1491,27 @@ def quiz(quiz_type):
             if selected == question["answer"]:
                 score += 1
 
+        # --- スコアをprogressに保存 ---
+        conn = mysql.connector.MySQLConnection(**this_users_dns)
+        cursor = conn.cursor()
+
+        # クイズIDを取得
+        cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_type,))
+        result = cursor.fetchone()
+
+
+        if result:
+            quiz_id = result[0]
+            cursor.execute("""
+                INSERT INTO progress (quiz_id, score)
+                VALUES (%s, %s)
+                ON DUPLICATE KEY UPDATE score = VALUES(score)
+            """, (quiz_id, score))
+            conn.commit()
+        
+        cursor.close()
+        conn.close()
+
 
     return render_template("quiz_base.html",
                            quiz_type=quiz_type,
@@ -6709,7 +6730,8 @@ def quiz_progress():
             11: "aggregation/min/quiz",
             12: "aggregation/group-by/quiz",
             13: "aggregation/having/quiz",
-            14: "aggregation/order-by/quiz"
+            14: "aggregation/order-by/quiz",
+            15: "quiz/insert"
         }
 
         # 完了したクイズの数を計算
