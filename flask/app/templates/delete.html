@@ -83,8 +83,13 @@
 </style>
 </head>
 <body>
+    <div class="flex justify-between mt-8">
+        <a href="/basic/delete/single/example" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+        <a href="/quiz/delete_single" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+    </div>
+
 <div class="container">
-    <h1>DELETE文を学ぼう</h1>
+    <h1>DELETE文の演習(単数条件)</h1>
     <p>
         <strong>DELETE文</strong>は、テーブルから不要なデータを削除するために使用されます。特定の条件に一致する行だけを削除することができます。
     </p>
@@ -135,7 +140,11 @@
         </div>
     </form>
 </div>
+
 <a href="/delete/multiple">複数条件での削除をやってみる</a>
-<hr>
-<a href="/index">HOME</a>
+
+<div class="flex justify-between mt-8">
+    <a href="/basic/delete/single/example" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/quiz/delete_single" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
 {% endblock  %}

@@ -994,40 +994,25 @@ def insert_practice():
 def insert_example():
     return render_template('insert_example.html')
 
-#insert クイズ
-@app.route('/basic/insert/insert/quiz', methods=['GET', 'POST'])
-def insert_quiz():
-    return render_template('insert_quiz.html')
-
 #delete single 学習
 @app.route('/basic/delete/single/study', methods=['GET', 'POST'])
 def delete_single_study():
-    return 0
+    return render_template('delete_single_study.html')
 
 #delete single 実行例
 @app.route('/basic/delete/single/example', methods=['GET', 'POST'])
 def delete_single_example():
-    return 0
-
-#delete single クイズ
-@app.route('/basic/delete/single/quiz', methods=['GET', 'POST'])
-def delete_single_quiz():
-    return 0
+    return render_template('delete_single_example.html')
 
 #delete multiple 学習
 @app.route('/basic/delete/multiple/study', methods=['GET', 'POST'])
 def delete_multiple_study():
-    return 0
+    return render_template('delete_multiple_study.html')
 
 #delete multiple 実行例
 @app.route('/basic/delete/multiple/example', methods=['GET', 'POST'])
 def delete_multiple_example():
-    return 0
-
-#delete multiple クイズ
-@app.route('/basic/delete/multiple/quiz', methods=['GET', 'POST'])
-def delete_multiple_quiz():
-    return 0
+    return render_template('delete_multiple_example.html')
 
 #DELETE文 演習ページ
 @app.route('/basic/delete/<type>/practice', methods=['GET', 'POST'])
@@ -1038,8 +1023,8 @@ def delete(type):
     elif type == 'multiple':
         url = 'delete_mul.html'
     else:
-        print(f"ページが存在しません。delete/<type>でtypeの部分をsingleかmultipleでもう一度確かめてみてください。")
-        error_message = "ページが存在しません。delete/<type>でtypeの部分をsingleかmultipleでもう一度確かめてみてください。"
+        print(f"ページが存在しません。/basic/delete/<type>/practiceでtypeの部分をsingleかmultipleでもう一度確かめてみてください。")
+        error_message = "ページが存在しません。/basic/delete/<type>/practiceでtypeの部分をsingleかmultipleでもう一度確かめてみてください。"
         return render_template('error.html', error_message=error_message)
     
     if request.method == "POST":
@@ -1496,7 +1481,8 @@ def quiz(quiz_type):
         cursor = conn.cursor()
 
         # クイズIDを取得
-        cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_type,))
+        quiz_name = quiz_type.replace("_", " ")
+        cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
         result = cursor.fetchone()
 
 
@@ -1626,6 +1612,79 @@ def logout():
     session.clear()
     this_users_dns['database'] = None
     return redirect(url_for('login'))
+
+#ユーザー管理ページ
+@app.route('/user_management', methods=['GET', 'POST'])
+def user_management():
+    stmt = "SELECT id, username FROM users"
+    users = user_db.query(stmt)
+    return render_template('user_management.html', users=users)
+
+#ユーザー削除ページ
+@app.route('/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    try:
+        # ユーザー名とDB名取得
+        user_info = user_db.query(f"SELECT username FROM users WHERE id = {user_id}")
+        if not user_info:
+            flash("ユーザーが見つかりませんでした。", "danger")
+            return redirect(url_for('user_management'))
+
+        username = user_info[0][0]
+        db_name = f"{username}_db"
+
+        # 専用DB削除
+        conn = mysql.connector.MySQLConnection(**user_dns)
+        cursor = conn.cursor()
+        cursor.execute(f"DROP DATABASE IF EXISTS `{db_name}`")
+        cursor.execute(f"DELETE FROM user_databases WHERE user_id = {user_id}")
+        cursor.execute(f"DELETE FROM users WHERE id = {user_id}")
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        flash("ユーザーを削除しました。", "success")
+    except Exception as e:
+        print(f"Error: {e}")
+        flash("ユーザーの削除に失敗しました。", "danger")
+
+    return redirect(url_for('user_management'))
+
+#ユーザーの進捗チェック
+@app.route('/user_progress/<username>')
+def user_progress(username):
+    try:
+        # 接続はユーザーDBだが、クエリで dataset. を明示する
+        user_dbname = f"{username}_db"
+        this_users_dns['database'] = user_dbname
+        conn = mysql.connector.MySQLConnection(**this_users_dns)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT ds_ql.quiz_name, 
+                IFNULL(up.score, 0) AS score,
+                COUNT(ds_q.id) AS total_questions
+            FROM dataset.quiz_list ds_ql
+            LEFT JOIN {}.progress up ON ds_ql.id = up.quiz_id
+            LEFT JOIN dataset.questions ds_q 
+                ON ds_q.category COLLATE utf8mb4_general_ci = ds_ql.quiz_name COLLATE utf8mb4_general_ci
+            GROUP BY ds_ql.id
+        """.format(user_dbname))
+
+
+        progress = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return render_template('user_progress.html', username=username, progress=progress)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template("error.html", error_message="進捗の取得に失敗しました。")
+
+
+
+
 
 
 #-------------------------------------------------------------------------#
@@ -6731,7 +6790,9 @@ def quiz_progress():
             12: "aggregation/group-by/quiz",
             13: "aggregation/having/quiz",
             14: "aggregation/order-by/quiz",
-            15: "quiz/insert"
+            15: "quiz/insert",
+            16: "quiz/delete_single",
+            17: "quiz/delete_multiple"
         }
 
         # 完了したクイズの数を計算

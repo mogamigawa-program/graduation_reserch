@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}DELETE文とは(単数条件){% endblock %}
+{% block content %}
+<div class="flex justify-between mt-8">
+    <a href="/index/delete?flag=min" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/basic/delete/single/example" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
+
+<div class="container mt-4">
+    <h1>DELETE文（単数条件）の学習</h1>
+
+     <!-- 学習内容 -->
+     <section class="mt-4">
+        <h2>1. このページで学ぶこと</h2>
+        <p>
+            <strong>DELETE文</strong>は、データベースの中からいらないデータを「消す」ための命令（SQL文）です。
+            <br>
+            このページでは、「<strong>1つの条件</strong>だけでデータを削除する方法」を学びます。
+        </p>
+    </section>
+
+    <!-- 基本構文 -->
+    <section class="mt-4">
+        <h2>2. 基本の書き方</h2>
+        <p>以下が、DELETE文の基本的な形です。</p>
+        <pre><code>DELETE FROM テーブル名
+WHERE 条件;</code></pre>
+        <ul>
+            <li><code>DELETE FROM</code>：どのテーブルから削除するかを指定します</li>
+            <li><code>WHERE 条件</code>：どの行を削除するかを条件で指定します（例：IDが1のデータ）</li>
+        </ul>
+
+        <div class="alert alert-warning">
+            <strong>⚠ 注意：</strong> <code>WHERE</code> を書かないと、テーブルのすべてのデータが削除されてしまいます！<br>
+            必ず <code>WHERE</code> をつけるようにしましょう。
+        </div>
+    </section>
+
+<div class="flex justify-between mt-8">
+    <a href="/index/delete?flag=min" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/basic/delete/single/example" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
+{% endblock  %}

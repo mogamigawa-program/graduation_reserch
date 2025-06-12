@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}DELETE文の実行例(単数条件){% endblock %}
+{% block content %}
+<div class="flex justify-between mt-8">
+    <a href="/basic/delete/single/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/basic/delete/single/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
+
+<div class="container mt-4">
+    <h1>DELETE文（単数条件）実行例</h1>
+
+    <section class="mt-4">
+        <h2>対象テーブル：products</h2>
+        <p>次のような <code>products</code> テーブルがあります。</p>
+
+        <table class="table table-bordered w-auto">
+            <thead>
+                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>ペン</td><td>100</td></tr>
+                <tr><td>2</td><td>ノート</td><td>200</td></tr>
+                <tr><td>3</td><td>消しゴム</td><td>100</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="mt-4">
+        <h2>実行例①：価格が100円の商品を削除</h2>
+        <pre><code>DELETE FROM products
+WHERE price = 100;</code></pre>
+
+        <p><strong>実行結果：</strong> 「ペン」と「消しゴム」が削除されます。</p>
+    </section>
+
+    <section class="mt-4">
+        <h2>実行例②：product_idが2の商品のみを削除</h2>
+        <pre><code>DELETE FROM products
+WHERE product_id = 2;</code></pre>
+
+        <p><strong>実行結果：</strong>「ノート」が削除されます。</p>
+    </section>
+
+    <section class="mt-5">
+        <h2>よくあるエラーと注意点</h2>
+
+        <div class="alert alert-danger">
+            <strong>❌ WHERE を忘れる</strong>
+            <pre><code>DELETE FROM products;</code></pre>
+            <p>→ テーブル内の全行が削除されてしまいます！</p>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>⚠ 条件に一致する行がない</strong>
+            <pre><code>DELETE FROM products
+WHERE product_name = 'はさみ';</code></pre>
+            <p>→ 実行されても削除対象がないため、何も起きません。</p>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>⚠ 文字列の指定ミス</strong>
+            <pre><code>DELETE FROM products
+WHERE product_name = はさみ;</code></pre>
+            <p>→ エラーになります（文字列はシングルクォートで囲む必要あり）</p>
+        </div>
+
+        <div class="alert alert-danger">
+            <strong>❌ 主キーの指定ミス</strong>
+            <pre><code>DELETE FROM products
+WHERE id = 3;</code></pre>
+            <p>→ カラム名を間違えると <code>Unknown column 'id'</code> のようなエラーが出ます。</p>
+        </div>
+    </section>
+
+    <section class="mt-4">
+        <h2>補足：削除前の確認方法</h2>
+        <p>削除前に対象データを確認するには、<code>SELECT</code>文を使いましょう。</p>
+        <pre><code>SELECT * FROM products
+WHERE price = 100;</code></pre>
+    </section>
+</div>
+
+<div class="flex justify-between mt-8">
+    <a href="/basic/delete/single/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/basic/delete/single/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
+{% endblock  %}

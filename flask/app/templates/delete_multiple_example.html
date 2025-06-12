@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}DELETE文の実行例(複数条件){% endblock %}
+{% block content %}
+
+<div class="flex justify-between mt-8">
+    <a href="/basic/delete/multiple/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/basic/delete/multiple/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
+
+<div class="container mt-10">
+    <h1 class="text-2xl font-bold mb-6">DELETE文の実行例（複数条件）</h1>
+
+    <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-2">実行例①：ANDを使った条件</h2>
+        <p>以下のSQLは、名前が「John」で、かつ年齢が30以上のユーザーを削除します。</p>
+        <pre class="bg-gray-100 p-4 rounded"><code>DELETE FROM users
+WHERE name = 'John' AND age &gt;= 30;</code></pre>
+    </section>
+
+    <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-2">実行例②：ORを使った条件</h2>
+        <p>以下のSQLは、住所がNULLか、または年齢が20未満のユーザーを削除します。</p>
+        <pre class="bg-gray-100 p-4 rounded"><code>DELETE FROM users
+WHERE address IS NULL OR age &lt; 20;</code></pre>
+    </section>
+
+    <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-2">実行例③：ANDとORを組み合わせる</h2>
+        <p>以下のSQLは、名前が「Alice」で年齢が40以上、またはステータスがNULLのユーザーを削除します。</p>
+        <pre class="bg-gray-100 p-4 rounded"><code>DELETE FROM users
+WHERE (name = 'Alice' AND age &gt;= 40) OR status IS NULL;</code></pre>
+        <p class="mt-2 text-yellow-700 bg-yellow-100 p-2 rounded">※ 括弧を使って条件の優先順位を明確にすることが重要です。</p>
+    </section>
+
+    <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-2">よくあるエラー・注意点</h2>
+        <ul class="list-disc list-inside space-y-2">
+            <li>
+                <strong>AND / OR の優先順位を誤る</strong><br>
+                <code>DELETE FROM users WHERE name = 'Taro' OR age &gt; 60 AND status = 'inactive';</code><br>
+                → 条件の優先順位に注意（<code>AND</code>が先に評価される）。<br>
+                対処法：明示的に<code>()</code>で囲う。
+            </li>
+            <li>
+                <strong>文字列をクォートで囲んでいない</strong><br>
+                <code>DELETE FROM users WHERE name = Taro;</code><br>
+                → 正しくは <code>name = 'Taro'</code>。文字列は必ずシングルクォートで囲む。
+            </li>
+            <li>
+                <strong>NULL値との比較で = を使ってしまう</strong><br>
+                <code>DELETE FROM users WHERE address = NULL;</code><br>
+                → NULLとの比較は<code>IS NULL</code>または<code>IS NOT NULL</code>を使う。
+            </li>
+            <li>
+                <strong>WHEREを付け忘れて全データを削除</strong><br>
+                → 複雑な条件を使うときほど、<code>WHERE</code>の記述漏れに注意。
+            </li>
+        </ul>
+    </section>
+</div>
+
+<div class="flex justify-between mt-8">
+    <a href="/basic/delete/multiple/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
+    <a href="/basic/delete/multiple/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+</div>
+
+{% endblock %}

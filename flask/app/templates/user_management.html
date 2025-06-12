@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Update_join{% endblock %}
+{% block content %}
+
+<h1>ユーザー管理ページ</h1>
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>ユーザー名</th>
+    <th>操作</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{ user[0] }}</td>
+    <td>{{ user[1] }}</td>
+    <td>
+      <!-- 削除フォーム -->
+      <form method="POST" action="{{ url_for('delete_user', user_id=user[0]) }}">
+        <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
+      </form>
+      <!-- 進捗確認リンク -->
+      <a href="{{ url_for('user_progress', username=user[1]) }}">進捗確認</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

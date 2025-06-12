@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}USER MANAGEMENT{% endblock %}
+{% block content %}
+
+<h1>{{ username }}さんの進捗状況</h1>
+<table border="1">
+  <tr><th>クイズ名</th><th>スコア</th></tr>
+  {% for quiz_name, score, total in progress %}
+  <tr>
+    <td>{{ quiz_name }}</td>
+    <td>{{ score }}/{{ total }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<a href="{{ url_for('user_management') }}">← ユーザー管理に戻る</a>
+
+{% endblock %}
