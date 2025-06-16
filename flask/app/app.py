@@ -1585,25 +1585,28 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        session['username'] = username
-
-        # パラメータ化でSQLインジェクション対策
-        select_user_query = "SELECT * FROM users WHERE username = '" + username + "'"
-        users = user_db.query(select_user_query)
-
         try:
+            # パラメータ化されたクエリ（SQLインジェクション対策）
+            select_user_query = "SELECT id, username, password, is_admin FROM users WHERE username = " + username
+            users = user_db.query(select_user_query)
+
             if users and bcrypt.check_password_hash(users[0][2], password):
                 session['user_id'] = users[0][0]
+                session['username'] = users[0][1]
+                session['is_admin'] = (users[0][3] == 1)
+
                 user_db_name = f"{username}_db"
                 this_users_dns['database'] = user_db_name
                 return redirect(url_for('main'))
             else:
                 flash("パスワードかユーザー名が違います", "danger")
+
         except Exception as e:
             print(f"Login Error: {e}")
             flash("ログイン中にエラーが発生しました", "danger")
 
     return render_template('login.html')
+
 
 
 #ログアウト
@@ -1613,8 +1616,21 @@ def logout():
     this_users_dns['database'] = None
     return redirect(url_for('login'))
 
+from functools import wraps
+# 管理者のみがアクセスできるページ権限
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('is_admin'):
+            flash("管理者のみアクセス可能です。", "danger")
+            return redirect(url_for('main'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 #ユーザー管理ページ
 @app.route('/user_management', methods=['GET', 'POST'])
+@admin_required
 def user_management():
     stmt = "SELECT id, username FROM users"
     users = user_db.query(stmt)
@@ -1622,6 +1638,7 @@ def user_management():
 
 #ユーザー削除ページ
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
+@admin_required
 def delete_user(user_id):
     try:
         # ユーザー名とDB名取得
@@ -1652,6 +1669,7 @@ def delete_user(user_id):
 
 #ユーザーの進捗チェック
 @app.route('/user_progress/<username>')
+@admin_required
 def user_progress(username):
     try:
         # 接続はユーザーDBだが、クエリで dataset. を明示する
