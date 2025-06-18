@@ -1,57 +1,58 @@
 {% extends "base.html" %}
 {% block title %}DELETE文とは(複数条件){% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
 {% block content %}
 
-<div class="flex justify-between mt-8">
-    <a href="/index/delete?flag=min" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/delete/multiple/example" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+<div class="nav-buttons">
+    <a href="/index/delete?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/delete/multiple/example" class="next">次へ ▶</a>
 </div>
 
-<div class="container mt-10">
-    <h1 class="text-2xl font-bold mb-4">DELETE文（複数条件）</h1>
+<div class="learning-container">
+    <h1>DELETE文（複数条件）</h1>
 
-    <section class="mb-8">
-        <h2 class="text-xl font-semibold mb-2">複数条件での削除とは？</h2>
+    <section>
+        <h2>複数条件での削除とは？</h2>
         <p>
             複数の条件を組み合わせて、より細かく削除対象を絞り込むことができます。<br>
             条件の組み合わせには <code>AND</code>（かつ）や <code>OR</code>（または）を使用します。
         </p>
     </section>
 
-    <section class="mb-8">
-        <h2 class="text-xl font-semibold mb-2">基本構文</h2>
-        <pre class="bg-gray-100 p-4 rounded">
-            <code>
-                DELETE FROM テーブル名 WHERE 条件1 AND 条件2;
+    <section>
+        <h2>基本構文</h2>
+        <div class="code-block">
+<code>DELETE FROM テーブル名 WHERE 条件1 AND 条件2;
 
-                DELETE FROM テーブル名 WHERE 条件1 OR 条件2;
-            </code>
-        </pre>
-        <ul class="list-disc list-inside mt-2">
+DELETE FROM テーブル名 WHERE 条件1 OR 条件2;</code>
+        </div>
+        <ul>
             <li><code>AND</code>：すべての条件を満たす行が削除されます</li>
             <li><code>OR</code>：いずれかの条件を満たす行が削除されます</li>
         </ul>
     </section>
 
-    <section class="mb-8">
-        <h2 class="text-xl font-semibold mb-2">使用例</h2>
+    <section>
+        <h2>使用例</h2>
         <p>たとえば、年齢が20歳以上かつ名前が"John"のデータを削除するには：</p>
-        <pre class="bg-gray-100 p-4 rounded"><code>DELETE FROM users
-WHERE age &gt;= 20 AND name = 'John';</code></pre>
+        <div class="code-block"><code>DELETE FROM users
+WHERE age &gt;= 20 AND name = 'John';</code></div>
 
-        <p class="mt-4">また、年齢が18歳未満または住所がNULLの人を削除したい場合：</p>
-        <pre class="bg-gray-100 p-4 rounded"><code>DELETE FROM users
-WHERE age &lt; 18 OR address IS NULL;</code></pre>
+        <p>また、年齢が18歳未満または住所がNULLの人を削除したい場合：</p>
+        <div class="code-block"><code>DELETE FROM users
+WHERE age &lt; 18 OR address IS NULL;</code></div>
     </section>
 
-    <div class="alert bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+    <div class="alert-warning">
         <strong>注意：</strong> <code>AND</code> と <code>OR</code> を混在させる場合は、<strong>括弧()</strong>で意図を明確にしましょう。
     </div>
 </div>
 
-<div class="flex justify-between mt-8">
-    <a href="/index/delete?flag=min" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/delete/multiple/example" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+<div class="nav-buttons">
+    <a href="/index/delete?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/delete/multiple/example" class="next">次へ ▶</a>
 </div>
 
 {% endblock %}

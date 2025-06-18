@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}INSERT + SELECT文 実行例と注意点{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/insert/insert-select/study" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/select/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>INSERT + SELECT文 実行例と注意点</h1>
+
+    <section>
+        <h2>実行例：users → temp_users にコピー</h2>
+        <div class="code-block">
+<code>INSERT INTO temp_users (id, name)
+SELECT id, name
+FROM users
+WHERE age &lt; 18;</code>
+        </div>
+        <p>このSQLは、18歳未満のユーザーを <code>temp_users</code> にコピーします。</p>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>よくあるエラーと原因</h2>
+
+        <div class="alert-error">
+            <strong>❌ 列数が一致していない</strong>
+            <div class="code-block">
+<code>INSERT INTO temp_users (id, name)
+SELECT id, name, age
+FROM users;</code>
+            </div>
+            <p><code>temp_users</code>には2列しかないのに3列指定しています。</p>
+        </div>
+
+        <div class="alert-warning">
+            <strong>⚠ データ型の不一致</strong>
+            <div class="code-block">
+<code>INSERT INTO target_table (id, created_at)
+SELECT id, name FROM source_table;</code>
+            </div>
+            <p><code>name</code>は文字列なのに、<code>created_at</code>は日付型 → エラーになります。</p>
+        </div>
+
+        <div class="alert-error">
+            <strong>❌ 主キー重複によるエラー</strong>
+            <div class="code-block">
+<code>INSERT INTO users (id, name)
+SELECT id, name FROM old_users;</code>
+            </div>
+            <p><code>users</code> テーブルにすでに同じ <code>id</code> があるとエラーになります。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>対策</h2>
+        <ul>
+            <li>列の数と順番を確認する</li>
+            <li>必要に応じて <code>WHERE</code> でデータを絞る</li>
+            <li><code>NOT EXISTS</code> などで重複チェックも可能</li>
+        </ul>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/insert/insert-select/study" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/select/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

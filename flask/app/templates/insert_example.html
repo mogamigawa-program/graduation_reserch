@@ -1,94 +1,109 @@
 {% extends "base.html" %}
 {% block title %}INSERT文の実行例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
 {% block content %}
-<div class="flex justify-between mt-8">
-    <a href="/basic/insert/insert/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/insert/insert/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+
+<div class="nav-buttons">
+    <a href="/basic/insert/insert/study" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/insert/practice" class="next">次へ ▶</a>
 </div>
-<h1>INSERT文の実行例</h1>
 
-<h2>基本的な実行例</h2>
-<p>以下のような <code>students</code> テーブルがあるとします：</p>
+<div class="learning-container">
+    <h1>INSERT文の実行例</h1>
 
-<pre><code>
-CREATE TABLE students (
+    <section>
+        <h2>基本的な実行例</h2>
+        <p>以下のような <code>students</code> テーブルがあるとします：</p>
+
+        <div class="code-block">
+<code>CREATE TABLE students (
     id INT PRIMARY KEY,
     name VARCHAR(100),
     age INT
-);
-</code></pre>
+);</code>
+        </div>
 
-<p>このテーブルに新しい学生を追加するには、次のようなSQLを使います。</p>
+        <p>このテーブルに新しい学生を追加するには、次のようなSQLを使います。</p>
 
-<pre><code>
-INSERT INTO students (id, name, age)
-VALUES (1, '佐藤太郎', 20);
-</code></pre>
+        <div class="code-block">
+<code>INSERT INTO students (id, name, age)
+VALUES (1, '佐藤太郎', 20);</code>
+        </div>
 
-<p>このSQLを実行すると、<strong>「idが1、名前が佐藤太郎、年齢が20歳」</strong>のデータが追加されます。</p>
+        <p><strong>実行結果：</strong> 「idが1、名前が佐藤太郎、年齢が20歳」のデータが追加されます。</p>
+    </section>
 
-<h2>複数行を追加する例</h2>
-<pre><code>
-INSERT INTO students (id, name, age)
+    <section>
+        <h2>複数行を追加する例</h2>
+        <div class="code-block">
+<code>INSERT INTO students (id, name, age)
 VALUES
 (2, '鈴木花子', 19),
-(3, '高橋一郎', 21);
-</code></pre>
+(3, '高橋一郎', 21);</code>
+        </div>
 
-<p>このように、<strong>複数のレコード</strong>を一度に追加することもできます。</p>
+        <p>このように、<strong>複数のレコード</strong>を一度に追加することもできます。</p>
+    </section>
 
-<hr>
+    <hr>
 
-<h2>よくあるミスやエラー集</h2>
+    <section>
+        <h2>よくあるミスやエラー集</h2>
 
-<h3>① PRIMARY KEYの重複</h3>
-<pre><code>
--- エラーになる例（id=1はすでに存在する）
+        <h3>① PRIMARY KEYの重複</h3>
+        <div class="code-block">
+<code>-- エラーになる例（id=1はすでに存在する）
 INSERT INTO students (id, name, age)
-VALUES (1, '山田次郎', 22);
-</code></pre>
-<p><strong>エラーメッセージ例：</strong> <code>ERROR: duplicate key value violates unique constraint "students_pkey"</code></p>
-<p><strong>対策：</strong> id（主キー）が重複しないように注意する。自動採番（SERIAL型）を使う方法もあります。</p>
+VALUES (1, '山田次郎', 22);</code>
+        </div>
+        <p><strong>エラーメッセージ例：</strong> <code>ERROR: duplicate key value violates unique constraint "students_pkey"</code></p>
+        <p><strong>対策：</strong> 主キー（id）の重複を避け、自動採番を使う方法も検討しましょう。</p>
 
-<h3>② データ型の不一致</h3>
-<pre><code>
--- エラーになる例（ageに文字列を入れてしまっている）
+        <h3>② データ型の不一致</h3>
+        <div class="code-block">
+<code>-- エラーになる例（ageに文字列を入れてしまっている）
 INSERT INTO students (id, name, age)
-VALUES (4, '田中花子', '二十');
-</code></pre>
-<p><strong>エラーメッセージ例：</strong> <code>ERROR: invalid input syntax for type integer: "二十"</code></p>
-<p><strong>対策：</strong> 数字の列には半角の数字を使う。</p>
+VALUES (4, '田中花子', '二十');</code>
+        </div>
+        <p><strong>エラーメッセージ例：</strong> <code>ERROR: invalid input syntax for type integer: "二十"</code></p>
+        <p><strong>対策：</strong> 数値型カラムには半角の数値を使用する。</p>
 
-<h3>③ 値の数と列の数が合わない</h3>
-<pre><code>
--- エラーになる例（列が3つあるのに、値が2つしかない）
+        <h3>③ 値の数と列の数が合わない</h3>
+        <div class="code-block">
+<code>-- エラーになる例（列が3つあるのに、値が2つしかない）
 INSERT INTO students (id, name, age)
-VALUES (5, '山本一郎');
-</code></pre>
-<p><strong>エラーメッセージ例：</strong> <code>ERROR: INSERT has more target columns than expressions</code></p>
-<p><strong>対策：</strong> 列の数と、値の数が合っているか確認する。</p>
+VALUES (5, '山本一郎');</code>
+        </div>
+        <p><strong>エラーメッセージ例：</strong> <code>ERROR: INSERT has more target columns than expressions</code></p>
+        <p><strong>対策：</strong> 列の数と、値の数が一致しているか確認しましょう。</p>
 
-<h3>④ シングルクォートの閉じ忘れ</h3>
-<pre><code>
--- エラーになる例（文字列が閉じられていない）
+        <h3>④ シングルクォートの閉じ忘れ</h3>
+        <div class="code-block">
+<code>-- エラーになる例（文字列が閉じられていない）
 INSERT INTO students (id, name, age)
-VALUES (6, '佐々木陽子, 20);
-</code></pre>
-<p><strong>エラーメッセージ例：</strong> <code>ERROR: unterminated quoted string</code></p>
-<p><strong>対策：</strong> 文字列は <code>'</code>（シングルクォート）で正しく囲む。</p>
+VALUES (6, '佐々木陽子, 20);</code>
+        </div>
+        <p><strong>エラーメッセージ例：</strong> <code>ERROR: unterminated quoted string</code></p>
+        <p><strong>対策：</strong> 文字列は <code>'</code>（シングルクォート）で正しく囲みましょう。</p>
+    </section>
 
-<hr>
+    <hr>
 
-<h2>まとめ</h2>
-<ul>
-  <li>INSERT文は、テーブルにデータを追加するための基本的なSQL文です。</li>
-  <li>列と値の数、順番、型に注意して書く必要があります。</li>
-  <li>よくあるエラーを経験しながら覚えると、理解が深まります。</li>
-</ul>
-
-
-<div class="flex justify-between mt-8">
-    <a href="/basic/insert/insert/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/insert/insert/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+    <section>
+        <h2>まとめ</h2>
+        <ul>
+            <li>INSERT文はテーブルにデータを追加するための基本的なSQL文です。</li>
+            <li>列と値の数・型・順番に注意して書きましょう。</li>
+            <li>よくあるエラーを知っておくことで、トラブルを防げます。</li>
+        </ul>
+    </section>
 </div>
-{% endblock  %}
+
+<div class="nav-buttons">
+    <a href="/basic/insert/insert/study" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/insert/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

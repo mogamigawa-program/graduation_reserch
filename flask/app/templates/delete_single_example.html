@@ -1,19 +1,23 @@
 {% extends "base.html" %}
 {% block title %}DELETE文の実行例(単数条件){% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
 {% block content %}
-<div class="flex justify-between mt-8">
-    <a href="/basic/delete/single/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/delete/single/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+
+<div class="nav-buttons">
+    <a href="/basic/delete/single/study" class="prev">◀ 前へ</a>
+    <a href="/basic/delete/single/practice" class="next">次へ ▶</a>
 </div>
 
-<div class="container mt-4">
+<div class="learning-container">
     <h1>DELETE文（単数条件）実行例</h1>
 
-    <section class="mt-4">
+    <section>
         <h2>対象テーブル：products</h2>
         <p>次のような <code>products</code> テーブルがあります。</p>
 
-        <table class="table table-bordered w-auto">
+        <table class="example-table">
             <thead>
                 <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
             </thead>
@@ -25,63 +29,56 @@
         </table>
     </section>
 
-    <section class="mt-4">
+    <section>
         <h2>実行例①：価格が100円の商品を削除</h2>
-        <pre><code>DELETE FROM products
-WHERE price = 100;</code></pre>
-
+        <div class="code-block"><code>DELETE FROM products<br>WHERE price = 100;</code></div>
         <p><strong>実行結果：</strong> 「ペン」と「消しゴム」が削除されます。</p>
     </section>
 
-    <section class="mt-4">
+    <section>
         <h2>実行例②：product_idが2の商品のみを削除</h2>
-        <pre><code>DELETE FROM products
-WHERE product_id = 2;</code></pre>
-
+        <div class="code-block"><code>DELETE FROM products<br>WHERE product_id = 2;</code></div>
         <p><strong>実行結果：</strong>「ノート」が削除されます。</p>
     </section>
 
-    <section class="mt-5">
+    <section>
         <h2>よくあるエラーと注意点</h2>
 
-        <div class="alert alert-danger">
+        <div class="alert-error">
             <strong>❌ WHERE を忘れる</strong>
-            <pre><code>DELETE FROM products;</code></pre>
+            <div class="code-block"><code>DELETE FROM products;</code></div>
             <p>→ テーブル内の全行が削除されてしまいます！</p>
         </div>
 
-        <div class="alert alert-warning">
+        <div class="alert-warning">
             <strong>⚠ 条件に一致する行がない</strong>
-            <pre><code>DELETE FROM products
-WHERE product_name = 'はさみ';</code></pre>
+            <div class="code-block"><code>DELETE FROM products<br>WHERE product_name = 'はさみ';</code></div>
             <p>→ 実行されても削除対象がないため、何も起きません。</p>
         </div>
 
-        <div class="alert alert-warning">
+        <div class="alert-warning">
             <strong>⚠ 文字列の指定ミス</strong>
-            <pre><code>DELETE FROM products
-WHERE product_name = はさみ;</code></pre>
+            <div class="code-block"><code>DELETE FROM products<br>WHERE product_name = はさみ;</code></div>
             <p>→ エラーになります（文字列はシングルクォートで囲む必要あり）</p>
         </div>
 
-        <div class="alert alert-danger">
+        <div class="alert-error">
             <strong>❌ 主キーの指定ミス</strong>
-            <pre><code>DELETE FROM products
-WHERE id = 3;</code></pre>
+            <div class="code-block"><code>DELETE FROM products<br>WHERE id = 3;</code></div>
             <p>→ カラム名を間違えると <code>Unknown column 'id'</code> のようなエラーが出ます。</p>
         </div>
     </section>
 
-    <section class="mt-4">
+    <section>
         <h2>補足：削除前の確認方法</h2>
         <p>削除前に対象データを確認するには、<code>SELECT</code>文を使いましょう。</p>
-        <pre><code>SELECT * FROM products
-WHERE price = 100;</code></pre>
+        <div class="code-block"><code>SELECT * FROM products<br>WHERE price = 100;</code></div>
     </section>
 </div>
 
-<div class="flex justify-between mt-8">
-    <a href="/basic/delete/single/study" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/delete/single/practice" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+<div class="nav-buttons">
+    <a href="/basic/delete/single/study" class="prev">◀ 前へ</a>
+    <a href="/basic/delete/single/practice" class="next">次へ ▶</a>
 </div>
-{% endblock  %}
+
+{% endblock %}

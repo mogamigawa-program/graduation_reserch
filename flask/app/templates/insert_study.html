@@ -1,59 +1,87 @@
 {% extends "base.html" %}
 {% block title %}INSERT文とは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
 {% block content %}
-<div class="flex justify-between mt-8">
-    <a href="/index/insert?flag=min" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/insert/insert/example" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+
+<div class="nav-buttons">
+    <a href="/index/insert?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/insert/example" class="next">次へ ▶</a>
 </div>
-<h1>INSERT文とは</h1>
-<p>
-    <strong>INSERT文</strong>は、データベースのテーブルに新しいデータ（レコード）を追加するときに使うSQL文です。たとえば、新しいユーザー情報や商品データなどを登録したいときに使います。
-</p>
 
-<h2>基本的な書き方</h2>
-<pre><code>INSERT INTO テーブル名 (列1, 列2, ...) VALUES (値1, 値2, ...);</code></pre>
+<div class="learning-container">
+    <h1>INSERT文とは</h1>
 
-<p>
-    この構文では、追加したい列と、それに対応する値を指定します。たとえば、「users」というテーブルに名前と年齢を追加したい場合は、次のように書きます：
-</p>
+    <section>
+        <p>
+            <strong>INSERT文</strong>は、データベースのテーブルに新しいデータ（レコード）を追加するときに使うSQL文です。<br>
+            たとえば、新しいユーザー情報や商品データなどを登録したいときに使います。
+        </p>
+    </section>
 
-<pre><code>INSERT INTO users (name, age) VALUES ('田中太郎', 25);</code></pre>
+    <section>
+        <h2>基本的な書き方</h2>
+        <div class="code-block">
+<code>INSERT INTO テーブル名 (列1, 列2, ...) VALUES (値1, 値2, ...);</code>
+        </div>
 
-<h2>すべての列に値を入れる場合</h2>
-<p>
-    すべての列に順番通りに値を入れる場合は、列名の部分を省略することもできます。
-</p>
-<pre><code>INSERT INTO users VALUES (1, '田中太郎', 25);</code></pre>
-<p>
-    ただし、この方法は列の順番や数を間違えるとエラーになるため、できるだけ列名を書くのがおすすめです。
-</p>
+        <p>
+            この構文では、追加したい列と、それに対応する値を指定します。たとえば、「users」テーブルに名前と年齢を追加するには次のように書きます：
+        </p>
 
-<h2>複数行のデータを一度に追加する</h2>
-<p>
-    複数のレコードを一度に追加することもできます。
-</p>
-<pre><code>
-INSERT INTO users (name, age) VALUES
+        <div class="code-block">
+<code>INSERT INTO users (name, age) VALUES ('田中太郎', 25);</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>すべての列に値を入れる場合</h2>
+        <p>
+            すべての列に順番通りに値を入れる場合は、列名の部分を省略することもできます。
+        </p>
+        <div class="code-block">
+<code>INSERT INTO users VALUES (1, '田中太郎', 25);</code>
+        </div>
+        <p>
+            ただしこの方法は、列の順番や数を間違えるとエラーになるため、できるだけ列名を書くのがおすすめです。
+        </p>
+    </section>
+
+    <section>
+        <h2>複数行のデータを一度に追加する</h2>
+        <p>
+            複数のレコードを一度に追加することもできます。
+        </p>
+        <div class="code-block">
+<code>INSERT INTO users (name, age) VALUES
 ('佐藤花子', 30),
 ('鈴木一郎', 22),
-('山田二郎', 28);
-</code></pre>
+('山田二郎', 28);</code>
+        </div>
+    </section>
 
-<h2>注意点</h2>
-<ul>
-    <li>指定した列に <code>NOT NULL</code> 制約がある場合、値を省略するとエラーになります。</li>
-    <li>文字列は <code>'（シングルクォート）</code> で囲む必要があります。</li>
-    <li>テーブルの構造や制約（PRIMARY KEY, UNIQUEなど）に合ったデータを入れる必要があります。</li>
-</ul>
+    <section>
+        <h2>注意点</h2>
+        <ul>
+            <li><code>NOT NULL</code> 制約がある列には必ず値を入れる必要があります。</li>
+            <li>文字列は <code>'（シングルクォート）</code> で囲みます。</li>
+            <li>テーブルの構造や制約（<code>PRIMARY KEY</code>, <code>UNIQUE</code> など）に適した値を使いましょう。</li>
+        </ul>
+    </section>
 
-<h2>まとめ</h2>
-<p>
-    INSERT文を使えば、テーブルに新しいデータを簡単に追加できます。まずは基本の形をしっかり覚え、必要に応じて応用的な使い方も試してみましょう。
-</p>
-
-
-<div class="flex justify-between mt-8">
-    <a href="/index/insert?flag=min" class="rounded bg-gray-300 px-6 py-2 text-black hover:bg-gray-400">◀ 前へ</a>
-    <a href="/basic/insert/insert/example" class="rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600">次へ ▶</a>
+    <section>
+        <h2>まとめ</h2>
+        <p>
+            INSERT文を使えば、テーブルに新しいデータを簡単に追加できます。<br>
+            まずは基本の形をしっかり覚えて、慣れてきたら応用的な使い方も試してみましょう。
+        </p>
+    </section>
 </div>
-{% endblock  %}
+
+<div class="nav-buttons">
+    <a href="/index/insert?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/insert/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

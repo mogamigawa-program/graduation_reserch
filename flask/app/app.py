@@ -122,7 +122,7 @@ def index_item(item):
             ],
             "insert": [
                 {"name": "挿入", "url": "/basic/insert/insert/study"},
-                {"name": "select文を利用したデータの挿入", "url": "/basic/insert/select-insert/study"}
+                {"name": "select文を利用したデータの挿入", "url": "/basic/insert/insert-select/study"}
             ],
             "update": [
                 {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column/study"},
@@ -994,6 +994,21 @@ def insert_practice():
 def insert_example():
     return render_template('insert_example.html')
 
+# insert_select 学習
+@app.route('/basic/insert/insert-select/study', methods=['GET', 'POST'])
+def insert_select_study():
+    return render_template('insert_select_study.html')
+
+# insert_select 実行例
+@app.route('/basic/insert/insert-select/example', methods=['GET', 'POST'])
+def insert_select_example():
+    return render_template('insert_select_example.html')
+
+# insert_select 演習
+@app.route('/basic/insert/insert-select/practice', methods=['GET', 'POST'])
+def insert_select_practice():
+    return 0
+
 #delete single 学習
 @app.route('/basic/delete/single/study', methods=['GET', 'POST'])
 def delete_single_study():
@@ -1513,6 +1528,8 @@ def quiz(quiz_type):
 def not_found(error):
     return redirect(url_for('main'))
 
+
+# ユーザー管理系
 #サインアップ
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():

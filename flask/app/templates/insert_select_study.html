@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}INSERT + SELECT文とは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/insert?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/insert-select/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>INSERT + SELECT文とは</h1>
+
+    <section>
+        <p>
+            <strong>INSERT + SELECT</strong>文は、別のテーブルからデータを取得して、別のテーブルに挿入するためのSQL構文です。<br>
+            主に「<strong>データのコピー</strong>」や「<strong>一部データの移動</strong>」に使われます。
+        </p>
+    </section>
+
+    <section>
+        <h2>基本構文</h2>
+        <div class="code-block">
+<code>INSERT INTO 追加先テーブル (列1, 列2, ...)
+SELECT 列1, 列2, ...
+FROM 元テーブル
+WHERE 条件;</code>
+        </div>
+        <p>
+            <code>VALUES</code> の代わりに <code>SELECT</code> を使って、複数の行を一括で挿入できます。
+        </p>
+    </section>
+
+    <section>
+        <h2>使用例</h2>
+        <p>以下のように、年齢が30以上のユーザーを <code>senior_users</code> テーブルに追加できます：</p>
+        <div class="code-block">
+<code>INSERT INTO senior_users (id, name, age)
+SELECT id, name, age
+FROM users
+WHERE age >= 30;</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>注意点</h2>
+        <ul>
+            <li>列数・型が一致している必要があります</li>
+            <li>挿入先テーブルに存在しない列を指定しないようにしましょう</li>
+            <li>必要に応じて <code>WHERE</code> で条件をつけましょう</li>
+        </ul>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/insert?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/insert/insert-select/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}
