@@ -10,6 +10,8 @@ import mysql.connector
 from .config import Config
 from DataStore.MySQL import MySQL
 
+import re
+
 #Flaskオブジェクトの生成
 app = Flask(__name__)
 
@@ -1005,9 +1007,84 @@ def insert_select_example():
     return render_template('insert_select_example.html')
 
 # insert_select 演習
-@app.route('/basic/insert/insert-select/practice', methods=['GET', 'POST'])
-def insert_select_practice():
-    return 0
+@app.route('/basic/insert/insert-select/practice/<type>', methods=['GET', 'POST'])
+def insert_select_practice(type):
+    if type == 'select':
+        html = 'insert_select_practice_select.html'
+    elif type == 'free':
+        html = 'insert_select_practice_free.html'
+    else:
+        error = 'URLが正しくありません。practice/<type>, typeの部分はselect or freeでもう一度お試しください。'
+        return redirect(url_for('error_page', msg=str(error)))
+
+    sql = ''
+    message = ''
+    error_message = ''
+
+    ALLOWED_COLUMNS = {'id', 'name', 'age'}
+
+    import re
+    SAFE_SQL_PATTERN = re.compile(r"""
+        ^\s*INSERT\s+INTO\s+selected_users\s*
+        \(\s*selected_id\s*,\s*selected_name\s*\)\s*
+        SELECT\s+[\w\s,]+\s+FROM\s+all_users\s+
+        WHERE\s+.+;\s*$""", re.IGNORECASE | re.VERBOSE)
+
+    if request.method == 'POST':
+        action = request.form.get('submit_button')
+
+        if action == 'execute':
+            if type == 'select':
+                columns = request.form.get('columns', '').strip()
+                condition = request.form.get('condition', '').strip()
+                col_list = [col.strip() for col in columns.split(",")]
+                if len(col_list) != 2 or not all(c in ALLOWED_COLUMNS for c in col_list):
+                    error_message = "使用できるカラムは id, name, age のみです。"
+                else:
+                    col1, col2 = col_list
+                    sql = f"""
+                        INSERT INTO selected_users (selected_id, selected_name)
+                        SELECT {col1}, {col2} FROM all_users WHERE {condition}
+                    """
+                    try:
+                        run_query(sql, commit=True)
+                        message = "データの挿入に成功しました。"
+                    except Exception as e:
+                        error_message = f"SQL実行エラー: {e}"
+
+            elif type == 'free':
+                sql = request.form.get('sql', '').strip()
+
+                if not SAFE_SQL_PATTERN.match(sql):
+                    error_message = "許可された形式のSQL文のみ実行できます。"
+                else:
+                    try:
+                        run_query(sql, commit=True)
+                        message = "SQLを実行しました。"
+                    except Exception as e:
+                        error_message = f"SQL実行エラー: {e}"
+
+        elif action == 'reset':
+            try:
+                run_query("TRUNCATE TABLE selected_users", commit=True)
+                message = "selected_usersテーブルを初期化しました。"
+            except Exception as e:
+                error_message = f"初期化エラー: {e}"
+
+    try:
+        desc1, all_users = fetch_table_data('all_users')
+        desc2, selected_users = fetch_table_data('selected_users')
+        return render_template(html,
+                               all_users=all_users,
+                               selected_users=selected_users,
+                               sql=sql,
+                               message=message,
+                               error_message=error_message)
+    except Exception as e:
+        return render_template(html)
+
+
+    
 
 #delete single 学習
 @app.route('/basic/delete/single/study', methods=['GET', 'POST'])
@@ -1526,7 +1603,8 @@ def quiz(quiz_type):
 
 @app.errorhandler(404)
 def not_found(error):
-    return redirect(url_for('main'))
+    print(error)
+    return render_template('error.html', error_message=error)
 
 
 # ユーザー管理系
@@ -1560,7 +1638,8 @@ def signup():
             conn.close()
             
             # ユーザーのデータベースにdataset内にある、テーブルをいくつかコピーする
-            tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'sales', 'quiz_list', 'progress']
+            tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'sales',
+                    'quiz_list', 'progress', 'all_users', 'selected_users']
             for table in tables:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)
                 cursor = conn.cursor()
@@ -6954,6 +7033,20 @@ def calculate_progress_rate(cursor):
     completed_quizzes = cursor.fetchone()[0]
 
     return int((completed_quizzes / total_quizzes) * 100)
+
+def run_query(sql, commit=False):
+
+    conn = mysql.connector.connect(**this_users_dns)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(sql)
+        if commit:
+            conn.commit()
+        return cursor.fetchall() if cursor.with_rows else None
+    finally:
+        cursor.close()
+        conn.close()
 
 #カウント
 @app.context_processor

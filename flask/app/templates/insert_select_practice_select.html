@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}INSERT + SELECT 演習{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/insert/select/study" class="prev">◀ 戻る</a>
+    <a href="/basic/insert/insert-select/practice/free" class="btn btn-outline">自由入力形式で練習する</a>
+    <a href="/quiz/insert_select" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>INSERT + SELECT 演習</h1>
+
+    <section>
+        <h2>INSERT + SELECT文とは？</h2>
+        <p>あるテーブルのデータを、条件を付けて別のテーブルにコピーするSQL文です。</p>
+        <div class="code-block">
+<code>INSERT INTO selected_users (id, name)
+SELECT id, name FROM users
+WHERE age &gt;= 18;</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>テーブルの状態</h2>
+        <h3>元データ（all_usersテーブル）</h3>
+        <table class="example-table">
+            <thead><tr><th>id</th><th>name</th><th>age</th></tr></thead>
+            <tbody>
+                {% for row in all_users %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>コピー先（selected_usersテーブル）</h3>
+        <table class="example-table">
+            <thead><tr><th>selected_id</th><th>selected_name</th></tr></thead>
+            <tbody>
+                {% for row in selected_users %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>演習：SQL構文を完成させよう</h2>
+        <form action="" method="post">
+            <p>INSERT INTO selected_users (selected_id, selected_name)</p>
+            <p>SELECT
+                <input type="text" name="columns" placeholder="例: id, name">
+                FROM users
+                WHERE <input type="text" name="condition" placeholder="例: age &gt;= 18">
+                ;
+            </p>
+            <div class="btn-container">
+                <button type="submit" name="submit_button" value="execute" class="btn">実行</button>
+                <button type="submit" name="submit_button" value="reset" class="btn">テーブルを初期化</button>
+            </div>
+        </form>
+
+        {% if sql %}<p><strong>実行したSQL:</strong> <code>{{ sql }}</code></p>{% endif %}
+        {% if message %}<p class="message">{{ message }}</p>{% endif %}
+        {% if error_message %}<p class="error-message">{{ error_message }}</p>{% endif %}
+    </section>
+
+    <section>
+        <h2>よくあるエラー</h2>
+        <ul>
+            <li><strong>列数不一致：</strong> コピー元とコピー先の列数を一致させる必要があります。</li>
+            <li><strong>データ型不一致：</strong> age列のデータを文字列列に挿入しないように。</li>
+            <li><strong>主キー重複：</strong> selected_usersにすでに同じidがあるとエラーになります。</li>
+        </ul>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/insert/select/study" class="prev">◀ 戻る</a>
+    <a href="/basic/insert/insert-select/practice/free" class="btn btn-outline">自由入力形式で練習する</a>
+    <a href="/quiz/insert_select" class="next">次へ ▶</a>
+</div>
+{% endblock %}

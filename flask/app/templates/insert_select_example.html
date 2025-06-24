@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% block title %}INSERT + SELECT文 実行例と注意点{% endblock %}
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
-{% endblock %}
 {% block content %}
 
 <div class="nav-buttons">
     <a href="/basic/insert/insert-select/study" class="prev">◀ 前へ</a>
-    <a href="/basic/insert/select/practice" class="next">次へ ▶</a>
+    <a href="/basic/insert/insert-select/practice/select" class="next">次へ ▶</a>
 </div>
 
 <div class="learning-container">
@@ -70,7 +67,7 @@ SELECT id, name FROM old_users;</code>
 
 <div class="nav-buttons">
     <a href="/basic/insert/insert-select/study" class="prev">◀ 前へ</a>
-    <a href="/basic/insert/select/practice" class="next">次へ ▶</a>
+    <a href="/basic/insert/insert-select/practice/select" class="next">次へ ▶</a>
 </div>
 
 {% endblock %}
