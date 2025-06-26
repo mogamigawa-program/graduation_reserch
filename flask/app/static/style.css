@@ -468,3 +468,18 @@ footer {
     margin: 1rem 0;
     border-radius: 6px;
 }
+
+.badge {
+    margin-left: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  .correct {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .wrong {
+    background-color: #f8d7da;
+    color: #721c24;
+  }

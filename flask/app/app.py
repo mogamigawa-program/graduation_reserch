@@ -1084,7 +1084,7 @@ def insert_select_practice(type):
         return render_template(html)
 
 
-    
+
 
 #delete single 学習
 @app.route('/basic/delete/single/study', methods=['GET', 'POST'])
@@ -6905,8 +6905,9 @@ def quiz_progress():
             13: "aggregation/having/quiz",
             14: "aggregation/order-by/quiz",
             15: "quiz/insert",
-            16: "quiz/delete_single",
-            17: "quiz/delete_multiple"
+            16: "quiz/insert_select",
+            17: "quiz/delete_single",
+            18: "quiz/delete_multiple"
         }
 
         # 完了したクイズの数を計算

@@ -30,17 +30,29 @@
                             <input type="radio" 
                                 id="answer_{{ idx }}_{{ i }}" 
                                 name="answer_{{ idx }}" 
-                                value="{{ choice.text }}">
+                                value="{{ choice.text }}"
+                                {% if submitted and user_answers["answer_" ~ idx] == choice.text %}checked{% endif %}
+                                {% if submitted %}disabled{% endif %}>
                             <label for="answer_{{ idx }}_{{ i }}">
                                 {{ ['A','B','C','D'][i] }}. {{ choice.text }}
                             </label>
+
+                            {% if submitted %}
+                                {% if user_answers["answer_" ~ idx] == choice.text %}
+                                    <span class="badge {% if choice.is_correct %}correct{% else %}wrong{% endif %}">
+                                        あなたの回答
+                                    </span>
+                                {% endif %}
+                                {% if choice.is_correct %}
+                                    <span class="badge correct">正解</span>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
 
                 {% if submitted %}
                     <div class="answer-block">
-                        <p><strong>正解:</strong> {{ question['answer'] }}</p>
                         <p><strong>解説:</strong> {{ question['explanation'] }}</p>
                     </div>
                 {% endif %}

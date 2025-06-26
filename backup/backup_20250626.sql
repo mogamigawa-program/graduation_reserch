@@ -47,7 +47,9 @@ LOCK TABLES `user_databases` WRITE;
 /*!40000 ALTER TABLE `user_databases` DISABLE KEYS */;
 INSERT INTO `user_databases` VALUES
 (26,'1_db'),
-(27,'admin_db');
+(27,'admin_db'),
+(28,'2_db'),
+(29,'3_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,7 +67,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,7 +78,9 @@ LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` VALUES
 (26,'1','$2b$12$rENmeL1oKez/J84cqLKOCezv9/ZY.smOzFbosKsjd4UJKOfYYb53W',0),
-(27,'admin','$2b$12$z73TVOGJU6rVHWQ77kDpPOVyWm0DVJZwKGTjgaVr20L8/rgHgWk6q',1);
+(27,'admin','$2b$12$z73TVOGJU6rVHWQ77kDpPOVyWm0DVJZwKGTjgaVr20L8/rgHgWk6q',1),
+(28,'2','$2b$12$103SE23IeX0Su.ZK5iUufuLiLt/o7mzV/GIvQxmyMfAwtNiZN4WQG',0),
+(29,'3','$2b$12$quCLxerkrlQsd3wjUpVfR.ghBx6oRJy4kiFT353PQ78mSBMIKR7GO',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -87,6 +91,41 @@ UNLOCK TABLES;
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dataset` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 
 USE `dataset`;
+
+--
+-- Table structure for table `all_users`
+--
+
+DROP TABLE IF EXISTS `all_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `all_users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `all_users`
+--
+
+LOCK TABLES `all_users` WRITE;
+/*!40000 ALTER TABLE `all_users` DISABLE KEYS */;
+INSERT INTO `all_users` VALUES
+(1,'田中太郎',17),
+(2,'鈴木花子',20),
+(3,'佐藤一郎',18),
+(4,'山田次郎',22),
+(5,'高橋三郎',15),
+(6,'伊藤美咲',30),
+(7,'中村健太',16),
+(8,'小林直子',25),
+(9,'加藤悠真',19),
+(10,'松本由紀',13);
+/*!40000 ALTER TABLE `all_users` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `choices`
@@ -662,6 +701,29 @@ INSERT INTO `sales` VALUES
 UNLOCK TABLES;
 
 --
+-- Table structure for table `selected_users`
+--
+
+DROP TABLE IF EXISTS `selected_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `selected_users` (
+  `selected_id` int(11) NOT NULL,
+  `selected_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`selected_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `selected_users`
+--
+
+LOCK TABLES `selected_users` WRITE;
+/*!40000 ALTER TABLE `selected_users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `selected_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `sisya`
 --
 
@@ -803,4 +865,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-06-16 21:20:47
+-- Dump completed on 2025-06-26 15:18:19
