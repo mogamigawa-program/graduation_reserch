@@ -47,7 +47,11 @@ LOCK TABLES `user_databases` WRITE;
 /*!40000 ALTER TABLE `user_databases` DISABLE KEYS */;
 INSERT INTO `user_databases` VALUES
 (26,'1_db'),
-(27,'admin_db');
+(27,'admin_db'),
+(28,'2_db'),
+(29,'3_db'),
+(30,'4_db'),
+(31,'5_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,7 +69,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,7 +80,11 @@ LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` VALUES
 (26,'1','$2b$12$rENmeL1oKez/J84cqLKOCezv9/ZY.smOzFbosKsjd4UJKOfYYb53W',0),
-(27,'admin','$2b$12$z73TVOGJU6rVHWQ77kDpPOVyWm0DVJZwKGTjgaVr20L8/rgHgWk6q',1);
+(27,'admin','$2b$12$z73TVOGJU6rVHWQ77kDpPOVyWm0DVJZwKGTjgaVr20L8/rgHgWk6q',1),
+(28,'2','$2b$12$103SE23IeX0Su.ZK5iUufuLiLt/o7mzV/GIvQxmyMfAwtNiZN4WQG',0),
+(29,'3','$2b$12$quCLxerkrlQsd3wjUpVfR.ghBx6oRJy4kiFT353PQ78mSBMIKR7GO',0),
+(30,'4','$2b$12$oKFkDfFVz1XhwQUMr09sLOIre35m7OSA9K8RZGlADu5C7iNgdptkq',0),
+(31,'5','$2b$12$JIrmQsdRAwK9FWjLyv15oei55C2PQRpgPviuSn0708zXY2QIDo.Qy',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -87,6 +95,41 @@ UNLOCK TABLES;
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dataset` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 
 USE `dataset`;
+
+--
+-- Table structure for table `all_users`
+--
+
+DROP TABLE IF EXISTS `all_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `all_users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `all_users`
+--
+
+LOCK TABLES `all_users` WRITE;
+/*!40000 ALTER TABLE `all_users` DISABLE KEYS */;
+INSERT INTO `all_users` VALUES
+(1,'田中太郎',17),
+(2,'鈴木花子',20),
+(3,'佐藤一郎',18),
+(4,'山田次郎',22),
+(5,'高橋三郎',15),
+(6,'伊藤美咲',30),
+(7,'中村健太',16),
+(8,'小林直子',25),
+(9,'加藤悠真',19),
+(10,'松本由紀',13);
+/*!40000 ALTER TABLE `all_users` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `choices`
@@ -103,7 +146,7 @@ CREATE TABLE `choices` (
   PRIMARY KEY (`id`),
   KEY `question_id` (`question_id`),
   CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1021 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1045 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,7 +223,31 @@ INSERT INTO `choices` VALUES
 (1017,17,'DELETE文では複数条件を使えない',0),
 (1018,17,'WHEREを省略しても一部のデータだけ削除できる',0),
 (1019,17,'ORは必ずANDより先に評価されるので()は不要',0),
-(1020,17,'複雑な条件では()を使って優先順位を明確にする',1);
+(1020,17,'複雑な条件では()を使って優先順位を明確にする',1),
+(1021,18,'INSERT + SELECT は列を追加する',0),
+(1022,18,'INSERT はテーブルを削除する',0),
+(1023,18,'SELECT は新しいテーブルを作成する',0),
+(1024,18,'INSERT + SELECT はデータをコピーする',1),
+(1025,19,'INSERT x SELECT FROM y;',0),
+(1026,19,'INSERT INTO x VALUES (SELECT id FROM y);',0),
+(1027,19,'SELECT INTO x FROM y;',0),
+(1028,19,'INSERT INTO x (id) SELECT id FROM y;',1),
+(1029,20,'old_table を削除する',0),
+(1030,20,'old_table の name列を new_table にコピーする',1),
+(1031,20,'new_table を作成する',0),
+(1032,20,'name列を削除して挿入する',0),
+(1033,21,'WHERE 句が必要',0),
+(1034,21,'SELECT 文が間違っている',0),
+(1035,21,'テーブルが存在しない',0),
+(1036,21,'コピー先に列が足りない',1),
+(1037,22,'18歳未満のユーザーのみ logs に入る',1),
+(1038,22,'全ユーザーが logs に入る',0),
+(1039,22,'members テーブルが変更される',0),
+(1040,22,'実行エラーが発生する',0),
+(1041,23,'完了した注文を archive にコピーする',1),
+(1042,23,'新しい注文を作成する',0),
+(1043,23,'archive を削除する',0),
+(1044,23,'orders テーブルを削除する',0);
 /*!40000 ALTER TABLE `choices` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -456,7 +523,7 @@ CREATE TABLE `questions` (
   `question_text` text NOT NULL,
   `explanation` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -482,7 +549,13 @@ INSERT INTO `questions` VALUES
 (14,'delete_multiple','年齢が20歳未満、または住所がNULLのユーザーを削除するSQLはどれか？','ORを使って複数条件をつなぎます。NULLの比較にはIS NULLを使います。'),
 (15,'delete_multiple','次のSQLの意味として正しいものはどれか？ DELETE FROM users WHERE name = \"Ken\" OR age < 18;','WHEREの条件はORでつながれているため、nameが\"Ken\"であるか、ageが18未満のどちらかを満たせば削除されます。'),
 (16,'delete_multiple','DELETE FROM users WHERE (age < 20 OR age > 60) AND status = \"inactive\"; に該当するのはどの条件か？','ORとANDを組み合わせる場合、カッコで優先順位を明確にするのが重要です。'),
-(17,'delete_multiple','DELETE文で複数条件を指定するときの注意点として正しいものはどれか？','特に複雑な条件の場合、カッコを使って優先順位を明確にする必要があります。');
+(17,'delete_multiple','DELETE文で複数条件を指定するときの注意点として正しいものはどれか？','特に複雑な条件の場合、カッコを使って優先順位を明確にする必要があります。'),
+(18,'insert_select','INSERT + SELECT 文の目的として正しいものはどれ？','INSERT + SELECT は別のテーブルにデータをコピーするために使います。'),
+(19,'insert_select','次のうち正しい INSERT + SELECT 文はどれ？','VALUES句ではなく、SELECT文を使う点に注意。'),
+(20,'insert_select','次のSQLの目的は何？\nINSERT INTO new_table (name)\nSELECT name FROM old_table;','old_table の name列の値を new_table にコピーしています。'),
+(21,'insert_select','このSQLの誤りはどこ？\nINSERT INTO users (id, name)\nSELECT id FROM customers;','コピー先とコピー元の列数が一致していないためエラーになります。'),
+(22,'insert_select','このSQLを実行すると何が起こる？\nINSERT INTO logs (uid, uname)\nSELECT id, name FROM members WHERE age < 18;','条件に合致するデータだけが logs に挿入されます。'),
+(23,'insert_select','このSQLは何をしている？\nINSERT INTO archive\nSELECT * FROM orders WHERE status = \'done\';','orders テーブルの完了済みデータを archive にコピーしています。すべての列を一括コピーしています。');
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -499,7 +572,7 @@ CREATE TABLE `quiz_list` (
   `total_questions` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `quiz_name` (`quiz_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -525,7 +598,8 @@ INSERT INTO `quiz_list` VALUES
 (14,'UPDATE',6),
 (15,'INSERT',6),
 (16,'DELETE SINGLE',5),
-(17,'DELETE MULTIPLE',5);
+(17,'DELETE MULTIPLE',5),
+(18,'INSERT SELECT',6);
 /*!40000 ALTER TABLE `quiz_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -659,6 +733,29 @@ INSERT INTO `sales` VALUES
 (9,'2024-10-06','Banana','Fruit',18,200),
 (10,'2024-10-06','Apple','Fruit',10,450);
 /*!40000 ALTER TABLE `sales` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `selected_users`
+--
+
+DROP TABLE IF EXISTS `selected_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `selected_users` (
+  `selected_id` int(11) NOT NULL,
+  `selected_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`selected_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `selected_users`
+--
+
+LOCK TABLES `selected_users` WRITE;
+/*!40000 ALTER TABLE `selected_users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `selected_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -803,4 +900,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-06-18 15:37:44
+-- Dump completed on 2025-07-01  2:43:00

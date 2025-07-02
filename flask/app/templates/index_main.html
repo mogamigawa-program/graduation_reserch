@@ -2,8 +2,29 @@
 {% block title %}SQL学習の森トップページ{% endblock %}
 {% block content %}
 <body>
+    {% if breadcrumbs %}
+    <nav class="breadcrumb">
+        {% for crumb in breadcrumbs %}
+            {% if crumb.url %}
+                <a href="{{ crumb.url }}">{{ crumb.label }}</a> /
+            {% else %}
+                <span class="current">{{ crumb.label }}</span>
+            {% endif %}
+        {% endfor %}
+    </nav>
+    {% endif %}    
     
     <div class="menu">
+        {% if current_level == "top" %}
+            <div class="back-link">
+                <a href="/index">◀ 大項目に戻る</a>
+            </div>
+        {% elif current_level == "middle" %}
+            <div class="back-link">
+                <a href="/index/{{ parent_category }}?flag=normal">◀ 中項目に戻る</a>
+            </div>
+        {% endif %}
+
         {% if index_item %}
         <ul>
             {% for item in index_item %}
@@ -19,7 +40,7 @@
                     <a href="/index/{{ item }}?flag=min">{{ item }}</a>
                 </li>
             {% endfor %}
-        </ul>            
+        </ul>
         {% elif min_index_item %}
         <ul>
             {% for item in min_index_item %}
@@ -30,7 +51,6 @@
         </ul>
         {% endif %}
     </div>
-
 </body>
 </html>
 {% endblock %}

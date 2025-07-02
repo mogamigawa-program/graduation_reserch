@@ -75,118 +75,158 @@ def main():
     ]
     
     return render_template('index_main.html', title="SQL学習の森", index_item=index_item)
-    
+
+
 @app.route("/index/<item>")
 def index_item(item):
     flag = request.args.get('flag')
     try:
         if flag == "normal":
             normal_index_item = {
-            "データベースの基礎": ["データベースとは", "関係データベースとは"],
-            "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
-            "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
-            "高度な検索": ["自己結合", "更新操作"],
-            "集約と分析": ["集約関数", "ソートとグループ化"],
-            "集合演算": ["union", "except", "intersect"],
-            "テーブル制約と管理": ["テーブルに対する制約", "alter"],
-            "トランザクション": ["トランザクションにおける基本操作", "acid特性"]    
-        }
+                "データベースの基礎": ["データベースとは", "関係データベースとは"],
+                "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
+                "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
+                "高度な検索": ["自己結合", "更新操作"],
+                "集約と分析": ["集約関数", "ソートとグループ化"],
+                "集合演算": ["union", "except", "intersect"],
+                "テーブル制約と管理": ["テーブルに対する制約", "alter"],
+                "トランザクション": ["トランザクションにおける基本操作", "acid特性"]    
+            }
             index_item = normal_index_item[item]
-            return render_template('index_main.html', title=item, normal_index_item=index_item)
+            return render_template('index_main.html',
+                                    title=item,
+                                    normal_index_item=index_item,
+                                    current_level="top",
+                                    breadcrumbs = [
+                                    {"label": "トップ", "url": "/index"},
+                                    {"label": item, "url": None}  # 現在の項目なのでURLはなし
+                                ])  # 大項目に戻るため
+
         if flag == "min":
             min_index_item = {
                 "データベースとは": [
                     {"name": "データベースとは", "url": "/databasebasic/whatdatabase"}
-            ],
-            "関係データベースとは": [
-                {"name": "関係データベースとは", "url": "/databasebasic/whatrelationaldatabase"}
-            ],
-            "キー": [
-                {"name": "キー", "url": "/partofdatabase/key"}
-            ],
-            "テーブルの定義": [
-                {"name": "テーブルの定義", "url": "/partofdatabase/definition"}
-            ],
-            "テーブルの作成": [
-                {"name": "テーブルの作成", "url": "/partofdatabase/create"}
-            ],
-            "select": [
-                {"name": "単一条件", "url": "/basic/select/single/study"},
-                {"name": "複数条件", "url": "/basic/select/multiple/study"}
-            ],
-            "join": [
-                {"name": "cross", "url": "/basic/join/cross_join/study"},
-                {"name": "inner", "url": "/basic/join/inner_join/study"},
-                {"name": "left", "url": "/basic/join/left_outer_join/study"},
-                {"name": "right", "url": "/basic/join/right_outer_join/study"},
-                {"name": "複数のテーブルの結合", "url": "/basic/join/multiple_table_join/study"},
-                {"name": "まとめクイズ", "url": "/basic/join/join_quiz"}
-            ],
-            "insert": [
-                {"name": "挿入", "url": "/basic/insert/insert/study"},
-                {"name": "select文を利用したデータの挿入", "url": "/basic/insert/insert-select/study"}
-            ],
-            "update": [
-                {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column/study"},
-                {"name": "複数のカラムに対して複数の条件", "url": "/basic/update/multiple-columns/study"},
-                {"name": "全レコード更新、計算", "url": "/basic/update/all-records/study"},
-                {"name": "join", "url": "/basic/update/join/study"}
-            ],
-            "upsert": [
-                {"name": "replace構文", "url": "/basic/upsert/replace/study"},
-                {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key/study"}
-            ],
-            "delete": [
-                {"name": "単一条件", "url": "/basic/delete/single/study"},
-                {"name": "複数条件", "url": "/basic/delete/multiple/study"},
-                {"name": "全レコード削除", "url": "/basic/delete/all-records/study"},
-                {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple/study"}
-            ],
-            "自己結合": [
-                {"name": "self join", "url": "/advanced/self-join/study"}
-            ],
-            "更新操作": [
-                {"name": "副問い合わせを用いた更新", "url": "/advanced/update/subquery/study"},
-                {"name": "副問い合わせを用いた挿入", "url": "/advanced/insert/subquery/study"},
-                {"name": "副問い合わせを用いた削除", "url": "/advanced/delete/subquery/study"}
-            ],
-            "集約関数": [
-                {"name": "集約関数の注意書き", "url": "/aggregation/warning_message"},
-                {"name": "count", "url": "/aggregation/count/study"},
-                {"name": "sum", "url": "/aggregation/sum/study"},
-                {"name": "avg", "url": "/aggregation/avg/study"},
-                {"name": "min", "url": "/aggregation/min/study"},
-                {"name": "max", "url": "/aggregation/max/study"}
-            ],
-            "ソートとグループ化": [
-                {"name": "order by", "url": "/aggregation/order-by/study"},
-                {"name": "group by", "url": "/aggregation/group-by/study"},
-                {"name": "having", "url": "/aggregation/having/study"}
-            ],
-            "テーブルに対する制約": [
-                {"name": "主キー", "url": "/constraints/primary-key/study"},
-                {"name": "一意性制約", "url": "/constraints/unique/study"},
-                {"name": "NOT NULL制約", "url": "/constraints/not-null/study"},
-                {"name": "外部キー制約", "url": "/constraints/foreign-key/study"},
-                {"name": "DEFAULT値", "url": "/constraints/default/study"}
-            ],
-            "alter": [
-                {"name": "カラムの追加", "url": "/table-management/alter/add-column/study"},
-                {"name": "カラムの削除", "url": "/table-management/alter/drop-column/study"},
-                {"name": "カラムの変更", "url": "/table-management/alter/modify-column/study"},
-                {"name": "制約の追加", "url": "/table-management/alter/add-constraint/study"},
-                {"name": "制約の削除", "url": "/table-management/alter/drop-constraint/study"},
-                {"name": "制約の変更", "url": "/table-management/alter/modify-constraint/study"}
-            ],
-            "トランザクションにおける基本操作": [
-                {"name": "start→commit or rollback", "url": "/transaction/basic-operations/study"}
-            ],
-            "acid特性": [
-                {"name": "原始性", "url": "/transaction/acid/atomicity/study"}
-            ]
-        }    
-        index_item = min_index_item[item]
-        return render_template('index_main.html', title=item, min_index_item=index_item)
+                ],
+                "関係データベースとは": [
+                    {"name": "関係データベースとは", "url": "/databasebasic/whatrelationaldatabase"}
+                ],
+                "キー": [
+                    {"name": "キー", "url": "/partofdatabase/key"}
+                ],
+                "テーブルの定義": [
+                    {"name": "テーブルの定義", "url": "/partofdatabase/definition"}
+                ],
+                "テーブルの作成": [
+                    {"name": "テーブルの作成", "url": "/partofdatabase/create"}
+                ],
+                "select": [
+                    {"name": "単一条件", "url": "/basic/select/single/study"},
+                    {"name": "複数条件", "url": "/basic/select/multiple/study"}
+                ],
+                "join": [
+                    {"name": "cross", "url": "/basic/join/cross_join/study"},
+                    {"name": "inner", "url": "/basic/join/inner_join/study"},
+                    {"name": "left", "url": "/basic/join/left_outer_join/study"},
+                    {"name": "right", "url": "/basic/join/right_outer_join/study"},
+                    {"name": "複数のテーブルの結合", "url": "/basic/join/multiple_table_join/study"},
+                    {"name": "まとめクイズ", "url": "/basic/join/join_quiz"}
+                ],
+                "insert": [
+                    {"name": "挿入", "url": "/basic/insert/insert/study"},
+                    {"name": "select文を利用したデータの挿入", "url": "/basic/insert/insert-select/study"}
+                ],
+                "update": [
+                    {"name": "一つのカラム一つの条件", "url": "/basic/update/single-column/study"},
+                    {"name": "複数のカラムに対して複数の条件", "url": "/basic/update/multiple-columns/study"},
+                    {"name": "全レコード更新、計算", "url": "/basic/update/all-records/study"},
+                    {"name": "join", "url": "/basic/update/join/study"}
+                ],
+                "upsert": [
+                    {"name": "replace構文", "url": "/basic/upsert/replace/study"},
+                    {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key/study"}
+                ],
+                "delete": [
+                    {"name": "単一条件", "url": "/basic/delete/single/study"},
+                    {"name": "複数条件", "url": "/basic/delete/multiple/study"},
+                    {"name": "全レコード削除", "url": "/basic/delete/all-records/study"},
+                    {"name": "共通なタプルの削除", "url": "/basic/delete/shared-tuple/study"}
+                ],
+                "自己結合": [
+                    {"name": "self join", "url": "/advanced/self-join/study"}
+                ],
+                "更新操作": [
+                    {"name": "副問い合わせを用いた更新", "url": "/advanced/update/subquery/study"},
+                    {"name": "副問い合わせを用いた挿入", "url": "/advanced/insert/subquery/study"},
+                    {"name": "副問い合わせを用いた削除", "url": "/advanced/delete/subquery/study"}
+                ],
+                "集約関数": [
+                    {"name": "集約関数の注意書き", "url": "/aggregation/warning_message"},
+                    {"name": "count", "url": "/aggregation/count/study"},
+                    {"name": "sum", "url": "/aggregation/sum/study"},
+                    {"name": "avg", "url": "/aggregation/avg/study"},
+                    {"name": "min", "url": "/aggregation/min/study"},
+                    {"name": "max", "url": "/aggregation/max/study"}
+                ],
+                "ソートとグループ化": [
+                    {"name": "order by", "url": "/aggregation/order-by/study"},
+                    {"name": "group by", "url": "/aggregation/group-by/study"},
+                    {"name": "having", "url": "/aggregation/having/study"}
+                ],
+                "テーブルに対する制約": [
+                    {"name": "主キー", "url": "/constraints/primary-key/study"},
+                    {"name": "一意性制約", "url": "/constraints/unique/study"},
+                    {"name": "NOT NULL制約", "url": "/constraints/not-null/study"},
+                    {"name": "外部キー制約", "url": "/constraints/foreign-key/study"},
+                    {"name": "DEFAULT値", "url": "/constraints/default/study"}
+                ],
+                "alter": [
+                    {"name": "カラムの追加", "url": "/table-management/alter/add-column/study"},
+                    {"name": "カラムの削除", "url": "/table-management/alter/drop-column/study"},
+                    {"name": "カラムの変更", "url": "/table-management/alter/modify-column/study"},
+                    {"name": "制約の追加", "url": "/table-management/alter/add-constraint/study"},
+                    {"name": "制約の削除", "url": "/table-management/alter/drop-constraint/study"},
+                    {"name": "制約の変更", "url": "/table-management/alter/modify-constraint/study"}
+                ],
+                "トランザクションにおける基本操作": [
+                    {"name": "start→commit or rollback", "url": "/transaction/basic-operations/study"}
+                ],
+                "acid特性": [
+                    {"name": "原始性", "url": "/transaction/acid/atomicity/study"}
+                ]
+            }
+
+            # ✅ 小項目 → 親カテゴリの逆引き用辞書を作成
+            reverse_index = {}
+            for parent, children in {
+                "データベースの基礎": ["データベースとは", "関係データベースとは"],
+                "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
+                "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
+                "高度な検索": ["自己結合", "更新操作"],
+                "集約と分析": ["集約関数", "ソートとグループ化"],
+                "集合演算": ["union", "except", "intersect"],
+                "テーブル制約と管理": ["テーブルに対する制約", "alter"],
+                "トランザクション": ["トランザクションにおける基本操作", "acid特性"]
+            }.items():
+                for child in children:
+                    reverse_index[child] = parent
+
+            index_item = min_index_item[item]
+            parent_category = reverse_index.get(item, None)
+
+            return render_template(
+                'index_main.html',
+                title=item,
+                min_index_item=index_item,
+                parent_category=parent_category,
+                current_level="middle",
+                breadcrumbs=[
+                    {"label": "トップ", "url": "/index"},
+                    {"label": parent_category, "url": f"/index/{parent_category}?flag=normal"},
+                    {"label": item, "url": None}
+                ]
+            )
+
+
     except Exception as e:
         return render_template('error.html', title="エラー", error_message=e)
 
