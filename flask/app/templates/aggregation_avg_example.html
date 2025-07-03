@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}AVG関数の実行例とエラー集{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/aggregation/avg/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/avg/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>AVG関数の実行例とエラー集</h1>
+
+    <p><strong>AVG関数</strong>は、指定された数値カラムの平均値を計算するために使われるSQLの集約関数です。</p>
+
+    <div class="example-box">
+        <h2>✅ 実行例 1：単純な平均</h2>
+        <p>数量の平均を求めます。</p>
+        <div class="code-block">
+            SELECT AVG(quantity) AS avg_quantity FROM sales;
+        </div>
+        <p>→ 結果：<code>avg_quantity</code> に平均数量が表示されます。</p>
+    </div>
+
+    <div class="example-box">
+        <h2>✅ 実行例 2：複数の平均を同時に計算</h2>
+        <p>価格と数量の平均を両方求めます。</p>
+        <div class="code-block">
+            SELECT AVG(price) AS avg_price, AVG(quantity) AS avg_quantity FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h2>✅ 実行例 3：GROUP BY でカテゴリ別に平均</h2>
+        <p>カテゴリごとの平均価格を求めます。</p>
+        <div class="code-block">
+            SELECT category, AVG(price) AS avg_price FROM sales GROUP BY category;
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="alert-error">
+        <h2>⚠ よくあるエラー例</h2>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー例 1：クエリの末尾に「;」がない</h3>
+        <div class="code-block">
+            SELECT AVG(price) AS avg_price FROM sales
+        </div>
+        <p class="alert-error">エラー: SQL構文エラー。末尾に「;」をつけましょう。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー例 2：AVGに文字列型カラムを使っている</h3>
+        <div class="code-block">
+            SELECT AVG(category) AS avg_category FROM sales;
+        </div>
+        <p class="alert-error">エラー: AVGは数値型にのみ使用可能です。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー例 3：WHEREにAVGを使っている</h3>
+        <div class="code-block">
+            SELECT AVG(price) AS avg_price FROM sales WHERE AVG(price) > 100;
+        </div>
+        <p class="alert-error">エラー: WHERE句では集約関数（AVGなど）は使えません。<br>
+        → 正しくは <code>HAVING</code> を使います。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>✅ 修正版（HAVINGの使用）</h3>
+        <div class="code-block">
+            SELECT category, AVG(price) AS avg_price FROM sales GROUP BY category HAVING AVG(price) > 100;
+        </div>
+    </div>
+</div>
+
+<div class="back-link">
+    <a href="/aggregate_avg_study">← 戻る</a>
+</div>
+
+{% endblock %}

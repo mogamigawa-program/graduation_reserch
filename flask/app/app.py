@@ -4851,7 +4851,7 @@ def aggregate_count_advance():
 # COUNT 実行例
 @app.route('/aggregation/count/example', methods=['GET', 'POST'])
 def aggregate_count_example():
-    return 0
+    return render_template('aggregation_count_example.html')
 
 
 # COUNT クイズページ(aggregate_count_quiz.html)
@@ -5350,7 +5350,7 @@ def aggregate_avg_advance():
 # AVG 実行例
 @app.route('/aggregation/avg/example', methods=['GET', 'POST'])
 def aggregate_avg_example():
-    return 0
+    return render_template('aggregation_avg_example.html')
 
 # AVG クイズページ(aggregate_avg_quiz.html)
 @app.route('/aggregation/avg/quiz', methods=['GET', 'POST'])

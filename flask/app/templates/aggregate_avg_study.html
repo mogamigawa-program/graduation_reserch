@@ -2,36 +2,39 @@
 {% block title %}AVG関数の学習ページ{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="nav-buttons">
+    <a href="/index/集約関数?flag=min" class="prev">◀ 前へ</a>
+    <a href="/aggregation/avg/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
     <h1>AVG関数</h1>
     
     <p><strong>AVG関数とは:</strong> AVG関数は、指定された列の数値の平均を計算するSQL集約関数です。</p>
 
-    <p><strong>基本的な構文:</strong>
-        <code>
+    <p><strong>基本的な構文:</strong></p>
+    <div class="code-block">
         SELECT AVG({平均を求めるカラム}) AS `{エイリアス名}` FROM {テーブル名};
-        </code>
-    </p>
+    </div>
 
-    <p><strong>例:</strong> 例えば、<code>sales</code>テーブルで数量の平均を計算する場合、<br><code>SELECT AVG(quantity) AS 'avg_quantity' FROM sales;</code>のように実行します。</p>
-
-    <p><strong><a href="/aggregate_avg_advance">AVG関数のクエリを全文書いてみよう！<a></a></strong></p>
-
-    <p><strong><a href="/aggregate_avg_quiz">AVG関数の理解度チェック！<a></a></strong></p>
+    <p><strong>例:</strong></p>
+    <div class="code-block">
+        SELECT AVG(quantity) AS 'avg_quantity' FROM sales;
+    </div>
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="alert-error">{{ error_message }}</p>
     {% endif %}
 
-    <table border="1">
+    <table class="example-table">
         <caption>sales</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr>
             {% for col in sales_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in sales_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -40,62 +43,65 @@
     </table>
 
     <form method="POST">
-        <p>SELECT AVG(</p>
-        <div id="avg-columns-container">
-            <div class="avg-column-group">
-                <select name="avg_column" required>
-                    {% for col in sales_desc %}
-                        <option value="{{ col[0] }}">{{ col[0] }}</option>
-                    {% endfor %}
-                </select>
-                <label for="as_column"><p>) AS</p></label>
-                <input type="text" name="as_column" placeholder="例: Avg Sales" required>
+        <div class="form-group">
+            <label>SELECT AVG(</label>
+            <div id="avg-columns-container">
+                <div class="avg-column-group">
+                    <select name="avg_column" required>
+                        {% for col in sales_desc %}
+                            <option value="{{ col[0] }}">{{ col[0] }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>) AS</label>
+                    <input type="text" name="as_column" placeholder="例: Avg Sales" required>
+                </div>
             </div>
+            <label>FROM sales</label>
         </div>
-        <p>FROM sales</p>
 
-        <!-- WHEREを使用するチェックボックス -->
-        <div>
+        <div class="form-group">
             <input type="checkbox" id="use_where" onclick="toggleWhereInput()">
             <label for="use_where">WHEREを使用する</label>
         </div>
 
-        <!-- WHERE句の入力ボックス（デフォルトでは非表示） -->
-        <div id="where-condition" style="display: none;">
+        <div id="where-condition" class="form-group" style="display: none;">
             <label for="where_clause">WHERE</label>
             <input type="text" id="where_clause" name="where_clause" placeholder="例: quantity > 10">
-            <p style="color: red; font-size: 0.9em;">
-                注意: WHERE句には集約関数（COUNT、SUM、AVGなど）は使用できません。<br>
-                集約関数に条件を適用する場合、HAVING句を使用してください。HAVING句は"ソートとグループ化"で学びます。
-            </p>
-            <p style="color: red; font-size: 0.9em;">
-            集約関数に条件を適用する場合の例：<br>SELECT AVG(quantity) AS avg_quantity 
-            FROM sales 
-            GROUP BY category 
-            HAVING AVG(quantity) > 10;
-            </p>
+            <div class="alert-warning">
+                注意: WHERE句では集約関数（COUNT、SUM、AVGなど）は使用できません。<br>
+                集約関数に条件を適用する場合は <strong>HAVING句</strong> を使用してください。<br>
+                <div class="code-block">
+                    SELECT AVG(quantity) AS avg_quantity<br>
+                    FROM sales<br>
+                    GROUP BY category<br>
+                    HAVING AVG(quantity) > 10;
+                </div>
+            </div>
         </div>
-        <button type="button" onclick="addAvgColumn()">カラムを追加</button>
-        <br><br>
-        <button type="submit">AVGを実行</button>
+
+        <div class="btn-container">
+            <button type="button" class="btn btn-secondary" onclick="addAvgColumn()">カラムを追加</button>
+            <button type="submit" class="btn">AVGを実行</button>
+        </div>
     </form>
 
     {% if avg_result %}
-    <h2>AVGの結果</h2>
-    <p><strong>実行クエリ:</strong> {{ avg_query }}</p>
-    <table border="1">
-        <tr style="background-color: rgba(0, 123, 255, 0.664);">
-            {% for col in avg_query.split('FROM')[0].split(',') %}
-                {% set alias = col.split('AS')[-1].strip().strip('` ') %}
-                <th>{{ alias }}</th>
-            {% endfor %}
-        </tr>        
-        <tr style="background-color: rgba(0, 123, 255, 0.313);">
-            {% for item in avg_result[0] %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    </table>
+        <h2>AVGの結果</h2>
+        <p><strong>実行クエリ:</strong></p>
+        <div class="code-block">{{ avg_query }}</div>
+        <table class="example-table">
+            <tr>
+                {% for col in avg_query.split('FROM')[0].split(',') %}
+                    {% set alias = col.split('AS')[-1].strip().strip('` ') %}
+                    <th>{{ alias }}</th>
+                {% endfor %}
+            </tr>        
+            <tr>
+                {% for item in avg_result[0] %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        </table>
     {% endif %}
 </div>
 
@@ -114,7 +120,7 @@
                     <option value="{{ col[0] }}">{{ col[0] }}</option>
                 {% endfor %}
             </select>
-            <label for="as_column"><p>) AS</p></label>
+            <label>) AS</label>
             <input type="text" name="as_column" placeholder="例: Avg Sales" required>
         `;
         container.appendChild(newAvgColumn);
@@ -126,6 +132,9 @@
     }
 </script>
 
-<hr>
-<a href="/aggregate_select">戻る</a>
+<div class="nav-buttons">
+    <a href="/index/集約関数?flag=min" class="prev">◀ 前へ</a>
+    <a href="/aggregation/avg/example" class="next">次へ ▶</a>
+</div>
+
 {% endblock %}

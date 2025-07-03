@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}COUNT関数の実行例とエラー集{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/aggregation/count/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/count/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>COUNT関数の実行例とエラー集</h1>
+
+    <p>COUNT関数は、指定されたカラムの<mark>NULLでない行数</mark>や<mark>全行数</mark>を集計するために使われます。</p>
+
+    <h2>✅ 実行例</h2>
+
+    <div class="example-box">
+        <h3>例1：全レコードの件数をカウント</h3>
+        <p>テーブル全体の行数を数えます。</p>
+        <div class="code-block">
+            SELECT COUNT(*) AS total_count FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>例2：NULLを除いた特定カラムの件数</h3>
+        <p>NULLでない <code>price</code> の数をカウントします。</p>
+        <div class="code-block">
+            SELECT COUNT(price) AS price_count FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>例3：カテゴリごとの件数をGROUP BYで集計</h3>
+        <p><code>GROUP BY</code> を使ってカテゴリごとの件数を取得します。</p>
+        <div class="code-block">
+            SELECT category, COUNT(*) AS count_per_category FROM sales GROUP BY category;
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="alert-error">
+        <h2>⚠ よくあるエラー例</h2>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー1：末尾にセミコロン「;」がない</h3>
+        <div class="code-block">
+            SELECT COUNT(*) FROM sales
+        </div>
+        <p class="alert-error">構文エラーになります。<br><strong>→ 正しくは：</strong>末尾に「<code>;</code>」を付けてください。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー2：WHERE句に集約関数を使用</h3>
+        <div class="code-block">
+            SELECT COUNT(*) FROM sales WHERE COUNT(price) > 10;
+        </div>
+        <p class="alert-error">WHERE句ではCOUNTなどの集約関数は使えません。</p>
+        <p><strong>→ 正しい書き方：</strong>HAVING句を使いましょう。</p>
+        <div class="code-block">
+            SELECT category, COUNT(price) FROM sales GROUP BY category HAVING COUNT(price) > 10;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー3：COUNT関数でNULLを含めてしまうと思っている</h3>
+        <div class="code-block">
+            SELECT COUNT(price) AS price_count FROM sales;
+        </div>
+        <p class="alert-error">このクエリでは<code>NULL</code>の行はカウントされません。<br>
+        <strong>→ すべての行をカウントしたい場合は：</strong></p>
+        <div class="code-block">
+            SELECT COUNT(*) AS total_count FROM sales;
+        </div>
+    </div>
+
+</div>
+
+<div class="back-link">
+    <a href="/aggregate_count_study">← COUNT関数の学習ページへ戻る</a>
+</div>
+
+{% endblock %}

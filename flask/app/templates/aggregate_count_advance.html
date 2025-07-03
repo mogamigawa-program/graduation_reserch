@@ -2,24 +2,29 @@
 {% block title %}COUNT関数の学習ページ（高度版）{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="nav-buttons">
+    <a href="/aggregation/count/example" class="prev">◀ 前へ</a>
+    <a href="/aggregation/count/quiz" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
     <h1>COUNT関数（実践）</h1>
 
     <p><strong>このページでは、SQLクエリを自由に記述して実行できます。</strong></p>
-    <p style="color: red;"><strong>COUNT関数を使って、データの数を集約してみましょう！</strong></p>
+    <p class="alert-error"><strong>COUNT関数を使って、データの数を集約してみましょう！</strong></p>
     <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
 
     <!-- salesテーブルの中身を表示 -->
     <h2>salesテーブルの内容</h2>
-    <table border="1">
+    <table class="example-table">
         <caption>sales</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr>
             {% for col in sales_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in sales_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -28,74 +33,75 @@
     </table>
 
     <!-- ヒントの追加 -->
-    <div class="hints">
+    <div class="alert-warning">
         <h2>ヒント</h2>
         
         <details>
-            <summary style="color: blue;">ヒント1</summary>
-            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
-            <p>例：SELECT ...;</p>
-        </details>
-    
-        <details>
-            <summary style="color: blue;">ヒント2</summary>
-            <p>COUNT関数は、指定されたカラムの行数をカウントします。ASを使ってエイリアスを指定できます。</p>
-            <p>例：SELECT COUNT(*) AS 'total_rows' ...;</p>
-        </details>
-    
-        <details>
-            <summary style="color: blue;">ヒント3</summary>
-            <p>特定のカラムの重複を除いた行数を数える場合、DISTINCTを使用します。</p>
-            <p>例：SELECT COUNT(DISTINCT category) AS 'unique_categories' ...;</p>
+            <summary>ヒント1</summary>
+            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。<br>例：<code>SELECT ...;</code></p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント4</summary>
-            <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではsalesテーブルを使っています。</p>
-            <p>例：SELECT COUNT(*) AS 'total_rows' FROM sales ...;</p>
-        </details>
-    
-        <details>
-            <summary style="color: blue;">ヒント5</summary>
-            <p>WHERE句を使うと、条件に合致するデータのみを対象にCOUNTを計算できます。</p>
-            <p style="color: red;">ただし、WHERE句では集約関数を使用できません！</p>
-            <p>例：SELECT COUNT(*) AS 'fruit_rows' FROM sales WHERE category = 'Fruit';</p>
+            <summary>ヒント2</summary>
+            <p>COUNT関数は、指定されたカラムの行数をカウントします。ASを使ってエイリアスを指定できます。<br>
+            例：<code>SELECT COUNT(*) AS 'total_rows' FROM sales;</code></p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント6</summary>
-            <p style="color: red;">発展：</p><p>COUNT関数は、GROUP BYと組み合わせることで、カテゴリごとの件数を計算できます。</p>
-            <p>例：SELECT category, COUNT(*) AS 'count_per_category' FROM sales GROUP BY category;</p>
+            <summary>ヒント3</summary>
+            <p>DISTINCTを使うと、重複を除いた件数が取得できます。<br>
+            例：<code>SELECT COUNT(DISTINCT category) AS 'unique_categories' FROM sales;</code></p>
+        </details>
+
+        <details>
+            <summary>ヒント4</summary>
+            <p>FROMは、データを取得するテーブルを指定するSQL文です。<br>例：<code>SELECT COUNT(*) FROM sales;</code></p>
+        </details>
+
+        <details>
+            <summary>ヒント5</summary>
+            <p>WHERE句を使うと、条件に合致するデータのみを対象にCOUNTを計算できます。<br>
+            例：<code>SELECT COUNT(*) FROM sales WHERE category = 'Fruit';</code></p>
+        </details>
+
+        <details>
+            <summary>ヒント6（発展）</summary>
+            <p>GROUP BYと組み合わせるとカテゴリごとの件数が取得できます。<br>
+            例：<code>SELECT category, COUNT(*) AS count_per_category FROM sales GROUP BY category;</code></p>
         </details>
     </div>
-    
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="alert-error">{{ error_message }}</p>
     {% endif %}
 
     <form method="POST">
-        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
-        <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
-        <br>
-        <button type="submit">クエリを実行</button>
+        <div class="form-group">
+            <label for="query">SQLクエリ:</label>
+            <p class="alert-error"><strong>クエリの最後には「;」をつけよう！</strong></p>
+            <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" class="btn">クエリを実行</button>
+        </div>
     </form>
 
     {% if query %}
         <h2>実行したクエリ</h2>
-        <p><code>{{ query }}</code></p>
+        <div class="code-block"><code>{{ query }}</code></div>
     {% endif %}
 
     {% if query_result %}
         <h2>クエリ結果</h2>
-        <table border="1">
-            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+        <table class="example-table">
+            <tr>
                 {% for col in query_result["columns"] %}
                     <th>{{ col }}</th>
                 {% endfor %}
             </tr>
             {% for row in query_result["data"] %}
-                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                <tr>
                     {% for item in row %}
                         <td>{{ item }}</td>
                     {% endfor %}
@@ -105,7 +111,9 @@
     {% endif %}
 </div>
 
-<hr>
-<a href="/aggregate_count_study">戻る</a>
+<div class="nav-buttons">
+    <a href="/aggregation/count/example" class="prev">◀ 前へ</a>
+    <a href="/aggregation/count/quiz" class="next">次へ ▶</a>
+</div>
 
 {% endblock %}
