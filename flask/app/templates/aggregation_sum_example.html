@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}SUM関数の実行例とエラー集{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/aggregation/sum/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/sum/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>SUM関数の実行例とエラー集</h1>
+
+    <p>SUM関数は、数値型の列の<mark>合計値</mark>を求めるために使用されるSQLの集約関数です。  
+    以下に、基本的な実行例と、学習者がよく直面するエラーの原因と解決法を紹介します。</p>
+
+    <h2>✅ 実行例</h2>
+
+    <div class="example-box">
+        <h3>例1：テーブル全体のamount合計</h3>
+        <div class="code-block">
+            SELECT SUM(amount) AS total_amount FROM sales;
+        </div>
+        <p>salesテーブル全体のamountカラムの合計を求めます。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>例2：条件付き（WHERE句）での合計</h3>
+        <div class="code-block">
+            SELECT SUM(amount) AS fruit_amount FROM sales WHERE category = 'Fruit';
+        </div>
+        <p>Fruitカテゴリのみを対象にamountの合計を求めます。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>例3：カテゴリごとの合計（GROUP BY）</h3>
+        <div class="code-block">
+            SELECT category, SUM(amount) AS total_amount FROM sales GROUP BY category;
+        </div>
+        <p>カテゴリごとに合計金額を求めます。</p>
+    </div>
+
+    <hr>
+
+    <h2>⚠️ よくあるエラーとその対処法</h2>
+
+    <div class="example-box">
+        <h3>❌ エラー1：末尾のセミコロン（;）を忘れた</h3>
+        <div class="code-block">
+            SELECT SUM(amount) AS total_amount FROM sales
+        </div>
+        <p class="alert-error">クエリ末尾にセミコロンがないと、SQLツールや環境によっては構文エラーになります。</p>
+        <p><strong>✔ 解決方法：</strong> セミコロンを必ずつけましょう。</p>
+        <div class="code-block">
+            SELECT SUM(amount) AS total_amount FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー2：非数値カラムをSUMに使った</h3>
+        <div class="code-block">
+            SELECT SUM(category) FROM sales;
+        </div>
+        <p class="alert-error">categoryは文字列型なので、SUM関数は使えません。</p>
+        <p><strong>✔ 解決方法：</strong> 数値型のカラム（例: amount, quantityなど）を使用してください。</p>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー3：WHERE句にSUMを使ってしまう</h3>
+        <div class="code-block">
+            SELECT SUM(amount) FROM sales WHERE SUM(quantity) > 100;
+        </div>
+        <p class="alert-error">集約関数（SUMなど）はWHERE句では使えません。</p>
+        <p><strong>✔ 解決方法：</strong> GROUP BY と HAVING を使います。</p>
+        <div class="code-block">
+            SELECT category, SUM(quantity) FROM sales GROUP BY category HAVING SUM(quantity) > 100;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー4：GROUP BYせずに非集約カラムをSELECT</h3>
+        <div class="code-block">
+            SELECT category, SUM(amount) FROM sales;
+        </div>
+        <p class="alert-error">多くのDBMSでは、非集約カラムをGROUP BYなしで使うとエラーになります。</p>
+        <p><strong>✔ 解決方法：</strong> 非集約カラムはGROUP BYに含めましょう。</p>
+        <div class="code-block">
+            SELECT category, SUM(amount) FROM sales GROUP BY category;
+        </div>
+    </div>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/aggregation/sum/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/sum/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

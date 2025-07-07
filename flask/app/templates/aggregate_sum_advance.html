@@ -2,25 +2,28 @@
 {% block title %}SUM関数の学習ページ（高度版）{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="nav-buttons">
+    <a href="/aggregation/sum/example" class="prev">◀ 前へ</a>
+    <a href="/aggregation/sum/quiz" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
     <h1>SUM関数（実践）</h1>
 
     <p><strong>このページでは、SQLクエリを自由に記述して実行できます。</strong></p>
-    <p style="color: red;"><strong>SUM関数を使って、データを集約してみましょう！</strong></p>
+    <p class="alert-error"><strong>SUM関数を使って、データを集約してみましょう！</strong></p>
     <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
-    
 
-    <!-- salesテーブルの中身を表示 -->
     <h2>salesテーブルの内容</h2>
-    <table border="1">
+    <table class="example-table">
         <caption>sales</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr>
             {% for col in sales_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in sales_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -28,74 +31,83 @@
         {% endfor %}
     </table>
 
-    <!-- ヒントの追加 -->
     <div class="hints">
         <h2>ヒント</h2>
-        
+
         <details>
-            <summary style="color: blue;">ヒント1</summary>
-            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
-            <p>例：SELECT ...;</p>
-        </details>
-    
-        <details>
-            <summary style="color: blue;">ヒント2</summary>
-            <p>SUM関数は、指定されたカラムの値を合計します。ASを使ってエイリアスを指定できます。</p>
-            <p>例：SELECT SUM(quantity) AS 'total_quantity' ...;</p>
-        </details>
-    
-        <details>
-            <summary style="color: blue;">ヒント3</summary>
-            <p>複数のカラムを使用するときは、カンマで区切りましょう。</p>
-            <p>例：SELECT SUM(quantity) AS 'total_quantity', SUM(price) AS 'total_price' ...;</p>
+            <summary>ヒント1</summary>
+            <p>SELECTは、データベースからデータを取得する基本文です。</p>
+            <div class="code-block">SELECT ...;</div>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント4</summary>
-            <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではsalesテーブルを使っています。</p>
-            <p>例：SELECT SUM(quantity) AS 'total_quantity', SUM(price) AS 'total_price' FROM sales ...;</p>
-        </details>
-    
-        <details>
-            <summary style="color: blue;">ヒント5</summary>
-            <p>WHERE句を使うと、条件に合致するデータのみを対象にSUMを計算できます。</p>
-            <p style="color: red;">ただし、WHERE句では集約関数を使用できません！</p>
-            <p>例：SELECT SUM(quantity) AS 'total_quantity', SUM(price) AS 'total_price' FROM sales WHERE category = 'Fruit';</p>
+            <summary>ヒント2</summary>
+            <p>SUM関数は指定カラムの値を合計します。ASでエイリアスを設定できます。</p>
+            <div class="code-block">SELECT SUM(quantity) AS 'total_quantity' FROM sales;</div>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント6</summary>
-            <p style="color: red;">発展</p><p>：集約関数は、GROUP BYと組み合わせることで、カテゴリごとの合計を計算できます。</p>
-            <p>例：SELECT category, SUM(price) FROM sales GROUP BY category;</p>
+            <summary>ヒント3</summary>
+            <p>複数カラムを使う場合、カンマで区切ります。</p>
+            <div class="code-block">
+                SELECT SUM(quantity) AS 'total_quantity', SUM(price) AS 'total_price' FROM sales;
+            </div>
+        </details>
+
+        <details>
+            <summary>ヒント4</summary>
+            <p>FROM句でテーブルを指定します（例：sales）</p>
+        </details>
+
+        <details>
+            <summary>ヒント5</summary>
+            <p>WHERE句で条件を指定できます（NULLは合計対象外）。</p>
+            <div class="code-block">
+                SELECT SUM(quantity) AS 'total_quantity' FROM sales WHERE category = 'Fruit';
+            </div>
+            <p class="alert-error">※ WHERE句では集約関数自体は使えません</p>
+        </details>
+
+        <details>
+            <summary>ヒント6（発展）</summary>
+            <p>GROUP BYと組み合わせてカテゴリごとの合計を計算できます。</p>
+            <div class="code-block">
+                SELECT category, SUM(price) FROM sales GROUP BY category;
+            </div>
         </details>
     </div>
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="alert-error">{{ error_message }}</p>
     {% endif %}
 
     <form method="POST">
-        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
-        <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
-        <br>
-        <button type="submit">クエリを実行</button>
+        <div class="form-group">
+            <label for="query">SQLクエリ:</label>
+            <p class="alert-error">クエリの末尾には <strong>「;」</strong> を付けましょう！</p>
+            <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" class="btn">クエリを実行</button>
+        </div>
     </form>
 
     {% if query %}
         <h2>実行したクエリ</h2>
-        <p><code>{{ query }}</code></p>
+        <div class="code-block">{{ query }}</div>
     {% endif %}
 
     {% if query_result %}
         <h2>クエリ結果</h2>
-        <table border="1">
-            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+        <table class="example-table">
+            <tr>
                 {% for col in query_result["columns"] %}
                     <th>{{ col }}</th>
                 {% endfor %}
             </tr>
             {% for row in query_result["data"] %}
-                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                <tr>
                     {% for item in row %}
                         <td>{{ item }}</td>
                     {% endfor %}
@@ -105,7 +117,9 @@
     {% endif %}
 </div>
 
-<hr>
-<a href="/aggregate_sum_study">戻る</a>
+<div class="nav-buttons">
+    <a href="/aggregation/sum/example" class="prev">◀ 前へ</a>
+    <a href="/aggregation/sum/quiz" class="next">次へ ▶</a>
+</div>
 
 {% endblock %}

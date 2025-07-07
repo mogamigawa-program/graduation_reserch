@@ -2,36 +2,39 @@
 {% block title %}MIN関数の学習ページ{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="nav-buttons">
+    <a href="/index/集約関数?flag=min" class="prev">◀ 前へ</a>
+    <a href="/aggregation/min/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
     <h1>MIN関数</h1>
-    
+
     <p><strong>MIN関数とは:</strong> MIN関数は、指定した列の中で最小値を返すSQL集約関数です。</p>
 
-    <p><strong>基本的な構文:</strong>
-        <code>
+    <p><strong>基本的な構文:</strong></p>
+    <div class="code-block">
         SELECT MIN({カラム名}) AS `{エイリアス名}` FROM {テーブル名};
-        </code>
-    </p>
+    </div>
 
-    <p><strong>例:</strong> 例えば、<code>sales</code>テーブルで価格の最小値を取得する場合、<br><code>SELECT MIN(price) AS 'min_price' FROM sales;</code>のように実行します。</p>
-
-    <p><strong><a href="/aggregate_min_advance">MIN関数のクエリを全文書いてみよう！<a></a></strong></p>
-
-    <p><strong><a href="/aggregate_min_quiz">MIN関数の理解度チェック！<a></a></strong></p>
+    <p><strong>例:</strong></p>
+    <div class="code-block">
+        SELECT MIN(price) AS 'min_price' FROM sales;
+    </div>
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="alert-error">{{ error_message }}</p>
     {% endif %}
 
-    <table border="1">
+    <table class="example-table">
         <caption>sales</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr>
             {% for col in sales_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in sales_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -40,64 +43,66 @@
     </table>
 
     <form method="POST">
-        <p>SELECT MIN(</p>
-        <div id="min-columns-container">
-            <div class="min-column-group">
-                <select name="min_column" required>
-                    {% for col in sales_desc %}
-                        <option value="{{ col[0] }}">{{ col[0] }}</option>
-                    {% endfor %}
-                </select>
-                <p><label for="as_column">) AS</label></p>
-                <input type="text" name="as_column" placeholder="例: Min Value" required>
+        <div class="form-group">
+            <label>SELECT MIN(</label>
+            <div id="min-columns-container">
+                <div class="min-column-group">
+                    <select name="min_column" required>
+                        {% for col in sales_desc %}
+                            <option value="{{ col[0] }}">{{ col[0] }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>) AS</label>
+                    <input type="text" name="as_column" placeholder="例: Min Value" required>
+                </div>
             </div>
+            <label>FROM sales</label>
         </div>
-        <p>FROM sales;</p>
 
-        <!-- WHEREを使用するチェックボックス -->
-        <div>
+        <div class="form-group">
             <input type="checkbox" id="use_where" onclick="toggleWhereInput()">
             <label for="use_where">WHEREを使用する</label>
         </div>
 
-        <!-- WHERE句の入力ボックス（デフォルトでは非表示） -->
-        <div id="where-condition" style="display: none;">
+        <div id="where-condition" class="form-group" style="display: none;">
             <label for="where_clause">WHERE</label>
             <input type="text" id="where_clause" name="where_clause" placeholder="例: price > 1000">
-            <p style="color: red; font-size: 0.9em;">
-                注意: WHERE句には集約関数（COUNT、SUM、AVG、MINなど）は使用できません。<br>
-                集約関数に条件を適用する場合、HAVING句を使用してください。HAVING句は"ソートとグループ化"で学びます。
-            </p>
-            <p style="color: red; font-size: 0.9em;">
-                集約関数に条件を適用する場合の例：<br>SELECT MIN(price) AS min_price 
-                FROM sales 
-                GROUP BY category 
-                HAVING MIN(price) < 500;
-            </p>
-            
+
+            <div class="alert-warning">
+                <p>注意: WHERE句では集約関数（COUNT、SUM、AVG、MINなど）は使用できません。</p>
+                <p>集約関数に条件を適用する場合、<strong>HAVING句</strong>を使います（"ソートとグループ化"で学習）。</p>
+                <div class="code-block">
+                    SELECT MIN(price) AS min_price<br>
+                    FROM sales<br>
+                    GROUP BY category<br>
+                    HAVING MIN(price) &lt; 500;
+                </div>
+            </div>
         </div>
 
-        <button type="button" onclick="addMinColumn()">カラムを追加</button>
-        <br><br>
-        <button type="submit">MINを実行</button>
+        <div class="btn-container">
+            <button type="button" class="btn btn-secondary" onclick="addMinColumn()">カラムを追加</button>
+            <button type="submit" class="btn">MINを実行</button>
+        </div>
     </form>
 
     {% if min_result %}
-    <h2>MINの結果</h2>
-    <p><strong>実行クエリ:</strong> {{ min_query }}</p>
-    <table border="1">
-        <tr style="background-color: rgba(238, 0, 255, 0.664);">
-            {% for col in min_query.split('FROM')[0].split(',') %}
-                {% set alias = col.split('AS')[-1].strip().strip('` ') %}
-                <th>{{ alias }}</th>
-            {% endfor %}
-        </tr>        
-        <tr style="background-color: rgba(238, 0, 255, 0.313);">
-            {% for item in min_result[0] %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    </table>
+        <h2>MINの結果</h2>
+        <p><strong>実行クエリ:</strong></p>
+        <div class="code-block">{{ min_query }}</div>
+        <table class="example-table">
+            <tr>
+                {% for col in min_query.split('FROM')[0].split(',') %}
+                    {% set alias = col.split('AS')[-1].strip().strip('` ') %}
+                    <th>{{ alias }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for item in min_result[0] %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        </table>
     {% endif %}
 </div>
 
@@ -113,7 +118,7 @@
                     <option value="{{ col[0] }}">{{ col[0] }}</option>
                 {% endfor %}
             </select>
-            <label for="as_column"><p>) AS</p></label>
+            <label>) AS</label>
             <input type="text" name="as_column" placeholder="例: Min Value" required>
         `;
         container.appendChild(newMinColumn);
@@ -125,6 +130,9 @@
     }
 </script>
 
-<hr>
-<a href="/aggregate_select">戻る</a>
+<div class="nav-buttons">
+    <a href="/index/集約関数?flag=min" class="prev">◀ 前へ</a>
+    <a href="/aggregation/min/example" class="next">次へ ▶</a>
+</div>
+
 {% endblock %}

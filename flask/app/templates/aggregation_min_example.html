@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}MIN関数の実行例とエラー集{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/aggregation/min/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/min/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>MIN関数の実行例とエラー集</h1>
+
+    <p>MIN関数は、指定したカラムの中で<mark>最も小さい値（最小値）</mark>を取得するSQL集約関数です。以下に正しい使い方の実例と、ありがちなエラーの原因・対処法を紹介します。</p>
+
+    <h2>✅ 実行例</h2>
+
+    <div class="example-box">
+        <h3>例1：テーブル全体の最小値を取得する</h3>
+        <p>salesテーブル内のprice列の最小値を求めるクエリです。</p>
+        <div class="code-block">
+            SELECT MIN(price) AS min_price FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>例2：WHERE句で条件を絞った最小値</h3>
+        <p>categoryが「Fruit」のデータのうち、最小のpriceを取得します。</p>
+        <div class="code-block">
+            SELECT MIN(price) AS min_price FROM sales WHERE category = 'Fruit';
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>例3：カテゴリごとの最小価格（GROUP BY使用）</h3>
+        <p>カテゴリごとにpriceの最小値を求めるクエリです。</p>
+        <div class="code-block">
+            SELECT category, MIN(price) AS min_price FROM sales GROUP BY category;
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>⚠️ よくあるエラーとその対処法</h2>
+
+    <div class="example-box">
+        <h3>❌ エラー1：セミコロンを忘れて構文エラー</h3>
+        <div class="code-block">
+            SELECT MIN(price) AS min_price FROM sales
+        </div>
+        <p class="alert-error">クエリの終わりにセミコロン（;）がないと、実行時にエラーになります。</p>
+        <p><strong>✔ 解決方法：</strong> クエリの末尾に <code>;</code> を付けましょう。</p>
+        <div class="code-block">
+            SELECT MIN(price) AS min_price FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー2：WHERE句の中で集約関数を使う</h3>
+        <div class="code-block">
+            SELECT MIN(price) FROM sales WHERE MIN(quantity) &gt; 10;
+        </div>
+        <p class="alert-error">WHERE句ではMINなどの集約関数は使用できません。</p>
+        <p><strong>✔ 解決方法：</strong> GROUP BYとHAVING句を使いましょう。</p>
+        <div class="code-block">
+            SELECT category, MIN(quantity) FROM sales GROUP BY category HAVING MIN(quantity) &gt; 10;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー3：GROUP BYを省略して複数カラムをSELECT</h3>
+        <div class="code-block">
+            SELECT category, MIN(price) FROM sales;
+        </div>
+        <p class="alert-error">多くのDBでは、非集約カラム（category）をSELECTする際に、GROUP BYを省略するとエラーになります。</p>
+        <p><strong>✔ 解決方法：</strong> GROUP BYを追加してください。</p>
+        <div class="code-block">
+            SELECT category, MIN(price) FROM sales GROUP BY category;
+        </div>
+    </div>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/aggregation/min/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/min/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

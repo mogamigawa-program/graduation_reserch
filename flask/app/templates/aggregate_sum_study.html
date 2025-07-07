@@ -2,41 +2,44 @@
 {% block title %}SUM関数の学習ページ{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="nav-buttons">
+    <a href="/index/集約関数?flag=min" class="prev">◀ 前へ</a>
+    <a href="/aggregation/sum/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
     <h1>SUM関数</h1>
     
     <p><strong>SUM関数とは:</strong> SUM関数は、指定された列の数値の合計を計算するSQL集約関数です。</p>
 
-    <p><strong>基本的な構文:</strong>
-        <code>
+    <p><strong>基本的な構文:</strong></p>
+    <div class="code-block">
         SELECT SUM({合計するカラム}) AS `{エイリアス名}` FROM {テーブル名};
-        </code>
-    </p>
+    </div>
 
-    <p><strong style="color: red;">
+    <p class="alert-error">
         注意：SUM関数は、数値の合計を計算するため、NULL値は無視されます。<br>
         非数値データの列に対して使用するとエラーが発生します。
-    </strong></p>
+    </p>
 
-    <p><strong>例:</strong> 例えば、<code>sales</code>テーブルで金額の合計を計算する場合、<br><code>SELECT SUM(amount) AS 'total_amount' FROM sales;</code>のように実行します。</p>
-
-    <p><strong><a href="/aggregate_sum_advance">SUM関数のクエリを全文書いてみよう！<a></a></strong></p>
-
-    <p><strong><a href="/aggregate_sum_quiz">SUM関数の理解度チェック！<a></a></strong></p>
+    <p><strong>例:</strong></p>
+    <div class="code-block">
+        SELECT SUM(amount) AS 'total_amount' FROM sales;
+    </div>
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="alert-error">{{ error_message }}</p>
     {% endif %}
 
-    <table border="1">
+    <table class="example-table">
         <caption>sales</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr>
             {% for col in sales_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in sales_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -44,8 +47,8 @@
         {% endfor %}
     </table>
 
-    <form method="POST">
-        <p>SELECT SUM(</p>
+    <form method="POST" class="form-section">
+        <div class="code-block">SELECT SUM(</div>
         <div id="sum-columns-container">
             <div class="sum-column-group">
                 <select name="sum_column" required>
@@ -53,54 +56,51 @@
                         <option value="{{ col[0] }}">{{ col[0] }}</option>
                     {% endfor %}
                 </select>
-                <label for="as_column"><p>) AS</p></label>
+                <label>) AS</label>
                 <input type="text" name="as_column" placeholder="例: Total Sales" required>
             </div>
         </div>
-        <p>FROM sales</p>
+        <div class="code-block">FROM sales</div>
 
-        <!-- WHEREを使用するチェックボックス -->
-        <div>
+        <div class="form-toggle">
             <input type="checkbox" id="use_where" onclick="toggleWhereInput()">
             <label for="use_where">WHEREを使用する</label>
         </div>
 
-        <!-- WHERE句の入力ボックス（デフォルトでは非表示） -->
         <div id="where-condition" style="display: none;">
             <label for="where_clause">WHERE</label>
             <input type="text" id="where_clause" name="where_clause" placeholder="例: amount > 1000">
-            <p style="color: red; font-size: 0.9em;">
+            <p class="alert-error">
                 注意: WHERE句には集約関数（SUM、COUNTなど）は使用できません。<br>
                 集約関数に条件を適用する場合、HAVING句を使用してください。HAVING句は"ソートとグループ化"で学びます。
             </p>
-            <p style="color: red; font-size: 0.9em;">
-            集約関数に条件を適用する場合の例：<br>SELECT SUM(amount) AS total_amount 
-            FROM sales 
-            GROUP BY category 
-            HAVING SUM(amount) > 1000;
+            <p class="alert-error">
+                集約関数に条件を適用する例：<br>
+                SELECT SUM(amount) AS total_amount FROM sales GROUP BY category HAVING SUM(amount) > 1000;
             </p>
         </div>
-        <button type="button" onclick="addSumColumn()">カラムを追加</button>
+
+        <button type="button" class="btn" onclick="addSumColumn()">カラムを追加</button>
         <br><br>
-        <button type="submit">SUMを実行</button>
+        <button type="submit" class="btn">SUMを実行</button>
     </form>
 
     {% if sum_result %}
-    <h2>SUMの結果</h2>
-    <p><strong>実行クエリ:</strong> {{ sum_query }}</p>
-    <table border="1">
-        <tr style="background-color: rgba(238, 0, 255, 0.664);">
-            {% for col in sum_query.split('FROM')[0].split(',') %}
-                {% set alias = col.split('AS')[-1].strip().strip('` ') %}
-                <th>{{ alias }}</th>
-            {% endfor %}
-        </tr>        
-        <tr style="background-color: rgba(238, 0, 255, 0.313);">
-            {% for item in sum_result[0] %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    </table>
+        <h2>SUMの結果</h2>
+        <p><strong>実行クエリ:</strong> {{ sum_query }}</p>
+        <table class="example-table">
+            <tr>
+                {% for col in sum_query.split('FROM')[0].split(',') %}
+                    {% set alias = col.split('AS')[-1].strip().strip('` ') %}
+                    <th>{{ alias }}</th>
+                {% endfor %}
+            </tr>        
+            <tr>
+                {% for item in sum_result[0] %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        </table>
     {% endif %}
 </div>
 
@@ -116,7 +116,7 @@
                     <option value="{{ col[0] }}">{{ col[0] }}</option>
                 {% endfor %}
             </select>
-            <label for="as_column"><p>)AS</p></label>
+            <label>)AS</label>
             <input type="text" name="as_column" placeholder="例: Total Amount" required>
         `;
         container.appendChild(newSumColumn);
@@ -128,6 +128,9 @@
     }
 </script>
 
-<hr>
-<a href="/aggregate_select">戻る</a>
+<div class="nav-buttons">
+    <a href="/index/集約関数?flag=min" class="prev">◀ 前へ</a>
+    <a href="/aggregation/sum/example" class="next">次へ ▶</a>
+</div>
+
 {% endblock %}

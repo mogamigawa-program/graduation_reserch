@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}MAX関数の実行例とエラー集{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/aggregation/max/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/max/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>MAX関数の実行例とエラー集</h1>
+
+    <p>MAX関数は、指定したカラムにおける<mark>最大値</mark>を取得するためのSQL集約関数です。ここでは、基本的な使い方から、よくあるエラーとその解決方法までを紹介します。</p>
+
+    <h2>✅ 実行例</h2>
+
+    <div class="example-box">
+        <h3>例1：テーブル全体での最大値</h3>
+        <p>priceカラムの最大値を求めます。</p>
+        <div class="code-block">
+            SELECT MAX(price) AS max_price FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>例2：WHERE句と組み合わせる</h3>
+        <p>Fruitカテゴリ内のprice最大値を求めます。</p>
+        <div class="code-block">
+            SELECT MAX(price) AS max_price FROM sales WHERE category = 'Fruit';
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>例3：GROUP BYとの併用（カテゴリごとの最大値）</h3>
+        <p>カテゴリごとに最大priceを求めます。</p>
+        <div class="code-block">
+            SELECT category, MAX(price) AS max_price FROM sales GROUP BY category;
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>⚠️ よくあるエラーとその対処法</h2>
+
+    <div class="example-box">
+        <h3>❌ エラー1：クエリ末尾にセミコロンがない</h3>
+        <div class="code-block">
+            SELECT MAX(price) AS max_price FROM sales
+        </div>
+        <p class="alert-error">構文エラーになります（特に複数文をサポートするツールでは）</p>
+        <p><strong>✔ 解決法：</strong>セミコロンをつけましょう</p>
+        <div class="code-block">
+            SELECT MAX(price) AS max_price FROM sales;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー2：WHERE句に集約関数を使う</h3>
+        <div class="code-block">
+            SELECT MAX(price) FROM sales WHERE MAX(quantity) &gt; 10;
+        </div>
+        <p class="alert-error">WHERE句では集約関数（MAXなど）は使用できません。</p>
+        <p><strong>✔ 解決法：</strong>GROUP BYとHAVINGを使用しましょう。</p>
+        <div class="code-block">
+            SELECT category, MAX(quantity) FROM sales GROUP BY category HAVING MAX(quantity) &gt; 10;
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h3>❌ エラー3：GROUP BYを省略して複数カラムをSELECT</h3>
+        <div class="code-block">
+            SELECT category, MAX(price) FROM sales;
+        </div>
+        <p class="alert-error">多くのDBではGROUP BYを明示しないとエラーになる場合があります（例：MySQLのsql_mode次第）。</p>
+        <p><strong>✔ 解決法：</strong>GROUP BYを追加しましょう。</p>
+        <div class="code-block">
+            SELECT category, MAX(price) FROM sales GROUP BY category;
+        </div>
+    </div>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/aggregation/max/study" class="prev">◀ 前へ</a>
+    <a href="/aggregation/max/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

@@ -5102,7 +5102,7 @@ def aggregate_sum_advance():
 # SUM 実行例
 @app.route('/aggregation/sum/example', methods=['GET', 'POST'])
 def aggregate_sum_example():
-    return 0
+    return render_template('aggregation_sum_example.html')
 
 # SUM クイズページ(aggregate_sum_quiz.html)
 @app.route('/aggregation/sum/quiz', methods=['GET', 'POST'])
@@ -5598,7 +5598,7 @@ def aggregate_max_advance():
 # MAX 実行例
 @app.route('/aggregation/max/example', methods=['GET', 'POST'])
 def aggregate_max_example():
-    return 0
+    return render_template('aggregation_max_example.html')
 
 # MAX クイズページ(aggregate_max_quiz.html)
 @app.route('/aggregation/max/quiz', methods=['GET', 'POST'])
@@ -5845,7 +5845,7 @@ def aggregate_min_advance():
 # MIN 実行例
 @app.route('/aggregation/min/example', methods=['GET', 'POST'])
 def aggregate_min_example():
-    return 0
+    return render_template('aggregation_min_example.html')
 
 # MIN クイズページ(aggregate_min_quiz.html)
 @app.route('/aggregation/min/quiz', methods=['GET', 'POST'])

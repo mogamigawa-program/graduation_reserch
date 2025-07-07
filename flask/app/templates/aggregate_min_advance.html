@@ -2,24 +2,29 @@
 {% block title %}MIN関数の学習ページ（高度版）{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="nav-buttons">
+    <a href="/aggregation/min/example" class="prev">◀ 前へ</a>
+    <a href="/aggregation/min/quiz" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
     <h1>MIN関数（実践）</h1>
 
     <p><strong>このページでは、SQLクエリを自由に記述して実行できます。</strong></p>
-    <p style="color: red;"><strong>MIN関数を使って、データの最小値を確認してみましょう！</strong></p>
+    <p class="alert-error"><strong>MIN関数を使って、データの最小値を確認してみましょう！</strong></p>
     <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
-    
+
     <!-- salesテーブルの中身を表示 -->
     <h2>salesテーブルの内容</h2>
-    <table border="1">
+    <table class="example-table">
         <caption>sales</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr>
             {% for col in sales_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in sales_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -27,76 +32,75 @@
         {% endfor %}
     </table>
 
-    <!-- ヒントの追加 -->
-    <div class="hints">
+    <!-- ヒントセクション -->
+    <div class="alert-warning">
         <h2>ヒント</h2>
 
         <details>
-            <summary style="color: blue;">ヒント1</summary>
-            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
-            <p>例：SELECT ...;</p>
+            <summary>ヒント1</summary>
+            <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。<br>例：<code>SELECT ...;</code></p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント2</summary>
-            <p>MIN関数は、指定されたカラムの最小値を取得します。ASを使ってエイリアスを指定できます。</p>
-            <p>例：SELECT MIN(price) AS 'min_price' ...;</p>
+            <summary>ヒント2</summary>
+            <p>MIN関数は、指定されたカラムの最小値を取得します。ASを使ってエイリアス（別名）を付けられます。<br>例：<code>SELECT MIN(price) AS 'min_price' FROM sales;</code></p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント3</summary>
-            <p>複数のカラムを使用するときは、カンマで区切りましょう。</p>
-            <p>例：SELECT category, MIN(price) AS 'min_price' ...;</p>
+            <summary>ヒント3</summary>
+            <p>複数のカラムを使うときは、カンマで区切ります。<br>例：<code>SELECT category, MIN(price) AS 'min_price' FROM sales;</code></p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント4</summary>
-            <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではsalesテーブルを使っています。</p>
-            <p>例：SELECT category, MIN(price) FROM sales ...;</p>
+            <summary>ヒント4</summary>
+            <p>FROM句で、データを取得するテーブル名（ここではsales）を指定します。</p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント5</summary>
-            <p>WHERE句を使うと、条件に合致するデータの最小値を取得できます。</p>
-            <p style="color: red;">ただし、WHERE句では集約関数を使用できません！</p>
-            <p>例：SELECT MIN(price) FROM sales WHERE category = 'Fruit';</p>
+            <summary>ヒント5</summary>
+            <p>WHERE句を使うと、条件に合致するデータに限定してMINを使えます。<br>
+               例：<code>SELECT MIN(price) FROM sales WHERE category = 'Fruit';</code></p>
+            <p class="alert-error">※ WHERE句内ではMIN関数などの集約関数は使えません。</p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント6</summary>
-            <p style="color: red;">発展</p>
-            <p>集約関数は、GROUP BYと組み合わせることで、カテゴリごとの最小値を取得できます。</p>
-            <p>例：SELECT category, MIN(price) FROM sales GROUP BY category;</p>
+            <summary>ヒント6（発展）</summary>
+            <p>GROUP BYと組み合わせると、カテゴリごとの最小値が取得できます。<br>
+               例：<code>SELECT category, MIN(price) FROM sales GROUP BY category;</code></p>
         </details>
     </div>
 
-
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="alert-error">{{ error_message }}</p>
     {% endif %}
 
     <form method="POST">
-        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
-        <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
-        <br>
-        <button type="submit">クエリを実行</button>
+        <div class="form-group">
+            <label for="query">SQLクエリ:</label>
+            <p class="alert-error"><strong>クエリの最後には「;」をつけましょう！</strong></p>
+            <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" class="btn">クエリを実行</button>
+        </div>
     </form>
 
     {% if query %}
         <h2>実行したクエリ</h2>
-        <p><code>{{ query }}</code></p>
+        <div class="code-block"><code>{{ query }}</code></div>
     {% endif %}
 
     {% if query_result %}
         <h2>クエリ結果</h2>
-        <table border="1">
-            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+        <table class="example-table">
+            <tr>
                 {% for col in query_result["columns"] %}
                     <th>{{ col }}</th>
                 {% endfor %}
             </tr>
             {% for row in query_result["data"] %}
-                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                <tr>
                     {% for item in row %}
                         <td>{{ item }}</td>
                     {% endfor %}
@@ -106,7 +110,9 @@
     {% endif %}
 </div>
 
-<hr>
-<a href="/aggregate_min_study">戻る</a>
+<div class="nav-buttons">
+    <a href="/aggregation/min/example" class="prev">◀ 前へ</a>
+    <a href="/aggregation/min/quiz" class="next">次へ ▶</a>
+</div>
 
 {% endblock %}
