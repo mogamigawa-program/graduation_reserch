@@ -1064,11 +1064,17 @@ def insert_select_practice(type):
     ALLOWED_COLUMNS = {'id', 'name', 'age'}
 
     import re
+
     SAFE_SQL_PATTERN = re.compile(r"""
-        ^\s*INSERT\s+INTO\s+selected_users\s*
-        \(\s*selected_id\s*,\s*selected_name\s*\)\s*
-        SELECT\s+[\w\s,]+\s+FROM\s+all_users\s+
-        WHERE\s+.+;\s*$""", re.IGNORECASE | re.VERBOSE)
+        ^\s*INSERT\s+INTO\s+selected_users\s*               # insert into selected_users
+        \(\s*selected_id\s*,\s*selected_name\s*\)\s*        # (selected_id, selected_name)
+        SELECT\s+                                           # SELECT
+        (?:[\w]+\s*,\s*)*[\w]+\s+                           # id, name（柔軟な列指定）
+        FROM\s+all_users\s+                                 # FROM all_users
+        WHERE\s+.+;                                         # WHERE 条件;
+        \s*$                                                # 終端
+    """, re.IGNORECASE | re.VERBOSE)
+
 
     if request.method == 'POST':
         action = request.form.get('submit_button')
@@ -1099,6 +1105,7 @@ def insert_select_practice(type):
                     error_message = "許可された形式のSQL文のみ実行できます。"
                 else:
                     try:
+                        sql.replace(';', '')
                         run_query(sql, commit=True)
                         message = "SQLを実行しました。"
                     except Exception as e:
@@ -1723,7 +1730,7 @@ def login():
 
         try:
             # パラメータ化されたクエリ（SQLインジェクション対策）
-            select_user_query = "SELECT id, username, password, is_admin FROM users WHERE username = " + username
+            select_user_query = "SELECT id, username, password, is_admin FROM users WHERE username = '" + username + "'"
             users = user_db.query(select_user_query)
 
             if users and bcrypt.check_password_hash(users[0][2], password):

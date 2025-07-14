@@ -1,97 +1,94 @@
 {% extends "base.html" %}
 {% block title %}CROSS JOINの実行例ページ{% endblock %}
 {% block content %}
-<h1>CROSS JOINの実行例</h1>
 
-<!-- productsテーブルの中身を表示 -->
-<table border="1">
-    <caption>products</caption>
-        <tr style="background-color: red;">
-            <th>商品ID</th>
-            <th>商品名</th>
-            <th>価格</th>
-            <th>在庫数</th>
-            <th>ステータス</th>
-        </tr>
-    <tr style="background-color: red;">
-        {% for col in products_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in products_data %}
-        <tr style="background-color: lightcoral;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
+<div class="nav-buttons">
+    <a href="/basic/join/cross_join/study" class="prev">◀ 前へ</a>
+    <a href="/basic/join/cross_join/practice" class="next">次へ ▶</a>
+</div>
 
-<!-- customersテーブルの中身を表示 -->
-<table border="1">
-    <caption>customers</caption>
-        <tr style="background-color: blue;">
-            <th>購入者ID</th>
-            <th>商品ID</th>
-            <th>購入日</th>
-        </tr>
-    <tr style="background-color: blue;">
-        {% for col in customers_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in customers_data %}
-        <tr style="background-color: lightblue;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
+<div class="learning-container">
+    <h1>CROSS JOINの実行例</h1>
 
-
-<!-- CROSS JOINの結果表示 -->
-{% if cross_join_result %}
-    <h2>CROSS JOINの結果</h2>
-    <p><strong>実行クエリ:</strong></p>
-    <p><code>
-        SELECT products.product_id, products.product_name, customers.customer_id, customers.order_date
-        FROM products
-        CROSS JOIN customers;
-        </code>
-    </p>
-    <p><strong>解説:</strong></p> 
-    <p>JOINを使用すると、2つのテーブルの全ての組み合わせが生成されます。<br>ここではproductsテーブルとcustomersテーブルをCROSS JOINするので、productsテーブルの各行がcustomersテーブルのすべての行と組み合わされます。</p>
-    <p>SELECTでproducts.product_id, products.product_name, customers.customer_id, customers.order_dateを選択しているので<br>表示されるカラムはこの4列であり、行数は3（productsの行数）×4（customersの行数） = 12行です。</p>
-    <table border="1">
+    <!-- productsテーブルの中身を表示 -->
+    <table class="example-table">
+        <caption>products</caption>
         <tr>
-            <!-- カラム名を動的に表示 -->
-            {% for col in columns.split(',') %}
-                <th 
-                    {% if 'products.' in col.strip() %} style="background-color: red;" {% endif %}
-                    {% if 'customers.' in col.strip() %} style="background-color: blue;" {% endif %}
-                >
-                    {{ col.strip() }}
-                </th>
+            {% for col in products_desc %}
+                <th class="products-col">{{ col[0] }}</th>
             {% endfor %}
         </tr>
-        {% for row in cross_join_result %}
+        {% for row in products_data %}
             <tr>
                 {% for item in row %}
-                    <!-- 'columns'をスプリットしてループ中のカラム名に応じて背景色を設定 -->
-                    <td
-                        {% if 'products.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightcoral;" {% endif %}
-                        {% if 'customers.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightblue;" {% endif %}
-                    >
-                        {{ item }}
-                    </td>
+                    <td class="products-cell">{{ item }}</td>
                 {% endfor %}
             </tr>
         {% endfor %}
     </table>
-{% endif %}
 
-<hr>
-    <a href="/cross_join_study">CROSS JOIN学習ページに戻る</a>
-    <a href="/index">ホーム</a><br>
+    <!-- customersテーブルの中身を表示 -->
+    <table class="example-table">
+        <caption>customers</caption>
+        <tr>
+            {% for col in customers_desc %}
+                <th class="customers-col">{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in customers_data %}
+            <tr>
+                {% for item in row %}
+                    <td class="customers-cell">{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% if cross_join_result %}
+        <h2>CROSS JOINの結果</h2>
+
+        <p><strong>実行クエリ:</strong></p>
+        <div class="code-block">
+            SELECT products.product_id, products.product_name, customers.customer_id, customers.order_date<br>
+            FROM products<br>
+            CROSS JOIN customers;
+        </div>
+
+        <p><strong>解説:</strong></p>
+        <p>
+            JOINを使用すると、2つのテーブルの全ての組み合わせが生成されます。<br>
+            ここでは <code>products</code> テーブルと <code>customers</code> テーブルを CROSS JOIN するので、<br>
+            products テーブルの各行が customers テーブルのすべての行と組み合わされます。
+        </p>
+        <p>
+            SELECT で <code>products.product_id, products.product_name, customers.customer_id, customers.order_date</code> を選択しているので、<br>
+            表示されるカラムはこの 4 列であり、行数は 3（products の行数）× 4（customers の行数）= <strong>12行</strong> です。
+        </p>
+
+        <table class="example-table">
+            <tr>
+                {% for col in columns.split(',') %}
+                    <th class="{% if 'products.' in col.strip() %}products-col{% elif 'customers.' in col.strip() %}customers-col{% endif %}">
+                        {{ col.strip() }}
+                    </th>
+                {% endfor %}
+            </tr>
+            {% for row in cross_join_result %}
+                <tr>
+                    {% for item in row %}
+                        <td class="{% if 'products.' in columns.split(',')[loop.index0].strip() %}products-cell{% elif 'customers.' in columns.split(',')[loop.index0].strip() %}customers-cell{% endif %}">
+                            {{ item }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/join/cross_join/study" class="prev">◀ 前へ</a>
+    <a href="/basic/join/cross_join/practice" class="next">次へ ▶</a>
+</div>
+
 {% endblock %}

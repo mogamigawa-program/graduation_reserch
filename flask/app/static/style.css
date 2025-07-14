@@ -547,3 +547,40 @@ footer {
     color: #555;
     margin-left: 5px;
 }
+
+.products-col {
+    background-color: red;
+}
+.products-cell {
+    background-color: lightcoral;
+}
+.customers-col {
+    background-color: blue;
+}
+.customers-cell {
+    background-color: lightblue;
+}
+.example-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+.example-table th,
+.example-table td {
+    border: 1px solid #999;
+    padding: 0.5em;
+    text-align: left;
+}
+.code-block {
+    background-color: #f4f4f4;
+    border-left: 4px solid #888;
+    padding: 0.5em 1em;
+    margin: 1em 0;
+    font-family: monospace;
+}
+.learning-container {
+    padding: 1em;
+}
+.back-link {
+    margin-top: 2em;
+}

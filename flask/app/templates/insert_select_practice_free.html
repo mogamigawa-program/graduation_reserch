@@ -54,7 +54,7 @@ WHERE age &gt;= 18;</code>
     <section>
         <h2>演習：SQL文を自由に入力して実行しよう</h2>
         <form action="" method="post">
-            <textarea name="sql" rows="5" style="width: 100%;" placeholder="例: INSERT INTO selected_users (selected_id, selected_name)\nSELECT id, name FROM all_users WHERE age &gt;= 18;"></textarea>
+            <textarea name="sql" rows="5" style="width: 100%;" placeholder="例: INSERT INTO selected_users (selected_id, selected_name) SELECT id, name FROM all_users WHERE age &gt;= 18;"></textarea>
             <div class="btn-container">
                 <button type="submit" name="submit_button" value="execute" class="btn">実行</button>
                 <button type="submit" name="submit_button" value="reset" class="btn">テーブルを初期化</button>

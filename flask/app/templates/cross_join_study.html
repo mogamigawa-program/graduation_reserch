@@ -1,140 +1,119 @@
 {% extends "base.html" %}
 {% block title %}CROSS JOINの学習ページ{% endblock %}
 {% block content %}
-<h1>CROSS JOIN</h1>
 
-<p><strong>CROSS JOINとは:</strong> CROSS JOINは、2つのテーブルのすべての行の組み合わせを生成する結合方法です。最初のテーブルの各行が、2つ目のテーブルのすべての行と組み合わされ、結果はn×m行となります（nは1つ目のテーブルの行数、mは2つ目のテーブルの行数）。CROSS JOINは大量のデータを生成するため、すべてのデータの組み合わせが必要な場合や、特定の分析やシミュレーションで使用されます。</p>
+<div class="nav-buttons">
+    <a href="/index/join?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/join/cross_join/example" class="next">次へ ▶</a>
+</div>
 
-<p><strong>WHERE句の使用:</strong> 通常、CROSS JOINではすべての組み合わせが取得されますが、WHERE句を使うことで、その結果にフィルターをかけ、条件を満たすデータの組み合わせのみを取得することができます。WHERE句を指定することで、結果セットを制限し、必要なデータに絞り込むことができます。</p>
+<div class="learning-container">
+    <h1>CROSS JOIN</h1>
 
-<p><strong>例:</strong> 例えば、<code>products</code>テーブルと<code>customers</code>テーブルに対してCROSS JOINを実行し、その結果を<code>WHERE products.prosuct_id = customers.product_id</code>という条件で絞り込む場合、各購入者が購入した商品に対応する組み合わせだけを取得できます。これにより、無関係なデータの組み合わせを除外し、関連するデータのみを効率的に取得できます。</p>
+    <p><strong>CROSS JOINとは:</strong> 2つのテーブルの全行の組み合わせ（直積）を生成する結合方法です。1つ目のテーブルにn行、2つ目にm行あると、結果はn×m行になります。</p>
 
-<p><strong><a href="/cross_join_study_example">CROSS JOINの実行例はこちら<a></a></strong></p>
+    <p><strong>WHERE句の使用:</strong> CROSS JOINではすべての組み合わせを取得しますが、<code>WHERE</code>で条件を指定することで、関連のあるデータだけを絞り込むことができます。</p>
 
-<!-- エラーメッセージの表示 -->
-{% if error_message %}
-    <p style="color: red;">{{ error_message }}</p>
-{% endif %}
+    <p><strong>例:</strong> <code>products</code>と<code>customers</code>をCROSS JOINし、<code>WHERE products.product_id = customers.product_id</code>とすることで、購入者と商品が一致する行だけに絞り込めます。</p>
 
-<!-- productsテーブルの中身を表示 -->
-<table border="1">
-    <caption>products</caption>
-        <tr style="background-color: red;">
-            <th>商品ID</th>
-            <th>商品名</th>
-            <th>価格</th>
-            <th>在庫数</th>
-            <th>ステータス</th>
-        </tr>
-    <tr style="background-color: red;">
-        {% for col in products_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in products_data %}
-        <tr style="background-color: lightcoral;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
+    {% if error_message %}
+        <p class="alert-error">{{ error_message }}</p>
+    {% endif %}
 
-<!-- customersテーブルの中身を表示 -->
-<table border="1">
-    <caption>customers</caption>
-        <tr style="background-color: blue;">
-            <th>購入者ID</th>
-            <th>商品ID</th>
-            <th>購入日</th>
-        </tr>
-    <tr style="background-color: blue;">
-        {% for col in customers_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in customers_data %}
-        <tr style="background-color: lightblue;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
-
-
-<form method="POST">
-    <p>SELECT</p>
-    <label for="columns"></label>
-    <input type="text" id="columns" name="columns" placeholder="カラム:products.product_id, customers.order_date" required>
-    <p>FROM</p>
-    <label for="table1_name"></label>
-    <input type="text" id="table1_name" name="table1_name" placeholder="テーブル名:products or customers" value="{{ table1_name if table1_name else '' }}" required>
-    <p>CROSS JOIN </p>
-    <label for="table2_name"></label>
-    <input type="text" id="table2_name" name="table2_name" placeholder="テーブル名:products or customers" value="{{ table2_name if table2_name else '' }}" required>
-
-    <br><br>
-
-    <!-- WHERE条件を使用するかを選択 -->
-    <input type="checkbox" id="use_where" name="use_where" onclick="toggleWhereCondition()">
-    <label for="use_where">WHEREを使用する</label>
-
-    <!-- WHERE条件入力フィールド（デフォルトは非表示） -->
-    <div id="where_condition_container" style="display: none;">
-       <p>WHERE</p>
-        <input type="text" name="where_condition" placeholder="(例) products.product_id = customers.product_id">
-    </div>
-
-    <br><br>
-
-    <button type="submit">CROSS JOINを実行</button>
-</form>
-
-<script>
-    function toggleWhereCondition() {
-        var whereContainer = document.getElementById('where_condition_container');
-        if (whereContainer.style.display === 'none') {
-            whereContainer.style.display = 'block';
-        } else {
-            whereContainer.style.display = 'none';
-        }
-    }
-</script>
-
-<!-- CROSS JOINの結果表示 -->
-{% if cross_join_result %}
-    <h2>CROSS JOINの結果</h2>
-    <p><strong>実行クエリ:</strong> {{ cross_join_query }}</p>
-    <table border="1">
+    <!-- productsテーブル -->
+    <table class="example-table">
+        <caption>products</caption>
         <tr>
-            <!-- カラム名を動的に表示 -->
-            {% for col in columns.split(',') %}
-                <th 
-                    {% if 'products.' in col.strip() %} style="background-color: red;" {% endif %}
-                    {% if 'customers.' in col.strip() %} style="background-color: blue;" {% endif %}
-                >
-                    {{ col.strip() }}
-                </th>
+            {% for col in products_desc %}
+                <th class="products-col">{{ col[0] }}</th>
             {% endfor %}
         </tr>
-        {% for row in cross_join_result %}
+        {% for row in products_data %}
             <tr>
                 {% for item in row %}
-                    <td
-                        {% if 'products.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightcoral;" {% endif %}
-                        {% if 'customers.' in columns.split(',')[loop.index0].strip() %} style="background-color: lightblue;" {% endif %}
-                    >
-                        {{ item }}
-                    </td>
+                    <td class="products-cell">{{ item }}</td>
                 {% endfor %}
             </tr>
         {% endfor %}
     </table>
-{% endif %}
 
+    <!-- customersテーブル -->
+    <table class="example-table">
+        <caption>customers</caption>
+        <tr>
+            {% for col in customers_desc %}
+                <th class="customers-col">{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in customers_data %}
+            <tr>
+                {% for item in row %}
+                    <td class="customers-cell">{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
 
-<hr>
-    <a href="/join_select">戻る<a><br>
-    <a href="/index">ホーム</a><br>
+    <!-- フォーム -->
+    <form method="POST" class="form-section">
+        <label>SELECT</label>
+        <input type="text" name="columns" placeholder="例: products.product_id, customers.order_date" required>
+
+        <label>FROM</label>
+        <input type="text" name="table1_name" value="{{ table1_name if table1_name else '' }}" required>
+
+        <label>CROSS JOIN</label>
+        <input type="text" name="table2_name" value="{{ table2_name if table2_name else '' }}" required>
+
+        <div class="form-toggle">
+            <input type="checkbox" id="use_where" name="use_where" onclick="toggleWhereCondition()">
+            <label for="use_where">WHEREを使用する</label>
+        </div>
+
+        <div id="where_condition_container" style="display: none;">
+            <label>WHERE</label>
+            <input type="text" name="where_condition" placeholder="例: products.product_id = customers.product_id">
+        </div>
+
+        <br>
+        <button type="submit" class="btn">CROSS JOINを実行</button>
+    </form>
+
+    <!-- CROSS JOIN 結果表示 -->
+    {% if cross_join_result %}
+        <h2>CROSS JOINの結果</h2>
+        <p><strong>実行クエリ:</strong> {{ cross_join_query }}</p>
+        <table class="example-table">
+            <tr>
+                {% for col in columns.split(',') %}
+                    <th class="{% if 'products.' in col %}products-col{% elif 'customers.' in col %}customers-col{% endif %}">
+                        {{ col.strip() }}
+                    </th>
+                {% endfor %}
+            </tr>
+            {% for row in cross_join_result %}
+                <tr>
+                    {% for item in row %}
+                        <td class="{% if 'products.' in columns.split(',')[loop.index0] %}products-cell{% elif 'customers.' in columns.split(',')[loop.index0] %}customers-cell{% endif %}">
+                            {{ item }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+
+<script>
+    function toggleWhereCondition() {
+        const container = document.getElementById("where_condition_container");
+        container.style.display = container.style.display === "none" ? "block" : "none";
+    }
+</script>
+
+<div class="nav-buttons">
+    <a href="/index/join?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/join/cross_join/example" class="next">次へ ▶</a>
+</div>
+
 {% endblock %}
