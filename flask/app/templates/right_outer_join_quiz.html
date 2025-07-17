@@ -7,16 +7,19 @@
     <p>以下のクイズに答えて、RIGHT OUTER JOINの理解を深めましょう！</p>
 
     {% if submitted %}
-        <h2>結果</h2>
-        <p>あなたのスコア: <strong>{{ score }}/{{ total }}</strong></p>
+        <div class="quiz-result">
+            <h2>結果</h2>
+            <p>あなたのスコア: <strong>{{ score }}/{{ total }}</strong></p>
+        </div>
         <hr>
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" class="quiz-form">
         {% for idx, question in enumerate(questions) %}
             <div class="question">
                 <h3>問題 {{ idx + 1 }}</h3>
                 <p>{{ question['question'] }}</p>
+
                 <div class="choices">
                     {% for i, choice in enumerate(question['choices']) %}
                         <div class="choice-item">
@@ -43,15 +46,18 @@
             </div>
             <hr>
         {% endfor %}
+
         {% if not submitted %}
-            <button type="submit">回答を送信</button>
+            <div style="text-align: center;">
+                <button type="submit" class="btn">回答を送信</button>
+            </div>
         {% else %}
-            <a href="/right_outer_join_quiz" class="btn btn-primary">再挑戦</a>
+            <div style="text-align: center;">
+                <a href="/right_outer_join_quiz" class="btn retry">再挑戦</a>
+                <a href="/index" class="btn">ホームに戻る</a>
+            </div>
         {% endif %}
     </form>
 </div>
-
-<hr>
-<a href="/right_outer_join_study">戻る</a>
 
 {% endblock %}

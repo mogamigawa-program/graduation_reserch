@@ -2,24 +2,29 @@
 {% block title %}RIGHT OUTER JOINの学習ページ（高度版）{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="learning-container">
+    <div class="nav-buttons">
+        <a href="/basic/join/right_outer_join/example" class="prev">◀ 前へ</a>
+        <a href="/basic/join/right_outer_join/quiz" class="next">次へ ▶</a>
+    </div>
+    
     <h1>RIGHT OUTER JOINの演習ページ（実践）</h1>
 
     <p><strong>このページでは、SQLクエリを自由に記述して実行できます。</strong></p>
-    <p style="color: red;"><strong>RIGHT OUTER JOINを使って、2つのテーブルを結合してみましょう！</strong></p>
+    <p class="alert-text"><strong>RIGHT OUTER JOINを使って、2つのテーブルを結合してみましょう！</strong></p>
     <p>以下のテキストボックスにクエリを入力し、「クエリを実行」をクリックしてください。</p>
 
     <!-- productsテーブルの中身を表示 -->
     <h2>productsテーブルの内容</h2>
     <table border="1">
         <caption>products</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr class="products-color">
             {% for col in products_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in products_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr class="products-row">
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -31,13 +36,13 @@
     <h2>customersテーブルの内容</h2>
     <table border="1">
         <caption>customers</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
+        <tr class="customers-color">
             {% for col in customers_desc %}
                 <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
         {% for row in customers_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
+            <tr class="customers-row">
                 {% for item in row %}
                     <td>{{ item }}</td>
                 {% endfor %}
@@ -45,10 +50,10 @@
         {% endfor %}
     </table>
 
-    <!-- ヒントの追加 -->
+    <!-- ヒント -->
     <div class="hints">
         <h2>ヒント</h2>
-        
+
         <details>
             <summary style="color: blue;">ヒント1</summary>
             <p>SELECTは、データベースからデータを取得するための基本的なSQL文です。</p>
@@ -58,10 +63,10 @@
         <details>
             <summary style="color: blue;">ヒント2</summary>
             <p>カラムは、テーブルから選択するフィールドです。<br>
-                複数のカラムを使用するときは、","で区切りましょう。<br>
-                また、"*"はすべてのカラムを指します。</p>
+               複数のカラムを使用するときは、","で区切りましょう。<br>
+               また、"*"はすべてのカラムを指します。</p>
             <p>例：SELECT products.product_id, customers.customer_id ...;<br>
-                例：SELECT * ...;</p>
+               例：SELECT * ...;</p>
         </details>
 
         <details>
@@ -69,33 +74,34 @@
             <p>FROMは、データを取得するテーブルを指定するSQL文です。ここではproductsテーブルを使っています。</p>
             <p>例：SELECT * FROM products ...;</p>
         </details>
-    
+
         <details>
             <summary style="color: blue;">ヒント4</summary>
-            <p>RIGHT OUTER JOINは、右のテーブル(ここではcustomers)のデータをすべて表示し、左のテーブル(ここではproducts)に一致するデータがあれば表示します。<br>
-                もし、左のテーブルに一致するデータがない場合は、左側のカラムにNULL（空の値） が入ります。</p>
-            <p>例：SELECT * FROM products <br>
-                RIGHT OUTER JOIN customers ON products.product_id = customers.product_id;</p>
+            <p>RIGHT OUTER JOINは、右のテーブル（customers）のデータをすべて表示し、左（products）に一致するデータがあれば結合します。<br>
+               一致しない場合、左側の値はNULLになります。</p>
+            <p>例：SELECT * FROM products<br>
+               RIGHT OUTER JOIN customers ON products.product_id = customers.product_id;</p>
         </details>
 
         <details>
             <summary style="color: blue;">ヒント5</summary>
-            <p>クエリ内で条件を指定したい場合、ONとWHERE句を使います。</p>
-            <p>例：SELECT * FROM products <br>
-                RIGHT OUTER JOIN customers ON products.product_id = customers.product_id <br>
-                WHERE customers.order_date > '2023-01-01';</p>
+            <p>WHERE句を使えば、結合結果に条件をつけることができます。</p>
+            <p>例：SELECT * FROM products<br>
+               RIGHT OUTER JOIN customers ON products.product_id = customers.product_id<br>
+               WHERE customers.order_date > '2023-01-01';</p>
         </details>
     </div>
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="error-message">{{ error_message }}</p>
     {% endif %}
 
+    <!-- SQL入力フォーム -->
     <form method="POST">
-        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
+        <label for="query">SQLクエリ:<p class="alert-text"><strong>クエリの最後には「;」をつけましょう！</strong></p></label>
         <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
         <br>
-        <button type="submit">クエリを実行</button>
+        <button type="submit" class="btn">クエリを実行</button>
     </form>
 
     {% if query %}
@@ -106,13 +112,13 @@
     {% if query_result %}
         <h2>クエリ結果</h2>
         <table border="1">
-            <tr style="background-color: rgba(0, 123, 255, 0.664);">
+            <tr class="result-header">
                 {% for col in query_result["columns"] %}
                     <th>{{ col }}</th>
                 {% endfor %}
             </tr>
             {% for row in query_result["data"] %}
-                <tr style="background-color: rgba(0, 123, 255, 0.313);">
+                <tr class="result-row">
                     {% for item in row %}
                         <td>{{ item }}</td>
                     {% endfor %}
@@ -120,9 +126,12 @@
             {% endfor %}
         </table>
     {% endif %}
-</div>
 
-<hr>
-<a href="/right_outer_join_study">戻る</a>
+    <div class="nav-buttons">
+        <a href="/basic/join/right_outer_join/example" class="prev">◀ 前へ</a>
+        <a href="/basic/join/right_outer_join/quiz" class="next">次へ ▶</a>
+    </div>
+
+</div>
 
 {% endblock %}
