@@ -33,12 +33,29 @@
         <h2>実行例①：価格が100円の商品を削除</h2>
         <div class="code-block"><code>DELETE FROM products<br>WHERE price = 100;</code></div>
         <p><strong>実行結果：</strong> 「ペン」と「消しゴム」が削除されます。</p>
+        <table class="example-table">
+            <thead>
+                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>2</td><td>ノート</td><td>200</td></tr>
+            </tbody>
+        </table>
     </section>
 
     <section>
         <h2>実行例②：product_idが2の商品のみを削除</h2>
         <div class="code-block"><code>DELETE FROM products<br>WHERE product_id = 2;</code></div>
         <p><strong>実行結果：</strong>「ノート」が削除されます。</p>
+        <table class="example-table">
+            <thead>
+                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>ペン</td><td>100</td></tr>
+                <tr><td>3</td><td>消しゴム</td><td>100</td></tr>
+            </tbody>
+        </table>
     </section>
 
     <section>

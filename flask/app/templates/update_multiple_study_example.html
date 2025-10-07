@@ -3,18 +3,16 @@
 {% block content %}
 
 <div class="container">
+    <div class="nav-buttons">
+        <a href="/basic/update/multiple-column/study" class="prev">◀ 前へ</a>
+        <a href="/quiz/update_multiple_columns" class="next">次へ ▶</a>
+    </div>
     <h1>複数のカラムに対して複数の条件でレコードをUPDATEする実行例</h1>
 
-    <!-- productsテーブルの中身を表示 -->
+    <!-- 更新前のproductsテーブル -->
+    <h2>更新前の products テーブル</h2>
     <table border="1">
         <caption>products (更新前)</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
-            <th>商品ID</th>
-            <th>商品名</th>
-            <th>価格</th>
-            <th>在庫数</th>
-            <th>ステータス</th>
-        </tr>
         <tr style="background-color: rgb(255, 123, 0);">
             {% for col in products_desc %}
                 <th>{{ col[0] }}</th>
@@ -29,41 +27,49 @@
         {% endfor %}
     </table>
 </div>
-<div class="container">
-    <!-- UPDATEクエリの実行結果表示 -->
-    {% if update_result %}
-        <h2>UPDATEの実行結果</h2>
-        <p><strong>実行クエリ:</strong></p>
-        <p><code>
-            UPDATE products<br>
-            SET price = {{ new_price }}, stock = {{ new_stock }}<br>
-            WHERE product_id = {{ target_product_id }} AND status = '{{ target_status }}';
-        </code></p>
-        
-        <p><strong>解説:</strong></p>
-        <p>このUPDATEクエリは、`products`テーブルの特定の`product_id`と`status`に一致するレコードの価格(`price`)と在庫数(`stock`)を新しい値に更新します。
-            <br>今回は、`product_id = 2`かつ`status = 'active'`のレコードを`price = 190000`と`stock = 80`に更新します。
-        </p>
 
-        <!-- 更新後のproductsテーブルの中身を表示 -->
-        <table border="1">
-            <caption>products (更新後)</caption>
-            <tr style="background-color: rgb(255, 123, 0);">
-                {% for col in products_desc %}
-                    <th>{{ col[0] }}</th>
+{% if update_result %}
+<div class="container">
+    <h2>UPDATEの実行結果</h2>
+
+    <p><strong>実行クエリ:</strong></p>
+    <pre><code>
+UPDATE products
+SET price = {{ new_price }}, stock = {{ new_stock }}
+WHERE product_id = {{ target_product_id }} AND status = '{{ target_status }}';
+    </code></pre>
+
+    <p><strong>解説:</strong></p>
+    <p>
+        このUPDATEクエリは、<code>products</code>テーブルの特定の<code>product_id</code>と<code>status</code>に一致する
+        レコードの価格（<code>price</code>）と在庫数（<code>stock</code>）を新しい値に更新します。<br>
+        今回は、<code>product_id = 2</code> かつ <code>status = 'active'</code> のレコードを
+        <code>price = 190000</code>、<code>stock = 80</code> に更新します。
+    </p>
+
+    <!-- 更新後のproductsテーブル -->
+    <h2>更新後の products テーブル</h2>
+    <table border="1">
+        <caption>products (更新後)</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in updated_products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
                 {% endfor %}
             </tr>
-            {% for row in updated_products_data %}
-                <tr style="background-color: rgb(240, 184, 128);">
-                    {% for item in row %}
-                        <td>{{ item }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+<div class="nav-buttons">
+    <a href="/basic/update/multiple-column/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/update_multiple_columns" class="next">次へ ▶</a>
 </div>
 
-<hr>
-<a href="/update_multiple_study">UPDATE学習ページに戻る</a>
 {% endblock %}

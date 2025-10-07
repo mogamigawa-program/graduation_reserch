@@ -648,3 +648,43 @@ footer {
     font-weight: bold;
     text-align: center;
 }
+
+.table-bordered {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.table-header {
+    background-color: #ff7b00;
+    color: #fff;
+    font-weight: bold;
+}
+
+.table-row:nth-child(even) {
+    background-color: #f0b880;
+}
+
+.table-row:nth-child(odd) {
+    background-color: #fce2c4;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #337ab7;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.btn:hover {
+    background-color: #286090;
+}

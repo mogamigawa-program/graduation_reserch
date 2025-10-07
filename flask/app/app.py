@@ -1686,7 +1686,7 @@ def signup():
             
             # ユーザーのデータベースにdataset内にある、テーブルをいくつかコピーする
             tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'sales',
-                    'quiz_list', 'progress', 'all_users', 'selected_users']
+                    'quiz_list', 'progress', 'all_users', 'selected_users', 'expenses']
             for table in tables:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)
                 cursor = conn.cursor()
@@ -4714,6 +4714,46 @@ def update_all_column_study():
     # GETリクエスト時の処理
     return render_template('update_all_column_study.html', products_desc=products_desc, products_data=products_data)
 
+@app.route('/basic/update/all-records/example', methods=['GET', 'POST'])
+def update_all_example():
+    return render_template('update_all_column_study_example.html')
+
+# UPDATEするときに計算をする
+@app.route('/basic/update/calc/study', methods=['GET', 'POST'])
+def update_calc_study():
+    conn = mysql.connector.MySQLConnection(**this_users_dns)
+    cursor = conn.cursor()
+    
+    error_message = ""
+    message = ""
+    query = ""
+    desc = []
+    products_data = []
+    query_result = []
+    table_name = 'expenses'
+
+    if request.method == 'POST':
+        query = request.form.get("query", "").strip()
+        try:
+            cursor.execute(query)
+            conn.commit()
+            message = "クエリを実行しました。"
+        except Exception as e:
+            error_message = f"SQLエラー: {str(e)}"
+
+    desc, expenses = fetch_table_data(table_name)
+
+    return render_template("update_calculation_study.html",
+                           desc = desc,
+                           expenses=expenses,
+                           error_message=error_message,
+                           message=message,
+                           query=query,
+                           query_result=products_data)
+
+@app.route('/basic/update/calc/example', methods=['GET', 'POST'])
+def update_calc_example():
+    return render_template('update_calculation_example.html')
 
 #以下は集約関数!
 @app.route('/aggregate_select', methods=['GET', 'POST'])
@@ -6954,7 +6994,9 @@ def quiz_progress():
             15: "quiz/insert",
             16: "quiz/insert_select",
             17: "quiz/delete_single",
-            18: "quiz/delete_multiple"
+            18: "quiz/delete_multiple",
+            19: "quiz/update_single_column",
+            20: "quiz/update_multiple_columns"
         }
 
         # 完了したクイズの数を計算

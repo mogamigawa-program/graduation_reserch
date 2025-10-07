@@ -46,12 +46,18 @@ CREATE TABLE `user_databases` (
 LOCK TABLES `user_databases` WRITE;
 /*!40000 ALTER TABLE `user_databases` DISABLE KEYS */;
 INSERT INTO `user_databases` VALUES
-(26,'1_db'),
 (27,'admin_db'),
-(28,'2_db'),
-(29,'3_db'),
-(30,'4_db'),
-(31,'5_db');
+(36,'aaa_db'),
+(37,'guest_db'),
+(38,'2_db'),
+(39,'3_db'),
+(40,'4_db'),
+(41,'5_db'),
+(42,'6_db'),
+(43,'7_db'),
+(44,'a_db'),
+(45,'aa_db'),
+(46,'test_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -69,7 +75,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,12 +85,18 @@ CREATE TABLE `users` (
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` VALUES
-(26,'1','$2b$12$rENmeL1oKez/J84cqLKOCezv9/ZY.smOzFbosKsjd4UJKOfYYb53W',0),
 (27,'admin','$2b$12$z73TVOGJU6rVHWQ77kDpPOVyWm0DVJZwKGTjgaVr20L8/rgHgWk6q',1),
-(28,'2','$2b$12$103SE23IeX0Su.ZK5iUufuLiLt/o7mzV/GIvQxmyMfAwtNiZN4WQG',0),
-(29,'3','$2b$12$quCLxerkrlQsd3wjUpVfR.ghBx6oRJy4kiFT353PQ78mSBMIKR7GO',0),
-(30,'4','$2b$12$oKFkDfFVz1XhwQUMr09sLOIre35m7OSA9K8RZGlADu5C7iNgdptkq',0),
-(31,'5','$2b$12$JIrmQsdRAwK9FWjLyv15oei55C2PQRpgPviuSn0708zXY2QIDo.Qy',0);
+(36,'aaa','$2b$12$syUtEGEcO/6x6amvkI/lkeqYZYvRZxVD5ILMw5UGKDcUqEWzX2pSa',0),
+(37,'guest','$2b$12$f1BTuexSNaSSPNH/iAmoL.NrBY5HB6pGApFhfllvzZxSUrCdljEiW',0),
+(38,'2','$2b$12$2eKW3eYeWLwKos83oe19QuNd/V1.tIQLArr87QmCBGeos14HZALDa',0),
+(39,'3','$2b$12$Nby0Bb/xbgEZBWtY.g0PU.ia.KEuZUk4x.LXwy3oxp/FivHTyGdvi',0),
+(40,'4','$2b$12$qw9CZ7zgg/UuxQQszL.uc.8lIYjc2oKiDzuPpIXL5TvSQc1LnFa3e',0),
+(41,'5','$2b$12$jyp.ReVn6W3xmJuH9UBZqurSOCQTt5qS4B.DduMc4H2WwRJDR06vK',0),
+(42,'6','$2b$12$ptJZd7rb.LbxKMNbHaEmzuk0ote.6EicN.eo2D.AmPkroiPa4E3F2',0),
+(43,'7','$2b$12$2n3a1/e16kDP86WjK5HrruzI5u.rKlCoRAL.hI/MVRq/d59neThEm',0),
+(44,'a','$2b$12$5d7tr8D9udQTAMwn71KVJelbD6YF30ZpvQLx.4YII.HLeJE4lff5K',0),
+(45,'aa','$2b$12$.cdH4zIH04QXdcRM8oO97ugIcEsDWi.fXw57jzHMBQCwdkAPKdRD6',0),
+(46,'test','$2b$12$91M5rM0hDRs7gf0T7sJluOJfMNNnOZlpvLu7cQ1.NwietVga5de7O',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -146,7 +158,7 @@ CREATE TABLE `choices` (
   PRIMARY KEY (`id`),
   KEY `question_id` (`question_id`),
   CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1045 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -247,7 +259,47 @@ INSERT INTO `choices` VALUES
 (1041,23,'完了した注文を archive にコピーする',1),
 (1042,23,'新しい注文を作成する',0),
 (1043,23,'archive を削除する',0),
-(1044,23,'orders テーブルを削除する',0);
+(1044,23,'orders テーブルを削除する',0),
+(1045,24,'UPDATE products WHERE product_id = 1 SET price = 1000;',0),
+(1046,24,'UPDATE products SET price = 1000 WHERE product_id = 1;',1),
+(1047,24,'UPDATE SET products.price = 1000 WHERE product_id = 1;',0),
+(1048,24,'MODIFY products SET price = 1000 WHERE product_id = 1;',0),
+(1049,25,'UPDATE products SET \'status\' = \'active\' WHERE \'status\' = \'inactive\';',0),
+(1050,25,'UPDATE products SET status = active WHERE status = inactive;',0),
+(1051,25,'UPDATE products SET status = \'active\' WHERE status = \'inactive\';',1),
+(1052,25,'UPDATE status FROM products TO \'active\' IF status = \'inactive\';',0),
+(1053,26,'UPDATE products SET price = 50000 WHERE product_name = \'パソコン\';',1),
+(1054,26,'UPDATE products SET price = 50000 IF product_name = \'パソコン\';',0),
+(1055,26,'UPDATE products SET price = \'50000\' WHERE product_name = パソコン;',0),
+(1056,26,'MODIFY products SET price TO 50000 WHERE product_name = \'パソコン\';',0),
+(1057,27,'UPDATE products SET stock TO 10 WHERE price == 5000;',0),
+(1058,27,'UPDATE products WHERE price = 5000 SET stock = 10;',0),
+(1059,27,'UPDATE stock = 10 FROM products WHERE price = 5000;',0),
+(1060,27,'UPDATE products SET stock = 10 WHERE price = 5000;',1),
+(1061,28,'UPDATE products SET status = \'inactive\' WHERE stock = 50;',1),
+(1062,28,'UPDATE products SET status TO inactive IF stock IS 50;',0),
+(1063,28,'UPDATE products WHERE stock = 50 SET status = \'inactive\';',0),
+(1064,28,'UPDATE SET status = \'inactive\' WHERE stock = 50 FROM products;',0),
+(10000,29,'UPDATE products SET product_name = \"New Name\" AND price = 2000 WHERE product_id = 1;',0),
+(10001,29,'UPDATE products SET product_name = \"New Name\", price = 2000 WHERE product_id = 1;',1),
+(10002,29,'UPDATE products (product_name, price) VALUES (\"New Name\", 2000) WHERE product_id = 1;',0),
+(10003,29,'UPDATE products SET (product_name = \"New Name\", price = 2000) WHERE product_id = 1;',0),
+(10004,30,'UPDATE products SET stock = 80, price = 190000 WHERE product_id = 2;',0),
+(10005,30,'UPDATE products SET stock = 80 AND price = 190000 WHERE product_id = 2 AND status = \"active\";',0),
+(10006,30,'UPDATE products SET (stock = 80, price = 190000) WHERE product_id = 2 AND status = \"active\";',0),
+(10007,30,'UPDATE products SET stock = 80, price = 190000 WHERE product_id = 2 AND status = \"active\";',1),
+(10008,31,'UPDATE products SET status = \"active\", price = 4000 WHERE price >= 5000 AND status = \"inactive\";',1),
+(10009,31,'UPDATE products SET (status = \"active\", price = 4000) WHERE price >= 5000 AND status = \"inactive\";',0),
+(10010,31,'UPDATE products SET status = \"active\" AND price = 4000 WHERE price >= 5000 AND status = \"inactive\";',0),
+(10011,31,'UPDATE products SET status = \"active\", price = 4000 WHERE (price >= 5000, status = \"inactive\");',0),
+(10012,32,'UPDATE products SET stock = 20, status = \"out\" WHERE product_id = 3;',0),
+(10013,32,'UPDATE products SET stock = 20 AND status = \"out\" WHERE product_id = 3 AND stock = 10;',0),
+(10014,32,'UPDATE products SET stock = 20, status = \"out\" WHERE product_id = 3 AND stock = 10;',1),
+(10015,32,'UPDATE products (stock, status) VALUES (20, \"out\") WHERE product_id = 3 AND stock = 10;',0),
+(10016,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0;',0),
+(10017,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0 AND status = \"inactive\";',1),
+(10018,33,'UPDATE products SET status = \"sold out\" AND stock = 5 WHERE stock = 0 AND status = \"inactive\";',0),
+(10019,33,'UPDATE products SET (status = \"sold out\", stock = 5) WHERE stock = 0 AND status = \"inactive\";',0);
 /*!40000 ALTER TABLE `choices` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -367,6 +419,40 @@ INSERT INTO `employees` VALUES
 (9,'Sophia Anderson',30,'営業'),
 (10,'James Moore',27,'開発');
 /*!40000 ALTER TABLE `employees` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expenses`
+--
+
+DROP TABLE IF EXISTS `expenses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `expenses` (
+  `expense_id` int(11) NOT NULL,
+  `department` varchar(50) DEFAULT NULL,
+  `item_name` varchar(100) DEFAULT NULL,
+  `unit_price` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `total_cost` int(11) DEFAULT NULL,
+  `approved` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`expense_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expenses`
+--
+
+LOCK TABLES `expenses` WRITE;
+/*!40000 ALTER TABLE `expenses` DISABLE KEYS */;
+INSERT INTO `expenses` VALUES
+(1,'営業部','名刺印刷',2000,3,6000,0),
+(2,'経理部','電卓',1500,2,3000,1),
+(3,'開発部','モニター',25000,1,25000,0),
+(4,'営業部','ノベルティグッズ',100,100,10000,0),
+(5,'人事部','社内研修教材',3000,5,15000,1);
+/*!40000 ALTER TABLE `expenses` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -523,7 +609,7 @@ CREATE TABLE `questions` (
   `question_text` text NOT NULL,
   `explanation` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -555,7 +641,17 @@ INSERT INTO `questions` VALUES
 (20,'insert_select','次のSQLの目的は何？\nINSERT INTO new_table (name)\nSELECT name FROM old_table;','old_table の name列の値を new_table にコピーしています。'),
 (21,'insert_select','このSQLの誤りはどこ？\nINSERT INTO users (id, name)\nSELECT id FROM customers;','コピー先とコピー元の列数が一致していないためエラーになります。'),
 (22,'insert_select','このSQLを実行すると何が起こる？\nINSERT INTO logs (uid, uname)\nSELECT id, name FROM members WHERE age < 18;','条件に合致するデータだけが logs に挿入されます。'),
-(23,'insert_select','このSQLは何をしている？\nINSERT INTO archive\nSELECT * FROM orders WHERE status = \'done\';','orders テーブルの完了済みデータを archive にコピーしています。すべての列を一括コピーしています。');
+(23,'insert_select','このSQLは何をしている？\nINSERT INTO archive\nSELECT * FROM orders WHERE status = \'done\';','orders テーブルの完了済みデータを archive にコピーしています。すべての列を一括コピーしています。'),
+(24,'UPDATE_SINGLE_COLUMN','商品IDが1の商品の価格を1000に更新するSQL文として正しいものはどれ？','基本的なUPDATE構文の使い方を確認する問題です。'),
+(25,'UPDATE_SINGLE_COLUMN','statusが\'inactive\'の商品のstatusを\'active\'に変更するSQL文として正しいものはどれ？','文字列の比較・更新においてシングルクォートが必要である点に注意します。'),
+(26,'UPDATE_SINGLE_COLUMN','商品名が「パソコン」の商品の価格を50000に更新する正しいSQL文はどれ？','WHERE句に文字列を使う場合も、シングルクォートで囲む必要があります。'),
+(27,'UPDATE_SINGLE_COLUMN','価格が5000円の商品の在庫数を10に変更するSQL文として正しいものはどれ？','WHERE句に数値条件を使ったUPDATE文の典型的な構文です。'),
+(28,'UPDATE_SINGLE_COLUMN','在庫数が50の商品のステータスを\'inactive\'に更新するSQL文で正しいものはどれ？','数値を条件にして、文字列を更新するパターンです。構文とクォートに注意しましょう。'),
+(29,'UPDATE_MULTIPLE_COLUMNS','次のSQL文は、特定の商品IDの商品名と価格を更新するものです。正しいSQL文はどれですか？','SET句でカンマで区切ることで複数カラムを更新できます。'),
+(30,'UPDATE_MULTIPLE_COLUMNS','商品IDが2で、ステータスが\"active\"の商品の在庫と価格を更新したい。正しいSQL文はどれですか？','複数条件はANDで結び、複数カラム更新はSET句でカンマ区切りにします。'),
+(31,'UPDATE_MULTIPLE_COLUMNS','productsテーブルで、価格が5000以上でステータスが\"inactive\"の商品のステータスと価格を更新したい。正しいSQLは？','WHERE句には複数条件をANDでつなげ、SETではカンマ区切りで複数カラムの更新をします。'),
+(32,'UPDATE_MULTIPLE_COLUMNS','商品IDが3で、現在の在庫数が10の商品について、在庫数とステータスを変更したい。正しいSQLはどれ？','数値条件（=10など）と文字列（ステータス）を正確に記述しましょう。'),
+(33,'UPDATE_MULTIPLE_COLUMNS','すべての「在庫数が0かつステータスがinactive」の商品のステータスと在庫数を更新するSQLは？','複数の条件で一致する行に対して、複数カラムを更新する場合の典型的なパターンです。');
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -572,7 +668,7 @@ CREATE TABLE `quiz_list` (
   `total_questions` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `quiz_name` (`quiz_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -599,7 +695,9 @@ INSERT INTO `quiz_list` VALUES
 (15,'INSERT',6),
 (16,'DELETE SINGLE',5),
 (17,'DELETE MULTIPLE',5),
-(18,'INSERT SELECT',6);
+(18,'INSERT SELECT',6),
+(19,'UPDATE SINGLE COLUMN',5),
+(20,'UPDATE MULTIPLE COLUMNS',5);
 /*!40000 ALTER TABLE `quiz_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -900,4 +998,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-07-04  2:05:43
+-- Dump completed on 2025-09-12  2:37:18
