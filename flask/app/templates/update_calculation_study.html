@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}UPDATE文 × 計算の学習ページ{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="nav-buttons">
+        <a href="/basic/update/all-records/example" class="prev">◀ 前へ</a>
+        <a href="/basic/update/calc/example" class="next">次へ ▶</a>
+    </div>
+
+    <h1>UPDATE文 × 計算の体験</h1>
+
+    <p><strong>UPDATE文では、数値カラムに対して計算を行うことができます。</strong></p>
+
+    <div class="tips">
+        <h2>💡 よく使われる書き方</h2>
+        <ul>
+            <li><code>UPDATE products SET stock = stock - 10 WHERE product_id = 1;</code></li>
+            <li><code>UPDATE products SET price = price * 1.1;</code></li>
+            <li><code>UPDATE products SET stock = stock + 5 WHERE stock &lt; 10;</code></li>
+        </ul>
+    </div>
+
+    <h2>expensesテーブル</h2>
+    <table class="table-bordered">
+        <thead>
+            <tr class="table-header">
+                {% for item in desc %}
+                    <th>{{ item[0] }} </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in expenses %}
+                <tr class="table-row">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    {% if message %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="query"><strong>SQLクエリ:</strong></label><br>
+        <textarea name="query" rows="5" cols="80" required>{{ query if query }}</textarea><br><br>
+        <button type="submit" class="btn btn-primary">クエリを実行</button>
+        <button type="reset" class="btn btn-primary"></button>
+    </form>
+
+    {% if query %}
+        <h2>実行クエリ</h2>
+        <pre><code>{{ query }}</code></pre>
+    {% endif %}
+
+    {% if query_result %}
+        <h2>更新後のproductsテーブル</h2>
+        <table class="table-bordered">
+            <thead>
+                <tr class="table-header">
+                    {% for col in products_desc %}
+                        <th>{{ col[0] }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in query_result %}
+                    <tr class="table-row">
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div class="nav-buttons">
+        <a href="/basic/update/all-records/example" class="prev">◀ 前へ</a>
+        <a href="/basic/update/calc/example" class="next">次へ ▶</a>
+    </div>
+</div>
+
+{% endblock %}

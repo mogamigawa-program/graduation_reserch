@@ -7,16 +7,19 @@
     <p>以下のクイズに答えて、UPDATE文の理解を深めましょう！</p>
 
     {% if submitted %}
-        <h2>結果</h2>
-        <p>あなたのスコア: <strong>{{ score }}/{{ total }}</strong></p>
+        <div class="quiz-result">
+            <h2>結果</h2>
+            <p>あなたのスコア: <strong>{{ score }}/{{ total }}</strong></p>
+        </div>
         <hr>
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" class="quiz-form">
         {% for idx, question in enumerate(questions) %}
-            <div class="question">
+            <div class="question-box">
                 <h3>問題 {{ idx + 1 }}</h3>
-                <p>{{ question['question'] }}</p>
+                <p class="question-text">{{ question['question'] }}</p>
+
                 <div class="choices">
                     {% for i, choice in enumerate(question['choices']) %}
                         <div class="choice-item">
@@ -33,7 +36,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                
+
                 {% if submitted %}
                     <div class="explanation">
                         <p><strong>正解: </strong>{{ question['answer'] }}</p>
@@ -43,15 +46,16 @@
             </div>
             <hr>
         {% endfor %}
-        {% if not submitted %}
-            <button type="submit">回答を送信</button>
-        {% else %}
-            <a href="/update_quiz" class="btn btn-primary">再挑戦</a>
-        {% endif %}
+
+        <div class="quiz-actions">
+            {% if not submitted %}
+                <button type="submit" class="btn btn-primary">回答を送信</button>
+            {% else %}
+                <a href="/update_quiz" class="btn retry">再挑戦</a>
+                <a href="/index" class="btn btn-secondary">ホームに戻る</a>
+            {% endif %}
+        </div>
     </form>
 </div>
-
-<hr>
-<a href="/update_multiple_study">戻る</a>
 
 {% endblock %}

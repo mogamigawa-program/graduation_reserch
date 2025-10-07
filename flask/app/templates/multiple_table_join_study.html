@@ -1,116 +1,81 @@
 {% extends "base.html" %}
 {% block title %}複数テーブルJOINの学習ページ{% endblock %}
 {% block content %}
+<div class="container">
+    <div class="nav-buttons">
+        <a href="/index/join?flag=min" class="prev">◀ 前へ</a>
+        <a href="/basic/join/multiple_table_join/practice" class="next">次へ ▶</a>
+    </div>
+
 <h1>JOINクエリビルダー</h1>
 
 <p><strong>JOINクエリビルダーの使い方:</strong> このページでは、複数のテーブルに対してJOINクエリを動的に構築し、実行することができます。JOINタイプを選択し、条件を指定することで、様々なクエリを実行することができます。</p>
 
-<!-- エラーメッセージの表示 -->
 {% if error_message %}
     <p style="color: red;">{{ error_message }}</p>
 {% endif %}
 
-<!-- productsテーブルの中身を表示 -->
+<!-- products -->
 <table border="1">
     <caption>products</caption>
     <tr style="background-color: red;">
-        <th>商品ID</th>
-        <th>商品名</th>
-        <th>価格</th>
-        <th>在庫数</th>
-        <th>ステータス</th>
-    </tr>
-    <tr style="background-color: red;">
-        {% for col in products_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
+        {% for col in products_desc %}<th>{{ col[0] }}</th>{% endfor %}
     </tr>
     {% for row in products_data %}
         <tr style="background-color: lightcoral;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
+            {% for item in row %}<td>{{ item }}</td>{% endfor %}
         </tr>
     {% endfor %}
 </table>
 
-<!-- customersテーブルの中身を表示 -->
+<!-- customers -->
 <table border="1">
     <caption>customers</caption>
     <tr style="background-color: blue;">
-        <th>購入者ID</th>
-        <th>商品ID</th>
-        <th>購入日</th>
-    </tr>
-    <tr style="background-color: blue;">
-        {% for col in customers_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
+        {% for col in customers_desc %}<th>{{ col[0] }}</th>{% endfor %}
     </tr>
     {% for row in customers_data %}
-        <tr  style="background-color: lightblue;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
+        <tr style="background-color: lightblue;">
+            {% for item in row %}<td>{{ item }}</td>{% endfor %}
         </tr>
     {% endfor %}
 </table>
 
-<!-- discountsテーブルの中身を表示 -->
+<!-- discounts -->
 <table border="1">
     <caption>discounts</caption>
     <tr style="background-color: green;">
-        <th>割引ID</th>
-        <th>商品ID</th>
-        <th>割引率</th>
-    </tr>
-    <tr style="background-color: green;">
-        {% for col in discounts_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
+        {% for col in discounts_desc %}<th>{{ col[0] }}</th>{% endfor %}
     </tr>
     {% for row in discounts_data %}
         <tr style="background-color: lightgreen;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
+            {% for item in row %}<td>{{ item }}</td>{% endfor %}
         </tr>
     {% endfor %}
 </table>
 
-<!-- inventoryテーブルの中身を表示 -->
+<!-- inventory -->
 <table border="1">
     <caption>inventory</caption>
     <tr style="background-color: yellow;">
-        <th>在庫ID</th>
-        <th>商品ID</th>
-        <th>在庫変動数</th>
-    </tr>
-    <tr style="background-color: yellow;">
-        {% for col in inventory_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
+        {% for col in inventory_desc %}<th>{{ col[0] }}</th>{% endfor %}
     </tr>
     {% for row in inventory_data %}
         <tr style="background-color: lightyellow;">
-            {% for item in row %}
-                <td>{{ item }}</td>
-            {% endfor %}
+            {% for item in row %}<td>{{ item }}</td>{% endfor %}
         </tr>
     {% endfor %}
 </table>
 
 <form method="POST">
     <p>SELECT</p>
-    <input type="text" id="select_columns" name="select_columns" placeholder="カラム　例: products.product_id, customers.order_date" required>
+    <input type="text" id="select_columns" name="select_columns" placeholder="カラム 例: products.product_id, customers.order_date" required>
     <p>FROM</p>
-    <input type="text" id="from_table" name="from_table" placeholder="テーブル名　例: products" required>
-    <br><br>
+    <input type="text" id="from_table" name="from_table" placeholder="テーブル名 例: products" required>
 
-    <!-- JOINセクションを動的に追加できる -->
+    <br><br>
     <div id="join-section">
         <div class="join-group">
-            <label for="join_type"></label>
             <select name="join_type" class="join_type" onchange="toggleOnCondition(this)">
                 <option value="CROSS JOIN">CROSS JOIN</option>
                 <option value="INNER JOIN">INNER JOIN</option>
@@ -118,38 +83,30 @@
                 <option value="RIGHT OUTER JOIN">RIGHT OUTER JOIN</option>
             </select>
 
-            <label for="join_table"></label>
-            <input type="text" name="join_table" class="join_table" placeholder="テーブル名　例: customers" required>
+            <input type="text" name="join_table" class="join_table" placeholder="テーブル名 例: customers" required>
 
             <div class="on-condition" style="display:none;">
                 <p>ON</p>
-                <input type="text" name="on_clause" class="on_clause" placeholder="条件　例: products.product_id = customers.product_id">
+                <input type="text" name="on_clause" class="on_clause" placeholder="条件 例: products.product_id = customers.product_id">
             </div>
         </div>
     </div>
-    
-    <br>
 
-    <!-- JOINを追加するボタン -->
-    <button type="button" onclick="addJoin()">JOINを追加</button>
-    <!-- JOINを削除するボタン -->
-    <button type="button" onclick="removeLastJoin()">JOINを削除</button>
+    <br>
+    <button type="button" class="btn" onclick="addJoin()">JOINを追加</button>
+    <button type="button" class="btn" onclick="removeLastJoin()">JOINを削除</button>
 
     <br><br>
-
-    <!-- WHERE条件を使用するかを選択 -->
     <input type="checkbox" id="use_where" name="use_where" onclick="toggleWhereCondition()">
     <label for="use_where">WHEREを使用する</label>
 
-    <!-- WHERE条件入力フィールド（デフォルトは非表示） -->
     <div id="where_condition_container" style="display: none;">
        <p>WHERE</p>
         <input type="text" name="where_condition" placeholder="(例) products.price > 50000">
     </div>
 
     <br><br>
-
-    <button type="submit">クエリを実行</button>
+    <button type="submit" class="btn">クエリを実行</button>
 </form>
 
 <script>
@@ -165,57 +122,47 @@
                 <option value="RIGHT OUTER JOIN">RIGHT OUTER JOIN</option>
             </select>
 
-            <input type="text" name="join_table" class="join_table" placeholder="テーブル名　例: customers" required>
+            <input type="text" name="join_table" class="join_table" placeholder="テーブル名 例: customers" required>
 
             <div class="on-condition" style="display:none;">
                 <p>ON</p>
-                <input type="text" name="on_clause" class="on_clause" placeholder="条件　例: products.product_id = customers.product_id">
+                <input type="text" name="on_clause" class="on_clause" placeholder="条件 例: products.product_id = customers.product_id">
             </div>
         `;
         joinSection.appendChild(joinGroup);
     }
 
     function removeLastJoin() {
-    var joinSection = document.getElementById('join-section');
-    var joinGroups = joinSection.getElementsByClassName('join-group');
-    if (joinGroups.length > 0) {
-        joinSection.removeChild(joinGroups[joinGroups.length - 1]);
+        var joinSection = document.getElementById('join-section');
+        var joinGroups = joinSection.getElementsByClassName('join-group');
+        if (joinGroups.length > 0) {
+            joinSection.removeChild(joinGroups[joinGroups.length - 1]);
+        }
     }
-}
 
     function toggleOnCondition(selectElement) {
         var joinGroup = selectElement.closest('.join-group');
         var onCondition = joinGroup.querySelector('.on-condition');
-        if (selectElement.value === 'CROSS JOIN') {
-            onCondition.style.display = 'none';
-        } else {
-            onCondition.style.display = 'block';
-        }
+        onCondition.style.display = (selectElement.value === 'CROSS JOIN') ? 'none' : 'block';
     }
 
     function toggleWhereCondition() {
         var whereContainer = document.getElementById('where_condition_container');
-        if (whereContainer.style.display === 'none') {
-            whereContainer.style.display = 'block';
-        } else {
-            whereContainer.style.display = 'none';
-        }
+        whereContainer.style.display = (whereContainer.style.display === 'none') ? 'block' : 'none';
     }
 </script>
 
-<!-- JOINの結果表示 -->
 {% if join_result %}
     <h2>JOINの結果</h2>
     <p><strong>実行クエリ:</strong> {{ join_query }}</p>
     <table border="1">
         <tr>
-            <!-- カラム名を動的に表示 -->
             {% for col in columns %}
                 <th
-                {% if 'product_id' in col or 'product_name' in col or 'price' in col %} style="background-color: red;" {% endif %}
-                {% if 'customer_id' in col or 'order_date' in col %} style="background-color: blue;" {% endif %}
-                {% if 'discount_id' in col or 'discount_rate' in col %} style="background-color: green;" {% endif %}
-                {% if 'inventory_id' in col or 'quantity_change' in col %} style="background-color: yellow;" {% endif %}
+                    {% if 'product_id' in col or 'product_name' in col or 'price' in col %} style="background-color: red;" {% endif %}
+                    {% if 'customer_id' in col or 'order_date' in col %} style="background-color: blue;" {% endif %}
+                    {% if 'discount_id' in col or 'discount_rate' in col %} style="background-color: green;" {% endif %}
+                    {% if 'inventory_id' in col or 'quantity_change' in col %} style="background-color: yellow;" {% endif %}
                 >
                     {{ col }}
                 </th>
@@ -225,10 +172,10 @@
             <tr>
                 {% for item in row %}
                     <td
-                    {% if 'product_id' in columns[loop.index0] or 'product_name' in columns[loop.index0] or 'price' in columns[loop.index0] %} style="background-color: lightcoral;" {% endif %}
-                    {% if 'customer_id' in columns[loop.index0] or 'order_date' in columns[loop.index0] %} style="background-color: lightblue;" {% endif %}
-                    {% if 'discount_id' in columns[loop.index0] or 'discount_rate' in columns[loop.index0] %} style="background-color: lightgreen;" {% endif %}
-                    {% if 'inventory_id' in columns[loop.index0] or 'quantity_change' in columns[loop.index0] %} style="background-color: lightyellow;" {% endif %}
+                        {% if 'product_id' in columns[loop.index0] or 'product_name' in columns[loop.index0] or 'price' in columns[loop.index0] %} style="background-color: lightcoral;" {% endif %}
+                        {% if 'customer_id' in columns[loop.index0] or 'order_date' in columns[loop.index0] %} style="background-color: lightblue;" {% endif %}
+                        {% if 'discount_id' in columns[loop.index0] or 'discount_rate' in columns[loop.index0] %} style="background-color: lightgreen;" {% endif %}
+                        {% if 'inventory_id' in columns[loop.index0] or 'quantity_change' in columns[loop.index0] %} style="background-color: lightyellow;" {% endif %}
                     >
                         {{ item }}
                     </td>
@@ -238,7 +185,10 @@
     </table>
 {% endif %}
 
+<div class="nav-buttons">
+    <a href="/index/join?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/join/multiple_table_join/practice" class="next">次へ ▶</a>
+</div>
 
-<hr>
-<a href="/join_select">戻る</a>
+</div>
 {% endblock %}

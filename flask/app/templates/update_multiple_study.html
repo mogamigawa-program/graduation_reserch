@@ -1,98 +1,104 @@
 {% extends "base.html" %}
 {% block title %}複数のカラム・条件でUPDATEする{% endblock %}
 {% block content %}
-<h1>1つ以上のカラムを1つ以上の条件でUPDATEする</h1>
 
-<p><strong>UPDATE文とは:</strong> 複数のカラムを一度に更新し、複数の条件に基づいて更新できます。</p>
+<div class="container">
+    <div class="nav-buttons">
+        <a href="/index/update?flag=min" class="prev">◀ 前へ</a>
+        <a href="/basic/update/multiple-columns/example" class="next">次へ ▶</a>
+    </div>
+    <h1>1つ以上のカラムを1つ以上の条件でUPDATEする</h1>
 
-<p><strong>基本的な構文:</strong>
-<code>
-UPDATE {テーブル名}
-SET {カラム名1 = 新しい値1, カラム名2 = 新しい値2, ...}
-WHERE {条件1} AND {条件2} ...
-</code>
-</p>
+    <p><strong>UPDATE文とは:</strong> 複数のカラムを一度に更新し、複数の条件に基づいて更新できます。</p>
 
-<!-- エラーメッセージの表示 -->
-{% if error_message %}
-    <p style="color: red;">{{ error_message }}</p>
-{% endif %}
+    <p><strong>基本的な構文:</strong></p>
+    <pre><code>
+UPDATE テーブル名
+SET カラム1 = 新しい値1, カラム2 = 新しい値2, ...
+WHERE 条件1 AND 条件2 ...
+    </code></pre>
 
-<!-- 成功メッセージの表示 -->
-{% if message %}
-    <p style="color: green;">{{ message }}</p>
-{% endif %}
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
 
-<!-- productsテーブルの中身を表示 -->
-<table border="1">
-    <caption>productsテーブル</caption>
-    <tr>
-        {% for col in products_desc %}
-            <th>{{ col[0] }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in products_data %}
-        <tr>
-            {% for item in row %}
-                <td>{{ item }}</td>
+    {% if message %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %}
+
+    <h2>productsテーブルの内容</h2>
+    <table border="1">
+        <caption>productsテーブル</caption>
+        <tr style="background-color: rgb(255, 123, 0);">
+            {% for col in products_desc %}
+                <th>{{ col[0] }}</th>
             {% endfor %}
         </tr>
-    {% endfor %}
-</table>
+        {% for row in products_data %}
+            <tr style="background-color: rgb(240, 184, 128);">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
 
-<form method="POST" id="update-form">
-    <h2>レコードを更新する</h2>
+    <form method="POST" id="update-form">
+        <h2>レコードを更新する</h2>
 
-    <div id="columns-container">
-        <div class="column-group">
-            <p>UPDATE products SET</p>
-            <p>
-                <select name="column_to_update_1" required>
+        <div id="columns-container">
+            <div class="column-group">
+                <p>UPDATE products SET</p>
+                <p>
+                    <select name="column_to_update_1" required>
+                        {% for col in products_desc %}
+                            <option value="{{ col[0] }}">{{ col[0] }}</option>
+                        {% endfor %}
+                    </select>
+                    =
+                    <input type="text" name="new_value_1" placeholder="新しい値" required>
+                </p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1em;">
+            <button type="button" onclick="addColumn()">カラムを追加</button>
+        </div>
+
+        <div id="conditions-container">
+            <p>WHERE</p>
+            <div class="condition-group">
+                <select name="condition_column_1" required>
                     {% for col in products_desc %}
                         <option value="{{ col[0] }}">{{ col[0] }}</option>
                     {% endfor %}
                 </select>
                 =
-                <input type="text" name="new_value_1" placeholder="新しい値" required>
-            </p>
+                <input type="text" name="condition_value_1" placeholder="条件の値" required>
+            </div>
         </div>
-    </div>
 
-    <button type="button" onclick="addColumn()">カラムを追加</button>
-
-    <div id="conditions-container">
-        <p>WHERE</p>
-        <div class="condition-group">
-            <select name="condition_column_1" required>
-                {% for col in products_desc %}
-                    <option value="{{ col[0] }}">{{ col[0] }}</option>
-                {% endfor %}
-            </select>
-            <p>=</p>
-            <input type="text" name="condition_value_1" placeholder="条件の値" required>
+        <div style="margin-bottom: 1em;">
+            <button type="button" onclick="addCondition()">条件を追加</button>
         </div>
+
+        <div style="margin-top: 1em;">
+            <button type="submit" name="button_val" value="update_record_btn">実行する</button>
+            <button type="submit" name="button_val" value="restore_backup_btn" onclick="return handleReset()">1つ前の状態に戻す</button>
+            <button type="submit" name="button_val" value="table_init_btn" onclick="return handleReset()">テーブルを初期状態に戻す</button>
+        </div>
+    </form>
+
+    <div class="nav-buttons">
+        <a href="/index/update?flag=min" class="prev">◀ 前へ</a>
+        <a href="/basic/update/multiple-columns/example" class="next">次へ ▶</a>
     </div>
-
-    <button type="button" onclick="addCondition()">条件を追加</button>
-
-    <br><br>
-    <button type="submit" name="button_val" value="update_record_btn">実行する</button>
-
-    <!-- 1つ前の状態に戻すボタン -->
-    <button type="submit" name="button_val" value="restore_backup_btn" onclick="return handleReset()">1つ前の状態に戻す</button>
-
-    <!-- テーブルを初期化するボタン -->
-    <button type="submit" name="button_val" value="table_init_btn" onclick="return handleReset()">テーブルを初期状態に戻す</button>
-</form>
-
-<br>
-<a href="/update_select">戻る</a>
+</div>
 
 <script>
     let columnCount = 1;
     let conditionCount = 1;
 
-    // カラム追加用の関数
     function addColumn() {
         columnCount++;
         const container = document.getElementById('columns-container');
@@ -111,7 +117,6 @@ WHERE {条件1} AND {条件2} ...
         container.appendChild(newColumn);
     }
 
-    // 条件追加用の関数
     function addCondition() {
         conditionCount++;
         const container = document.getElementById('conditions-container');
@@ -130,14 +135,11 @@ WHERE {条件1} AND {条件2} ...
         container.appendChild(newCondition);
     }
 
-    function handleReset() { 
-        // すべての input と select フィールドを取得
-        const inputs = document.querySelectorAll('form input, form select');  
-        // 各フィールドから 'required' 属性を削除
+    function handleReset() {
+        const inputs = document.querySelectorAll('form input, form select');
         inputs.forEach(input => input.removeAttribute('required'));
-        // フォームを送信する
         return true;
     }
-
 </script>
+
 {% endblock %}

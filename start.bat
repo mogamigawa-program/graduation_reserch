@@ -6,7 +6,7 @@ chcp 65001
 :: === 設定 ===
 set BACKUP_DIR=%~dp0backup
 set DATESTR=%DATE:~0,4%%DATE:~5,2%%DATE:~8,2%
-set BACKUP_FILE=%BACKUP_DIR%\backup_%DATESTR%.sql
+set BACKUP_FILE=%BACKUP_DIR%\backup_%DATESTR%_hiroki.sql
 
 set MYSQLDUMP="C:\Program Files\MariaDB 11.4\bin\mysqldump.exe"
 set DB_USER=root

@@ -11,67 +11,70 @@
 
     <!-- productsテーブルの中身を表示 -->
     <h2>productsテーブルの内容</h2>
-    <table border="1">
+    <table class="table">
         <caption>products</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
-            {% for col in products_desc %}
-                <th>{{ col[0] }}</th>
-            {% endfor %}
-        </tr>
-        {% for row in products_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
-                {% for item in row %}
-                    <td>{{ item }}</td>
+        <thead>
+            <tr>
+                {% for col in products_desc %}
+                    <th>{{ col[0] }}</th>
                 {% endfor %}
             </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            {% for row in products_data %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
-    <!-- ヒントの追加 -->
+    <!-- ヒント -->
     <div class="hints">
         <h2>ヒント</h2>
         
         <details>
-            <summary style="color: blue;">ヒント1</summary>
-            <p>UPDATE文は、テーブル内のデータを更新するためのSQL文です。<br>
-            UPDATEの後ろには適用させるテーブル名を入れます。</p>
+            <summary class="btn retry">ヒント1</summary>
+            <p>UPDATE文は、テーブル内のデータを更新するためのSQL文です。<br>UPDATEの後ろには適用させるテーブル名を入れます。</p>
             <p>例：UPDATE products ...;</p>
         </details>
-    
+
         <details>
-            <summary style="color: blue;">ヒント2</summary>
+            <summary class="btn retry">ヒント2</summary>
             <p>SETを使って更新するカラムと値を指定します。</p>
             <p>例：UPDATE products SET price = 85000 ;</p>
         </details>
-    
+
         <details>
-            <summary style="color: blue;">ヒント3</summary>
+            <summary class="btn retry">ヒント3</summary>
             <p>WHERE句を使うことで、特定の条件を満たすレコードだけを更新できます。</p>
             <p>例：UPDATE products SET stock_quantity = 120 WHERE product_id = 1;</p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント4</summary>
+            <summary class="btn retry">ヒント4</summary>
             <p>複数のカラムを一度に更新することもできます。</p>
             <p>例：UPDATE products SET price = 85000, stock_quantity = 110 WHERE product_id = 1;</p>
         </details>
 
         <details>
-            <summary style="color: blue;">ヒント5</summary>
+            <summary class="btn retry">ヒント5</summary>
             <p style="color: red;">注意：</p><p>クエリを実行した後、データが更新されるため、適用前と適用後の結果を確認しましょう。</p>
         </details>
     </div>
-    
 
     {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p>
+        <p class="error">{{ error_message }}</p>
     {% endif %}
 
     <form method="POST">
-        <label for="query">SQLクエリ:<p style="color: red;"><strong>クエリの最後には";"をつけよう！</strong></p></label>
+        <label for="query">SQLクエリ:</label>
+        <p style="color: red;"><strong>クエリの最後には「;」をつけよう！</strong></p>
         <textarea id="query" name="query" rows="5" required>{{ query if query }}</textarea>
         <br>
-        <button type="submit">クエリを実行</button>
+        <button type="submit" class="btn btn-primary">クエリを実行</button>
     </form>
 
     {% if query %}
@@ -81,24 +84,28 @@
 
     {% if query_result %}
         <h2>更新後のproductsテーブル</h2>
-        <table border="1">
-            <tr style="background-color: rgba(0, 123, 255, 0.664);">
-                {% for col in products_desc %}
-                    <th>{{ col[0] }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in query_result %}
-                <tr style="background-color: rgba(0, 123, 255, 0.313);">
-                    {% for item in row %}
-                        <td>{{ item }}</td>
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for col in products_desc %}
+                        <th>{{ col[0] }}</th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+                {% for row in query_result %}
+                    <tr>
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     {% endif %}
 </div>
 
 <hr>
-<a href="/update_multiple_study">戻る</a>
+<a href="/update_multiple_study" class="btn">UPDATE学習ページに戻る</a>
 
 {% endblock %}

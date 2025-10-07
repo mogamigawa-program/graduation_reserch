@@ -42,15 +42,16 @@
             </div>
             <hr>
         {% endfor %}
-        {% if not submitted %}
-            <button type="submit">回答を送信</button>
-        {% else %}
-            <a href="/join_quiz" class="btn btn-primary">再挑戦</a>
-        {% endif %}
+        
+        <div style="text-align: center; margin-top: 20px;">
+            {% if not submitted %}
+                <button type="submit" class="btn">回答を送信</button>
+            {% else %}
+                <a href="/basic/join/join_quiz" class="btn retry">再挑戦</a>
+                <a href="/index" class="btn btn-secondary">ホームに戻る</a>
+            {% endif %}
+        </div>
     </form>
 </div>
-
-<hr>
-<a href="/multiple_table_join_study">戻る</a>
 
 {% endblock %}

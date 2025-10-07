@@ -3,18 +3,15 @@
 {% block content %}
 
 <div class="container">
+    <div class="nav-buttons">
+        <a href="/basic/update/single-column/study" class="prev">◀ 前へ</a>
+        <a href="/quiz/update_single_column" class="next">次へ ▶</a>
+    </div>
     <h1>1つのカラムに対して1つの条件でレコードをUPDATEする実行例</h1>
 
-    <!-- productsテーブルの中身を表示 -->
+    <h2>更新前の products テーブル</h2>
     <table border="1">
         <caption>products (更新前)</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
-            <th>商品ID</th>
-            <th>商品名</th>
-            <th>価格</th>
-            <th>在庫数</th>
-            <th>ステータス</th>
-        </tr>
         <tr style="background-color: rgb(255, 123, 0);">
             {% for col in products_desc %}
                 <th>{{ col[0] }}</th>
@@ -29,22 +26,23 @@
         {% endfor %}
     </table>
 
-    <!-- UPDATEクエリの実行結果表示 -->
     {% if update_result %}
         <h2>UPDATEの実行結果</h2>
         <p><strong>実行クエリ:</strong></p>
-        <p><code>
-            UPDATE products<br>
-            SET price = {{ new_price }}<br>
-            WHERE product_id = {{ target_product_id }};
-        </code></p>
-        
+        <pre><code>
+UPDATE products
+SET price = {{ new_price }}
+WHERE product_id = {{ target_product_id }};
+        </code></pre>
+
         <p><strong>解説:</strong></p>
-        <p>このUPDATEクエリは、`products`テーブルの特定の`product_id`を持つレコードの価格(`price`)を新しい値に更新します。
-            <br>今回は、`product_id = 1`を持つレコードの価格を新しい値(`price = 2000`)に更新します。
+        <p>
+            このUPDATEクエリは、<code>products</code>テーブルの中で
+            <code>product_id = {{ target_product_id }}</code> に該当するレコードの
+            <code>price</code> を <code>{{ new_price }}</code> に変更します。
         </p>
 
-        <!-- 更新後のproductsテーブルの中身を表示 -->
+        <h2>更新後の products テーブル</h2>
         <table border="1">
             <caption>products (更新後)</caption>
             <tr style="background-color: rgb(255, 123, 0);">
@@ -61,8 +59,11 @@
             {% endfor %}
         </table>
     {% endif %}
+
+    <div class="nav-buttons">
+        <a href="/basic/update/single-column/study" class="prev">◀ 前へ</a>
+        <a href="/quiz/update_single_column" class="next">次へ ▶</a>
+    </div>
 </div>
 
-<hr>
-<a href="/update_single_study">UPDATE学習ページに戻る</a>
 {% endblock %}

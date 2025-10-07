@@ -3,59 +3,150 @@
 {% block content %}
 
 <div class="container">
+    <div class="nav-buttons">
+        <a href="/basic/update/all-records/study" class="prev">◀ 前へ</a>
+        <a href="/basic/update/calc/study" class="next">次へ ▶</a>
+    </div>
+
     <h1>全レコード更新の実行例</h1>
 
-    <!-- productsテーブルの中身を表示 -->
-    <table border="1">
-        <caption>products (更新前)</caption>
-        <tr style="background-color: rgb(255, 123, 0);">
-            {% for col in products_desc %}
-                <th>{{ col[0] }}</th>
-            {% endfor %}
-        </tr>
-        {% for row in products_data %}
-            <tr style="background-color: rgb(240, 184, 128);">
-                {% for item in row %}
-                    <td>{{ item }}</td>
-                {% endfor %}
+    <p>
+        このページでは、<strong>WHERE句を省略したUPDATE文がすべてのレコードに影響を与える</strong>ことを体験します。
+    </p>
+
+    <table class="table-bordered">
+        <caption>products（更新前）</caption>
+        <thead>
+            <tr class="table-header">
+                <th>product_id</th>
+                <th>name</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>status</th>
             </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            <tr class="table-row">
+                <td>1</td>
+                <td>ノートパソコン</td>
+                <td>120000</td>
+                <td>50</td>
+                <td>active</td>
+            </tr>
+            <tr class="table-row">
+                <td>2</td>
+                <td>スマートフォン</td>
+                <td>80000</td>
+                <td>80</td>
+                <td>active</td>
+            </tr>
+            <tr class="table-row">
+                <td>3</td>
+                <td>タブレット</td>
+                <td>60000</td>
+                <td>30</td>
+                <td>active</td>
+            </tr>
+        </tbody>
     </table>
-</div>
-<div class="container">
-    <!-- UPDATEクエリの実行結果表示 -->
-    {% if update_result %}
-        <h2>UPDATEの実行結果</h2>
-        <p><strong>実行クエリ:</strong></p>
-        <p><code>
-            UPDATE products<br>
-            SET {{ update_column }} = '{{ new_value }}';
-        </code></p>
 
-        <p><strong>解説:</strong></p>
-        <p>このUPDATEクエリは、`products`テーブルの全てのレコードに対して`{{ update_column }}`カラムの値を`{{ new_value }}`に更新します。
-            <br>今回の例では、全てのレコードの`status`が`discontinued`に設定されます。
-        </p>
+    <h2>UPDATEの実行結果</h2>
 
-        <!-- 更新後のproductsテーブルの中身を表示 -->
-        <table border="1">
-            <caption>products (更新後)</caption>
-            <tr style="background-color: rgb(255, 123, 0);">
-                {% for col in products_desc %}
-                    <th>{{ col[0] }}</th>
-                {% endfor %}
+    <p><strong>実行クエリ:</strong></p>
+    <pre><code>
+UPDATE products
+SET status = 'discontinued';
+    </code></pre>
+
+    <p><strong>解説:</strong></p>
+    <p>
+        このUPDATE文は、<code>products</code> テーブルのすべてのレコードの 
+        <code>status</code> を <code>discontinued</code> に更新します。
+        <br>WHERE句がないため、すべての行が影響を受けました。
+    </p>
+
+    <table class="table-bordered">
+        <caption>products（更新後）</caption>
+        <thead>
+            <tr class="table-header">
+                <th>product_id</th>
+                <th>name</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>status</th>
             </tr>
-            {% for row in updated_products_data %}
-                <tr style="background-color: rgb(240, 184, 128);">
-                    {% for item in row %}
-                        <td>{{ item }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+        </thead>
+        <tbody>
+            <tr class="table-row">
+                <td>1</td>
+                <td>ノートパソコン</td>
+                <td>120000</td>
+                <td>50</td>
+                <td>discontinued</td>
+            </tr>
+            <tr class="table-row">
+                <td>2</td>
+                <td>スマートフォン</td>
+                <td>80000</td>
+                <td>80</td>
+                <td>discontinued</td>
+            </tr>
+            <tr class="table-row">
+                <td>3</td>
+                <td>タブレット</td>
+                <td>60000</td>
+                <td>30</td>
+                <td>discontinued</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="errors">
+        <h2>よくあるエラー例（実際のエラーメッセージ付き）</h2>
+
+        <details>
+            <summary><strong>① セミコロン忘れ</strong></summary>
+            <p><code>UPDATE products SET status = 'active'</code></p>
+            <p><strong>エラー例:</strong></p>
+            <pre><code>
+ERROR 1064 (42000): You have an error in your SQL syntax; 
+check the manual that corresponds to your MariaDB server version 
+for the right syntax to use near '' at line 1
+            </code></pre>
+        </details>
+
+        <details>
+            <summary><strong>② カラム名のスペルミス</strong></summary>
+            <p><code>UPDATE products SET sttus = 'active';</code></p>
+            <p><strong>エラー例:</strong></p>
+            <pre><code>
+ERROR 1054 (42S22): Unknown column 'sttus' in 'field list'
+            </code></pre>
+        </details>
+
+        <details>
+            <summary><strong>③ クォートの閉じ忘れ</strong></summary>
+            <p><code>UPDATE products SET status = 'active;</code></p>
+            <p><strong>エラー例:</strong></p>
+            <pre><code>
+ERROR 1064 (42000): You have an error in your SQL syntax; 
+check the manual that corresponds to your MariaDB server version 
+for the right syntax to use near '' at line 1
+            </code></pre>
+        </details>
+
+        <details>
+            <summary><strong>④ WHERE句のつけ忘れによる全件更新</strong></summary>
+            <p><code>UPDATE products SET stock = 0;</code></p>
+            <p><strong>（実行自体は成功するが、意図せず全レコードに適用される）</strong></p>
+            <p style="color: red;">意図せず全レコードが書き換えられる恐れがあるため、WHERE句の確認は必須です。</p>
+        </details>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="/basic/update/all-records/study" class="prev">◀ 前へ</a>
+        <a href="/basic/update/calc/study" class="next">次へ ▶</a>
+    </div>
 </div>
 
-<hr>
-<a href="/update_select">戻る</a>
 {% endblock %}

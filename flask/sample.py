@@ -1,21 +1,30 @@
 import mysql.connector
+from mysql.connector import Error
 
-dns = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '0734',
-    'database': 'dataset'
-}
+def test_connection():
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",          # MariaDBサーバーのホスト
+            user="root",          # ユーザー名（rootも可）
+            password="0734",  # パスワード
+            database="user_info"   # データベース名
+        )
 
-# 接続を作成して、1 つのレコードを読み込む
-connection = mysql.connector.MySQLConnection(**dns)
-cursor = connection.cursor()
-cursor.execute('SELECT * FROM users WHERE email = %s', ('webmaster@python.org',))
-result = cursor.fetchone()
-print(result)
+        if conn.is_connected():
+            print("✅ MariaDB に接続成功！")
 
-# 接続を再利用して、すべてのレコードを読み込む
-cursor.fetchall()
-cursor.execute('SELECT * FROM users')
-results = cursor.fetchall()
-print(results)
+            cursor = conn.cursor()
+            cursor.execute("SELECT NOW();")  # 現在時刻を取得
+            result = cursor.fetchone()
+            print("サーバー時刻:", result[0])
+
+            cursor.close()
+            conn.close()
+        else:
+            print("❌ 接続できませんでした")
+
+    except Error as e:
+        print("接続エラー:", e)
+
+if __name__ == "__main__":
+    test_connection()
