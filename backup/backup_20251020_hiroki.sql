@@ -55,7 +55,9 @@ INSERT INTO `user_databases` VALUES
 (41,'5_db'),
 (42,'6_db'),
 (43,'7_db'),
-(44,'a_db');
+(44,'a_db'),
+(45,'aa_db'),
+(46,'test_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -73,7 +75,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +94,9 @@ INSERT INTO `users` VALUES
 (41,'5','$2b$12$jyp.ReVn6W3xmJuH9UBZqurSOCQTt5qS4B.DduMc4H2WwRJDR06vK',0),
 (42,'6','$2b$12$ptJZd7rb.LbxKMNbHaEmzuk0ote.6EicN.eo2D.AmPkroiPa4E3F2',0),
 (43,'7','$2b$12$2n3a1/e16kDP86WjK5HrruzI5u.rKlCoRAL.hI/MVRq/d59neThEm',0),
-(44,'a','$2b$12$5d7tr8D9udQTAMwn71KVJelbD6YF30ZpvQLx.4YII.HLeJE4lff5K',0);
+(44,'a','$2b$12$5d7tr8D9udQTAMwn71KVJelbD6YF30ZpvQLx.4YII.HLeJE4lff5K',0),
+(45,'aa','$2b$12$.cdH4zIH04QXdcRM8oO97ugIcEsDWi.fXw57jzHMBQCwdkAPKdRD6',0),
+(46,'test','$2b$12$91M5rM0hDRs7gf0T7sJluOJfMNNnOZlpvLu7cQ1.NwietVga5de7O',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -994,4 +998,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-09-01 10:17:37
+-- Dump completed on 2025-10-20 16:39:05

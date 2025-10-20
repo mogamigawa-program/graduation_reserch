@@ -156,9 +156,8 @@ CREATE TABLE `choices` (
   `choice_text` text NOT NULL,
   `is_correct` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
-  KEY `question_id` (`question_id`),
-  CONSTRAINT `choices_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `idx_question_id` (`question_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=256 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,6 +167,165 @@ CREATE TABLE `choices` (
 LOCK TABLES `choices` WRITE;
 /*!40000 ALTER TABLE `choices` DISABLE KEYS */;
 INSERT INTO `choices` VALUES
+(1,1,'SELECT * FROM users',0),
+(2,1,'DELETE FROM users WHERE id = 1',0),
+(3,1,'INSERT INTO users (name) VALUES (\"Alice\")',1),
+(4,1,'UPDATE users SET name = \"Bob\" WHERE id = 1',0),
+(5,2,'SELECT name FROM users',0),
+(6,2,'UPDATE users SET name = \"Charlie\" WHERE id = 1',1),
+(7,2,'INSERT INTO users (name) VALUES (\"Charlie\")',0),
+(8,2,'DELETE FROM users WHERE id = 1',0),
+(9,3,'INSERT INTO users (name) VALUES (\"Alice\");',1),
+(10,3,'SELECT * FROM users;',0),
+(11,3,'UPDATE users SET name = \"Alice\";',0),
+(12,3,'DELETE FROM users WHERE name = \"Alice\";',0),
+(13,4,'INSERT INTO users (name, age) VALUES (\"Tom\", 30);',1),
+(14,4,'INSERT INTO users name, age VALUES (\"Tom\", 30);',0),
+(15,4,'INSERT users (name, age) VALUES (\"Tom\", 30);',0),
+(16,4,'INSERT INTO users VALUES name, age (\"Tom\", 30);',0),
+(17,5,'はい、省略可能です。',1),
+(18,5,'いいえ、必ず列名が必要です。',0),
+(19,5,'WHERE句を使えば省略できます。',0),
+(20,5,'テーブルの構造に関係なく常に列名は必要です。',0),
+(21,6,'INSERT INTO users (name) VALUES (\"Tom\"), (\"Jerry\");',1),
+(22,6,'INSERT INTO users (name) VALUE (\"Tom\"); (\"Jerry\");',0),
+(23,6,'INSERT ALL INTO users VALUES (\"Tom\"), (\"Jerry\");',0),
+(24,6,'INSERT INTO users (name) ADD (\"Tom\"), (\"Jerry\");',0),
+(25,7,'テーブルの列数とVALUESの数が合っていない可能性があるから',1),
+(26,7,'文字列をダブルクォーテーションで囲んでいるから',0),
+(27,7,'usersテーブルにデータを削除していないから',0),
+(28,7,'VALUESではなくVALUEを使っているから',0),
+(29,8,'REMOVE FROM users WHERE id = 3;',0),
+(30,8,'DELETE users WHERE id = 3;',0),
+(31,8,'DELETE FROM users WHERE id = 3;',1),
+(32,8,'DELETE WHERE id = 3 FROM users;',0),
+(33,9,'DELETE FROM users WHERE name = Taro;',0),
+(34,9,'DELETE FROM users WHERE name = \"Taro\";',1),
+(35,9,'DELETE users WHERE name = \'Taro\';',0),
+(36,9,'DELETE FROM users name = \'Taro\';',0),
+(37,10,'priceが0の商品のみを削除する',1),
+(38,10,'productsテーブルを削除する',0),
+(39,10,'priceがNULLのデータを削除する',0),
+(40,10,'全てのデータを削除する',0),
+(41,11,'全てのデータが削除される',1),
+(42,11,'何も削除されない',0),
+(43,11,'構文エラーになる',0),
+(44,11,'1行だけ削除される',0),
+(45,12,'WHERE句を忘れないようにする',1),
+(46,12,'UPDATE文を使う',0),
+(47,12,'SELECTで先に確認する',0),
+(48,12,'DELETEを2回実行する',0),
+(49,13,'DELETE users WHERE age >= 30 AND status = \"active\";',0),
+(50,13,'DELETE FROM users WHERE age = 30 status = \"active\";',0),
+(51,13,'DELETE FROM users WHERE age >= 30 OR status = \"active\";',0),
+(52,13,'DELETE FROM users WHERE age >= 30 AND status = \"active\";',1),
+(53,14,'DELETE FROM users WHERE age < 20 AND address IS NULL;',0),
+(54,14,'DELETE FROM users WHERE age < 20 OR address = \"NULL\";',0),
+(55,14,'DELETE FROM users WHERE age < 20 OR address IS NULL;',1),
+(56,14,'DELETE FROM users WHERE age < 20 AND address = NULL;',0),
+(57,15,'年齢に関係なく全てのユーザーを削除する',0),
+(58,15,'ageが18以上のKenという名前のユーザーを削除する',0),
+(59,15,'nameが\"Ken\"またはageが18未満のユーザーを削除する',1),
+(60,15,'nameが\"Ken\"かつageが18未満のユーザーを削除する',0),
+(61,16,'statusが\"inactive\"のユーザーをすべて削除',0),
+(62,16,'年齢が60未満でstatusが\"active\"のユーザーを削除',0),
+(63,16,'年齢が20未満またはstatusが\"inactive\"のユーザーを削除',0),
+(64,16,'年齢が20未満または60より大きく、かつstatusが\"inactive\"のユーザーを削除',1),
+(65,17,'DELETE文では複数条件を使えない',0),
+(66,17,'WHEREを省略しても一部のデータだけ削除できる',0),
+(67,17,'ORは必ずANDより先に評価されるので()は不要',0),
+(68,17,'複雑な条件では()を使って優先順位を明確にする',1),
+(69,18,'INSERT + SELECT は列を追加する',0),
+(70,18,'INSERT はテーブルを削除する',0),
+(71,18,'SELECT は新しいテーブルを作成する',0),
+(72,18,'INSERT + SELECT はデータをコピーする',1),
+(73,19,'INSERT x SELECT FROM y;',0),
+(74,19,'INSERT INTO x VALUES (SELECT id FROM y);',0),
+(75,19,'SELECT INTO x FROM y;',0),
+(76,19,'INSERT INTO x (id) SELECT id FROM y;',1),
+(77,20,'old_table を削除する',0),
+(78,20,'old_table の name列を new_table にコピーする',1),
+(79,20,'new_table を作成する',0),
+(80,20,'name列を削除して挿入する',0),
+(81,21,'WHERE 句が必要',0),
+(82,21,'SELECT 文が間違っている',0),
+(83,21,'テーブルが存在しない',0),
+(84,21,'コピー先に列が足りない',1),
+(85,22,'18歳未満のユーザーのみ logs に入る',1),
+(86,22,'全ユーザーが logs に入る',0),
+(87,22,'members テーブルが変更される',0),
+(88,22,'実行エラーが発生する',0),
+(89,23,'完了した注文を archive にコピーする',1),
+(90,23,'新しい注文を作成する',0),
+(91,23,'archive を削除する',0),
+(92,23,'orders テーブルを削除する',0),
+(93,24,'UPDATE products WHERE product_id = 1 SET price = 1000;',0),
+(94,24,'UPDATE products SET price = 1000 WHERE product_id = 1;',1),
+(95,24,'UPDATE SET products.price = 1000 WHERE product_id = 1;',0),
+(96,24,'MODIFY products SET price = 1000 WHERE product_id = 1;',0),
+(97,25,'UPDATE products SET \'status\' = \'active\' WHERE \'status\' = \'inactive\';',0),
+(98,25,'UPDATE products SET status = active WHERE status = inactive;',0),
+(99,25,'UPDATE products SET status = \'active\' WHERE status = \'inactive\';',1),
+(100,25,'UPDATE status FROM products TO \'active\' IF status = \'inactive\';',0),
+(101,26,'UPDATE products SET price = 50000 WHERE product_name = \'パソコン\';',1),
+(102,26,'UPDATE products SET price = 50000 IF product_name = \'パソコン\';',0),
+(103,26,'UPDATE products SET price = \'50000\' WHERE product_name = パソコン;',0),
+(104,26,'MODIFY products SET price TO 50000 WHERE product_name = \'パソコン\';',0),
+(105,27,'UPDATE products SET stock TO 10 WHERE price == 5000;',0),
+(106,27,'UPDATE products WHERE price = 5000 SET stock = 10;',0),
+(107,27,'UPDATE stock = 10 FROM products WHERE price = 5000;',0),
+(108,27,'UPDATE products SET stock = 10 WHERE price = 5000;',1),
+(109,28,'UPDATE products SET status = \'inactive\' WHERE stock = 50;',1),
+(110,28,'UPDATE products SET status TO inactive IF stock IS 50;',0),
+(111,28,'UPDATE products WHERE stock = 50 SET status = \'inactive\';',0),
+(112,28,'UPDATE SET status = \'inactive\' WHERE stock = 50 FROM products;',0),
+(113,29,'UPDATE products SET product_name = \"New Name\" AND price = 2000 WHERE product_id = 1;',0),
+(114,29,'UPDATE products SET product_name = \"New Name\", price = 2000 WHERE product_id = 1;',1),
+(115,29,'UPDATE products (product_name, price) VALUES (\"New Name\", 2000) WHERE product_id = 1;',0),
+(116,29,'UPDATE products SET (product_name = \"New Name\", price = 2000) WHERE product_id = 1;',0),
+(117,30,'UPDATE products SET stock = 80, price = 190000 WHERE product_id = 2;',0),
+(118,30,'UPDATE products SET stock = 80 AND price = 190000 WHERE product_id = 2 AND status = \"active\";',0),
+(119,30,'UPDATE products SET (stock = 80, price = 190000) WHERE product_id = 2 AND status = \"active\";',0),
+(120,30,'UPDATE products SET stock = 80, price = 190000 WHERE product_id = 2 AND status = \"active\";',1),
+(121,31,'UPDATE products SET status = \"active\", price = 4000 WHERE price >= 5000 AND status = \"inactive\";',1),
+(122,31,'UPDATE products SET (status = \"active\", price = 4000) WHERE price >= 5000 AND status = \"inactive\";',0),
+(123,31,'UPDATE products SET status = \"active\" AND price = 4000 WHERE price >= 5000 AND status = \"inactive\";',0),
+(124,31,'UPDATE products SET status = \"active\", price = 4000 WHERE (price >= 5000, status = \"inactive\");',0),
+(125,32,'UPDATE products SET stock = 20, status = \"out\" WHERE product_id = 3;',0),
+(126,32,'UPDATE products SET stock = 20 AND status = \"out\" WHERE product_id = 3 AND stock = 10;',0),
+(127,32,'UPDATE products SET stock = 20, status = \"out\" WHERE product_id = 3 AND stock = 10;',1),
+(128,32,'UPDATE products (stock, status) VALUES (20, \"out\") WHERE product_id = 3 AND stock = 10;',0),
+(129,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0;',0),
+(130,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0 AND status = \"inactive\";',1),
+(131,33,'UPDATE products SET status = \"sold out\" AND stock = 5 WHERE stock = 0 AND status = \"inactive\";',0),
+(132,33,'UPDATE products SET (status = \"sold out\", stock = 5) WHERE stock = 0 AND status = \"inactive\";',0);
+/*!40000 ALTER TABLE `choices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `choices_backup`
+--
+
+DROP TABLE IF EXISTS `choices_backup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `choices_backup` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `question_id` int(11) NOT NULL,
+  `choice_text` text NOT NULL,
+  `is_correct` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `question_id` (`question_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `choices_backup`
+--
+
+LOCK TABLES `choices_backup` WRITE;
+/*!40000 ALTER TABLE `choices_backup` DISABLE KEYS */;
+INSERT INTO `choices_backup` VALUES
 (1,1,'SELECT * FROM users',0),
 (2,1,'DELETE FROM users WHERE id = 1',0),
 (3,1,'INSERT INTO users (name) VALUES (\"Alice\")',1),
@@ -300,7 +458,167 @@ INSERT INTO `choices` VALUES
 (10017,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0 AND status = \"inactive\";',1),
 (10018,33,'UPDATE products SET status = \"sold out\" AND stock = 5 WHERE stock = 0 AND status = \"inactive\";',0),
 (10019,33,'UPDATE products SET (status = \"sold out\", stock = 5) WHERE stock = 0 AND status = \"inactive\";',0);
-/*!40000 ALTER TABLE `choices` ENABLE KEYS */;
+/*!40000 ALTER TABLE `choices_backup` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `choices_old`
+--
+
+DROP TABLE IF EXISTS `choices_old`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `choices_old` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `question_id` int(11) NOT NULL,
+  `choice_text` text NOT NULL,
+  `is_correct` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `question_id` (`question_id`),
+  CONSTRAINT `choices_old_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10020 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `choices_old`
+--
+
+LOCK TABLES `choices_old` WRITE;
+/*!40000 ALTER TABLE `choices_old` DISABLE KEYS */;
+INSERT INTO `choices_old` VALUES
+(1,1,'SELECT * FROM users',0),
+(2,1,'DELETE FROM users WHERE id = 1',0),
+(3,1,'INSERT INTO users (name) VALUES (\"Alice\")',1),
+(4,1,'UPDATE users SET name = \"Bob\" WHERE id = 1',0),
+(5,2,'SELECT name FROM users',0),
+(6,2,'UPDATE users SET name = \"Charlie\" WHERE id = 1',1),
+(7,2,'INSERT INTO users (name) VALUES (\"Charlie\")',0),
+(8,2,'DELETE FROM users WHERE id = 1',0),
+(9,3,'INSERT INTO users (name) VALUES (\"Alice\");',1),
+(10,3,'SELECT * FROM users;',0),
+(11,3,'UPDATE users SET name = \"Alice\";',0),
+(12,3,'DELETE FROM users WHERE name = \"Alice\";',0),
+(13,4,'INSERT INTO users (name, age) VALUES (\"Tom\", 30);',1),
+(14,4,'INSERT INTO users name, age VALUES (\"Tom\", 30);',0),
+(15,4,'INSERT users (name, age) VALUES (\"Tom\", 30);',0),
+(16,4,'INSERT INTO users VALUES name, age (\"Tom\", 30);',0),
+(17,5,'はい、省略可能です。',1),
+(18,5,'いいえ、必ず列名が必要です。',0),
+(19,5,'WHERE句を使えば省略できます。',0),
+(20,5,'テーブルの構造に関係なく常に列名は必要です。',0),
+(21,6,'INSERT INTO users (name) VALUES (\"Tom\"), (\"Jerry\");',1),
+(22,6,'INSERT INTO users (name) VALUE (\"Tom\"); (\"Jerry\");',0),
+(23,6,'INSERT ALL INTO users VALUES (\"Tom\"), (\"Jerry\");',0),
+(24,6,'INSERT INTO users (name) ADD (\"Tom\"), (\"Jerry\");',0),
+(25,7,'テーブルの列数とVALUESの数が合っていない可能性があるから',1),
+(26,7,'文字列をダブルクォーテーションで囲んでいるから',0),
+(27,7,'usersテーブルにデータを削除していないから',0),
+(28,7,'VALUESではなくVALUEを使っているから',0),
+(29,8,'REMOVE FROM users WHERE id = 3;',0),
+(30,8,'DELETE users WHERE id = 3;',0),
+(31,8,'DELETE FROM users WHERE id = 3;',1),
+(32,8,'DELETE WHERE id = 3 FROM users;',0),
+(33,9,'DELETE FROM users WHERE name = Taro;',0),
+(34,9,'DELETE FROM users WHERE name = \"Taro\";',1),
+(35,9,'DELETE users WHERE name = \'Taro\';',0),
+(36,9,'DELETE FROM users name = \'Taro\';',0),
+(37,10,'priceが0の商品のみを削除する',1),
+(38,10,'productsテーブルを削除する',0),
+(39,10,'priceがNULLのデータを削除する',0),
+(40,10,'全てのデータを削除する',0),
+(41,11,'全てのデータが削除される',1),
+(42,11,'何も削除されない',0),
+(43,11,'構文エラーになる',0),
+(44,11,'1行だけ削除される',0),
+(45,12,'WHERE句を忘れないようにする',1),
+(46,12,'UPDATE文を使う',0),
+(47,12,'SELECTで先に確認する',0),
+(48,12,'DELETEを2回実行する',0),
+(1001,13,'DELETE users WHERE age >= 30 AND status = \"active\";',0),
+(1002,13,'DELETE FROM users WHERE age = 30 status = \"active\";',0),
+(1003,13,'DELETE FROM users WHERE age >= 30 OR status = \"active\";',0),
+(1004,13,'DELETE FROM users WHERE age >= 30 AND status = \"active\";',1),
+(1005,14,'DELETE FROM users WHERE age < 20 AND address IS NULL;',0),
+(1006,14,'DELETE FROM users WHERE age < 20 OR address = \"NULL\";',0),
+(1007,14,'DELETE FROM users WHERE age < 20 OR address IS NULL;',1),
+(1008,14,'DELETE FROM users WHERE age < 20 AND address = NULL;',0),
+(1009,15,'年齢に関係なく全てのユーザーを削除する',0),
+(1010,15,'ageが18以上のKenという名前のユーザーを削除する',0),
+(1011,15,'nameが\"Ken\"またはageが18未満のユーザーを削除する',1),
+(1012,15,'nameが\"Ken\"かつageが18未満のユーザーを削除する',0),
+(1013,16,'statusが\"inactive\"のユーザーをすべて削除',0),
+(1014,16,'年齢が60未満でstatusが\"active\"のユーザーを削除',0),
+(1015,16,'年齢が20未満またはstatusが\"inactive\"のユーザーを削除',0),
+(1016,16,'年齢が20未満または60より大きく、かつstatusが\"inactive\"のユーザーを削除',1),
+(1017,17,'DELETE文では複数条件を使えない',0),
+(1018,17,'WHEREを省略しても一部のデータだけ削除できる',0),
+(1019,17,'ORは必ずANDより先に評価されるので()は不要',0),
+(1020,17,'複雑な条件では()を使って優先順位を明確にする',1),
+(1021,18,'INSERT + SELECT は列を追加する',0),
+(1022,18,'INSERT はテーブルを削除する',0),
+(1023,18,'SELECT は新しいテーブルを作成する',0),
+(1024,18,'INSERT + SELECT はデータをコピーする',1),
+(1025,19,'INSERT x SELECT FROM y;',0),
+(1026,19,'INSERT INTO x VALUES (SELECT id FROM y);',0),
+(1027,19,'SELECT INTO x FROM y;',0),
+(1028,19,'INSERT INTO x (id) SELECT id FROM y;',1),
+(1029,20,'old_table を削除する',0),
+(1030,20,'old_table の name列を new_table にコピーする',1),
+(1031,20,'new_table を作成する',0),
+(1032,20,'name列を削除して挿入する',0),
+(1033,21,'WHERE 句が必要',0),
+(1034,21,'SELECT 文が間違っている',0),
+(1035,21,'テーブルが存在しない',0),
+(1036,21,'コピー先に列が足りない',1),
+(1037,22,'18歳未満のユーザーのみ logs に入る',1),
+(1038,22,'全ユーザーが logs に入る',0),
+(1039,22,'members テーブルが変更される',0),
+(1040,22,'実行エラーが発生する',0),
+(1041,23,'完了した注文を archive にコピーする',1),
+(1042,23,'新しい注文を作成する',0),
+(1043,23,'archive を削除する',0),
+(1044,23,'orders テーブルを削除する',0),
+(1045,24,'UPDATE products WHERE product_id = 1 SET price = 1000;',0),
+(1046,24,'UPDATE products SET price = 1000 WHERE product_id = 1;',1),
+(1047,24,'UPDATE SET products.price = 1000 WHERE product_id = 1;',0),
+(1048,24,'MODIFY products SET price = 1000 WHERE product_id = 1;',0),
+(1049,25,'UPDATE products SET \'status\' = \'active\' WHERE \'status\' = \'inactive\';',0),
+(1050,25,'UPDATE products SET status = active WHERE status = inactive;',0),
+(1051,25,'UPDATE products SET status = \'active\' WHERE status = \'inactive\';',1),
+(1052,25,'UPDATE status FROM products TO \'active\' IF status = \'inactive\';',0),
+(1053,26,'UPDATE products SET price = 50000 WHERE product_name = \'パソコン\';',1),
+(1054,26,'UPDATE products SET price = 50000 IF product_name = \'パソコン\';',0),
+(1055,26,'UPDATE products SET price = \'50000\' WHERE product_name = パソコン;',0),
+(1056,26,'MODIFY products SET price TO 50000 WHERE product_name = \'パソコン\';',0),
+(1057,27,'UPDATE products SET stock TO 10 WHERE price == 5000;',0),
+(1058,27,'UPDATE products WHERE price = 5000 SET stock = 10;',0),
+(1059,27,'UPDATE stock = 10 FROM products WHERE price = 5000;',0),
+(1060,27,'UPDATE products SET stock = 10 WHERE price = 5000;',1),
+(1061,28,'UPDATE products SET status = \'inactive\' WHERE stock = 50;',1),
+(1062,28,'UPDATE products SET status TO inactive IF stock IS 50;',0),
+(1063,28,'UPDATE products WHERE stock = 50 SET status = \'inactive\';',0),
+(1064,28,'UPDATE SET status = \'inactive\' WHERE stock = 50 FROM products;',0),
+(10000,29,'UPDATE products SET product_name = \"New Name\" AND price = 2000 WHERE product_id = 1;',0),
+(10001,29,'UPDATE products SET product_name = \"New Name\", price = 2000 WHERE product_id = 1;',1),
+(10002,29,'UPDATE products (product_name, price) VALUES (\"New Name\", 2000) WHERE product_id = 1;',0),
+(10003,29,'UPDATE products SET (product_name = \"New Name\", price = 2000) WHERE product_id = 1;',0),
+(10004,30,'UPDATE products SET stock = 80, price = 190000 WHERE product_id = 2;',0),
+(10005,30,'UPDATE products SET stock = 80 AND price = 190000 WHERE product_id = 2 AND status = \"active\";',0),
+(10006,30,'UPDATE products SET (stock = 80, price = 190000) WHERE product_id = 2 AND status = \"active\";',0),
+(10007,30,'UPDATE products SET stock = 80, price = 190000 WHERE product_id = 2 AND status = \"active\";',1),
+(10008,31,'UPDATE products SET status = \"active\", price = 4000 WHERE price >= 5000 AND status = \"inactive\";',1),
+(10009,31,'UPDATE products SET (status = \"active\", price = 4000) WHERE price >= 5000 AND status = \"inactive\";',0),
+(10010,31,'UPDATE products SET status = \"active\" AND price = 4000 WHERE price >= 5000 AND status = \"inactive\";',0),
+(10011,31,'UPDATE products SET status = \"active\", price = 4000 WHERE (price >= 5000, status = \"inactive\");',0),
+(10012,32,'UPDATE products SET stock = 20, status = \"out\" WHERE product_id = 3;',0),
+(10013,32,'UPDATE products SET stock = 20 AND status = \"out\" WHERE product_id = 3 AND stock = 10;',0),
+(10014,32,'UPDATE products SET stock = 20, status = \"out\" WHERE product_id = 3 AND stock = 10;',1),
+(10015,32,'UPDATE products (stock, status) VALUES (20, \"out\") WHERE product_id = 3 AND stock = 10;',0),
+(10016,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0;',0),
+(10017,33,'UPDATE products SET status = \"sold out\", stock = 5 WHERE stock = 0 AND status = \"inactive\";',1),
+(10018,33,'UPDATE products SET status = \"sold out\" AND stock = 5 WHERE stock = 0 AND status = \"inactive\";',0),
+(10019,33,'UPDATE products SET (status = \"sold out\", stock = 5) WHERE stock = 0 AND status = \"inactive\";',0);
+/*!40000 ALTER TABLE `choices_old` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -998,4 +1316,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-09-12  2:37:18
+-- Dump completed on 2025-10-21  2:29:16

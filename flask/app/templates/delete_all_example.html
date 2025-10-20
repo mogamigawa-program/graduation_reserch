@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}DELETE文（全レコード削除） 実行例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/example.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/delete/all-records/study" class="prev">◀ 前へ</a>
+    <a href="/basic/delete/all-records/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>DELETE文（全レコード削除）の実行例</h1>
+
+    <section>
+        <h2>例題</h2>
+        <p>次の <code>employees</code> テーブルの全レコードを削除してみましょう。</p>
+
+        <h3>実行前のテーブル</h3>
+        <table class="db-table">
+            <tr><th>id</th><th>name</th><th>department</th><th>salary</th></tr>
+            <tr><td>1</td><td>田中太郎</td><td>営業</td><td>300000</td></tr>
+            <tr><td>2</td><td>山田花子</td><td>総務</td><td>280000</td></tr>
+            <tr><td>3</td><td>佐藤次郎</td><td>開発</td><td>320000</td></tr>
+        </table>
+
+        <h3>実行するSQL</h3>
+        <div class="code-block"><code>DELETE FROM employees;</code></div>
+
+        <h3>実行後のテーブル</h3>
+        <table class="db-table">
+            <tr><th>id</th><th>name</th><th>department</th><th>salary</th></tr>
+            <tr><td colspan="4" style="text-align:center;">（データなし）</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>よくあるミス・エラー</h2>
+        <ul>
+            <li><strong>WHEREを付け忘れた：</strong> 本当は一部だけ削除したかったのに全削除される</li>
+            <li><strong>権限エラー：</strong> 削除権限（DELETE権限）がないユーザーではエラーが出る</li>
+            <li><strong>外部キー制約：</strong> 他のテーブルから参照されていると削除できない（例：外部キー制約エラー）</li>
+            <li><strong>トランザクション未使用：</strong> 間違って削除しても戻せないので、必要に応じて <code>ROLLBACK</code> を活用する</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>ポイント</h2>
+        <p>
+            条件を省略したDELETEは「テーブルの内容をリセットする操作」として使えますが、<br>
+            一般的には開発・検証環境での利用が推奨されます。
+        </p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/delete/all-records/study" class="prev">◀ 前へ</a>
+    <a href="/basic/delete/all-records/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

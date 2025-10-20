@@ -688,3 +688,66 @@ footer {
 .btn:hover {
     background-color: #286090;
 }
+
+
+/* 実行ボタン */
+.run-btn {
+    background-color: #4CAF50; /* 緑系 */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-right: 10px;
+}
+
+.run-btn:hover {
+    background-color: #45a049;
+}
+
+/* テーブル初期化ボタン */
+.init-btn {
+    background-color: #f44336; /* 赤系 */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-right: 10px;
+}
+
+.init-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* 並びやレイアウト調整 */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+form .sql-input {
+    width: 100%;
+    max-width: 700px;
+    font-family: monospace;
+    margin-bottom: 10px;
+}
+
+form button {
+    display: inline-block;
+}
+
+/* 両ボタンをまとめるブロックを中央に */
+form .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}

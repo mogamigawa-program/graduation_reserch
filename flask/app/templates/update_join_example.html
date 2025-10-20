@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}UPDATE JOIN 実行例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/update/join/study" class="prev">◀ 前へ</a>
+    <a href="/basic/update/join/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>UPDATE JOIN 実行例</h1>
+
+    <section>
+        <h2>例題：割引価格の反映</h2>
+        <p>
+            以下の2つのテーブルを使用します。
+        </p>
+
+        <table class="example-table">
+            <caption>products</caption>
+            <tr><th>id</th><th>name</th><th>category_id</th><th>price</th></tr>
+            <tr><td>1</td><td>ペン</td><td>1</td><td>100</td></tr>
+            <tr><td>2</td><td>ノート</td><td>2</td><td>200</td></tr>
+            <tr><td>3</td><td>ファイル</td><td>1</td><td>150</td></tr>
+        </table>
+
+        <table class="example-table">
+            <caption>discounts</caption>
+            <tr><th>category_id</th><th>rate</th></tr>
+            <tr><td>1</td><td>0.1</td></tr>
+            <tr><td>2</td><td>0.2</td></tr>
+        </table>
+
+        <h3>実行文</h3>
+        <div class="code-block">
+<code>UPDATE products
+JOIN discounts
+ON products.category_id = discounts.category_id
+SET products.price = products.price * (1 - discounts.rate);</code>
+        </div>
+
+        <h3>実行後の結果</h3>
+        <table class="example-table">
+            <caption>更新後の products</caption>
+            <tr><th>id</th><th>name</th><th>category_id</th><th>price</th></tr>
+            <tr><td>1</td><td>ペン</td><td>1</td><td>90</td></tr>
+            <tr><td>2</td><td>ノート</td><td>2</td><td>160</td></tr>
+            <tr><td>3</td><td>ファイル</td><td>1</td><td>135</td></tr>
+        </table>
+    </section>
+
+    <div class="alert-warning">
+        <strong>ポイント：</strong> JOINでつないだテーブルの条件によって、更新対象が変わります。
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/update/join/study" class="prev">◀ 前へ</a>
+    <a href="/basic/update/join/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

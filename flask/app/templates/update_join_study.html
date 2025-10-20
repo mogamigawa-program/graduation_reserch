@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}UPDATE JOINとは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/update?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/update/join/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>UPDATE JOIN（結合更新）</h1>
+
+    <section>
+        <h2>UPDATE JOINとは？</h2>
+        <p>
+            <code>UPDATE JOIN</code> は、2つ以上のテーブルを結合しながら、<br>
+            特定の条件に合致するレコードをまとめて更新するための構文です。
+        </p>
+    </section>
+
+    <section>
+        <h2>基本構文</h2>
+        <div class="code-block">
+<code>UPDATE テーブルA
+JOIN テーブルB ON テーブルA.共通列 = テーブルB.共通列
+SET テーブルA.列名 = 値
+WHERE 条件;</code>
+        </div>
+        <ul>
+            <li><strong>JOIN句</strong>：結合するテーブルを指定します。</li>
+            <li><strong>SET句</strong>：更新する列と値を指定します。</li>
+            <li><strong>WHERE句</strong>：更新対象の条件を指定します。</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>使用例</h2>
+        <p>例：`products` テーブルの価格を、`discounts` テーブルの割引率に基づいて更新する場合。</p>
+        <div class="code-block">
+<code>UPDATE products
+JOIN discounts
+ON products.category_id = discounts.category_id
+SET products.price = products.price * (1 - discounts.rate);</code>
+        </div>
+        <p>この例では、同じカテゴリIDを持つ商品の価格を割引後の価格に更新します。</p>
+    </section>
+
+    <div class="alert-warning">
+        <strong>注意：</strong> <code>UPDATE JOIN</code> は一度に多くの行を変更する可能性があります。<br>
+        実行前に <code>SELECT</code> 文で対象を確認してから実行しましょう。
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/update?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/update/join/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

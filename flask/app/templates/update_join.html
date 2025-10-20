@@ -1,156 +1,118 @@
 {% extends "base.html" %}
-{% block title %}Update_join{% endblock %}
+{% block title %}UPDATE文（JOIN）{% endblock %}
 {% block content %}
-<h1>UPDATE_JOIN</h1>
-<div class="update_join">
-    <p>テーブルアップデート例</p>
-    <pre>
-        <code>
-            ＊UPDATEのみの場合
-            UPDATE products
-            SET price = price * 0.9;
 
-            ＊JOIN句を使用する場合
-            UPDATE products
-            JOIN discounts d ON products.category_id = d.category_id
-            SET price = price * discounts.discount_rate;
-        </code>
-    </pre>
-
-    <!-- productsテーブルの中身を表示 -->
-    <table border="1">
-        <caption>products</caption>
-            <tr>
-                {% for col in products_desc %}
-                    <th>{{ col[0] }}</th>
-                {% endfor %}
-            </tr>
-        {% for row in products_data %}
-            <tr>
-                {% for item in row %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-
-    <!-- customersテーブルの中身を表示 -->
-    <table border="1">
-        <caption>customers</caption>
-            <tr>
-                {% for col in customers_desc %}
-                    <th>{{ col[0] }}</th>
-                {% endfor %}
-            </tr>
-        {% for row in customers_data %}
-            <tr>
-                {% for item in row %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-
-    <!-- discountsテーブルの中身を表示 -->
-    <table border="1">
-        <caption>discounts</caption>
-        <tr>
-            {% for col in discounts_desc %}
-                <th>{{ col[0] }}</th>
-            {% endfor %}
-        </tr>
-        {% for row in discounts_data %}
-            <tr>
-                {% for item in row %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-
-    <!-- inventoryテーブルの中身を表示 -->
-    <table border="1">
-        <caption>inventory</caption>
-        <tr>
-            {% for col in inventory_desc %}
-                <th>{{ col[0] }}</th>
-            {% endfor %}
-        </tr>
-        {% for row in inventory_data %}
-            <tr>
-                {% for item in row %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-
-    <p>実際にテーブルを更新してみよう！</p>
-    {% if error_message %}
-        <p style="color: red;">エラー: {{ error_message }}</p>
-    {% endif %}
-
-    {% if message %}
-        <p style="color: green;">更新: {{ message }}</p>
-    {% endif %}
-
-    <form action="{{ url_for('update_join') }}" method="post" id="update-form">
-        <p>UPDATE {{ table_name }}</p>
-
-        <p>
-            <label>
-                <input type="checkbox" id="use_from_clause" name="use_from_clause" value="1">
-                JOIN句を使用する
-            </label>
-        </p>
-
-        <div id="from_clause_section" style="display:none;">
-            <select name="inner_outer">
-                <option value="INNER">INNER</option>
-                <option value="LEFT OUTER">LEFT OUTER</option>
-                <option value="RIGHT OUTER">RIGHT OUTER</option>
-            </select>
-            <p>JOIN 
-                <select name="from_table">
-                    <option value="customers">customers</option>
-                    <option value="discounts">discounts</option>
-                    <option value="inventory">inventory</option>
-                </select>
-                ON <input type="text" name="join_condition" placeholder="products.id = x.id"> 
-            </p> 
-        </div> 
-
-        <label for="set_clause">SET</label>
-        <input type="text" name="set_clause" placeholder="price = price * 0.9" >
-        
-        <p>
-            <label>
-                <input type="checkbox" id="use_where_clause" name="use_where_clause" value="1">
-                WHERE句を使用する
-            </label>
-        </p>
-
-        <div id="where_clause_section" style="display:none;">
-            <label for="where_clause">WHERE</label>
-            <input type="text" name="where_clause" placeholder="products.product_id = 1">
-        </div>
-
-        <button type="submit" name="submit_button" value="result_btn">実行する</button>
-        <button type="submit" name="submit_button" value="restore_backup_btn">1つ前の状態に戻る</button>
-        <button type="submit" name="submit_button" value="table_init_btn">テーブルを初期状態に戻す</button>
-    </form>
-    <br>
-    <a href="/update_select">戻る</a><br>
-    <a href="/index">ホーム</a>
+<div class="nav-buttons">
+    <a href="/basic/update/join/example" class="prev">◀ 前へ</a>
+    <a href="/quiz/update_join" class="next">次へ ▶</a>
 </div>
 
-<script>
-    document.getElementById('use_from_clause').addEventListener('change', function() {
-        document.getElementById('from_clause_section').style.display = this.checked ? 'block' : 'none';
-    });
+<div class="learning-container">
+    <h1>UPDATE文 × JOIN句</h1>
 
-    document.getElementById('use_where_clause').addEventListener('change', function() {
-        document.getElementById('where_clause_section').style.display = this.checked ? 'block' : 'none';
-    });
-</script>
+    <section>
+        <h2>UPDATE文とJOINの組み合わせ</h2>
+        <p>複数のテーブルを結合しながら、関連するデータをまとめて更新することができます。</p>
+    </section>
+
+    <section>
+        <h2>基本構文</h2>
+        <div class="code-block">
+<code>UPDATE テーブルA
+JOIN テーブルB ON 結合条件
+SET テーブルA.カラム = 更新内容
+WHERE 条件;</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>使用例</h2>
+        <div class="code-block">
+<code>UPDATE products
+JOIN discounts d ON products.category_id = d.category_id
+SET products.price = products.price * d.discount_rate;</code>
+        </div>
+        <p>上記のクエリでは、<code>discounts</code>テーブルの割引率を基に、<code>products</code>の価格を一括更新します。</p>
+    </section>
+
+    <section>
+        <h2>実際のテーブル</h2>
+
+        <h3>productsテーブル</h3>
+        <table class="example-table">
+            <thead>
+                <tr>
+                    {% for col in products_desc %}
+                        <th>{{ col[0] }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in products_data %}
+                    <tr>
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>discountsテーブル</h3>
+        <table class="example-table">
+            <thead>
+                <tr>
+                    {% for col in discounts_desc %}
+                        <th>{{ col[0] }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in discounts_data %}
+                    <tr>
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>UPDATE実行フォーム</h2>
+        {% if error_message %}
+            <p class="error">{{ error_message }}</p>
+        {% endif %}
+        {% if message %}
+            <p class="message">{{ message }}</p>
+        {% endif %}
+
+        <form method="POST" class="form">
+            <label>SET句：</label>
+            <input type="text" name="set_clause" placeholder="price = price * 0.9">
+
+            <label>JOIN句を使う</label>
+            <select name="join_table">
+                <option value="discounts">discounts</option>
+                <option value="customers">customers</option>
+                <option value="inventory">inventory</option>
+            </select>
+
+            <input type="text" name="join_condition" placeholder="products.category_id = discounts.category_id">
+
+            <label>WHERE句（任意）</label>
+            <input type="text" name="where_clause" placeholder="price > 1000">
+
+            <button type="submit" class="btn">実行する</button>
+            <button type="submit" name="restore" class="btn btn-secondary">元に戻す</button>
+        </form>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/update/join/example" class="prev">◀ 前へ</a>
+    <a href="/quiz/update_join" class="next">次へ ▶</a>
+</div>
+
 {% endblock %}

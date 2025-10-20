@@ -1544,6 +1544,66 @@ def delete_from_table_multiple():
         return render_template('error.html', error_message=error_message)
     return render_template('delete_from_table_multiple.html', table_name=delete_table_name, desc=table_desc, table=table)
 
+
+#delete all studyのページ
+@app.route('/basic/delete/all-records/study', methods=['GET', 'POST'])
+def delete_all_records_study():
+    return render_template('delete_all_study.html')
+
+#delete all exampleのページ
+@app.route('/basic/delete/all-records/example', methods=['GET', 'POST'])
+def delete_all_records_example():
+    return render_template('delete_all_example.html')
+
+@app.route('/basic/delete/all-records/practice', methods=['GET', 'POST'])
+def delete_all_records_practice():
+    delete_table_name = "employees"
+    message = None
+
+    if request.method == 'POST':
+        action = request.form['action']
+        user_db = this_users_dns['database']
+
+        try:
+            conn = mysql.connector.MySQLConnection(**this_users_dns)
+            cursor = conn.cursor()
+
+            if action == 'run':
+                sql_raw = request.form.get('sql_query', '').strip()
+                sql_lower = sql_raw.lower()
+
+                pattern = r"^delete\s+from\s+\w+(\s+where\s+.+)?;?$"
+                if not re.match(pattern, sql_lower):
+                    message = "DELETE文のみ実行できます。構文を確認してください。"
+                else:
+                    cursor.execute(sql_raw)
+                    conn.commit()
+                    message = "SQLを実行しました。"
+
+            elif action == 'init':
+                cursor.execute(f"DROP TABLE IF EXISTS {user_db}.{delete_table_name}")
+                cursor.execute(f"CREATE TABLE {user_db}.{delete_table_name} LIKE dataset.{delete_table_name}")
+                cursor.execute(f"INSERT INTO {user_db}.{delete_table_name} SELECT * FROM dataset.{delete_table_name}")
+                conn.commit()
+                message = "テーブルを初期化しました。"
+
+        except mysql.connector.Error as err:
+            message = f"MySQLエラー: {err}"
+        except Exception as e:
+            message = f"エラー: {e}"
+        finally:
+            cursor.close()
+            conn.close()
+
+        desc, table = fetch_table_data(delete_table_name)
+        return render_template('delete_all_practice.html', table_name=delete_table_name, desc=desc, table=table, message=message)
+
+    # 初回表示
+    desc, table = fetch_table_data(delete_table_name)
+    return render_template('delete_all_practice.html', desc=desc, table=table, table_name=delete_table_name)
+
+
+
 #quiz 管理
 @app.route('/quiz/<quiz_type>', methods=['GET', 'POST'])
 def quiz(quiz_type):
@@ -2105,8 +2165,18 @@ def execute_groupby_query(table_name, select_clause, groupby_clause):
 
     return result, table_desc, table
 
+# update_join_studyページ (update_join_study.html) JOIN句あり 学習ページ
+@app.route('/basic/update/join/study', methods=['GET', 'POST'])
+def update_join_study():
+    return render_template('update_join_study.html')
+
+# update_join_exampleページ (update_join_example.html) JOIN句あり 実行例ページ
+@app.route('/basic/update/join/example', methods=['GET', 'POST'])
+def update_join_example():
+    return render_template('update_join_example.html')
+
 # update_joinページ (update_join.html) JOIN句あり 
-@app.route('/basic/update/join', methods=['GET', 'POST'])
+@app.route('/basic/update/join/practice', methods=['GET', 'POST'])
 def update_join():
     try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
@@ -6996,7 +7066,9 @@ def quiz_progress():
             17: "quiz/delete_single",
             18: "quiz/delete_multiple",
             19: "quiz/update_single_column",
-            20: "quiz/update_multiple_columns"
+            20: "quiz/update_multiple_columns",
+            21: "quiz/delete_all_records",
+            22: "quiz/update_join"
         }
 
         # 完了したクイズの数を計算
@@ -7142,3 +7214,45 @@ def run_query(sql, commit=False):
 @app.context_processor
 def inject_enumerate():
     return dict(enumerate=enumerate)
+
+def initialize_table(table_name: str, user_dns: dict):
+    """
+    個人データベース上の指定テーブルを初期化する。
+    datasetデータベースにある同名テーブルをコピーして再作成する。
+
+    Args:
+        table_name (str): 初期化対象テーブル名
+        user_dns (dict): 個人ユーザー用DB接続情報
+    Returns:
+        str: メッセージ（成功・エラー内容）
+    """
+    try:
+        user_db = user_dns['database']
+        conn = mysql.connector.MySQLConnection(**user_dns)
+        cursor = conn.cursor()
+
+        # テーブルを削除（存在しない場合もエラーにならない）
+        cursor.execute(f"DROP TABLE IF EXISTS {user_db}.{table_name}")
+
+        # 構造（カラム・制約）を共通DBからコピー
+        cursor.execute(f"CREATE TABLE {user_db}.{table_name} LIKE dataset.{table_name}")
+
+        # データ（レコード）をコピー
+        cursor.execute(f"INSERT INTO {user_db}.{table_name} SELECT * FROM dataset.{table_name}")
+
+        conn.commit()
+        message = f"テーブル {table_name} を初期化しました。"
+
+    except mysql.connector.Error as err:
+        message = f"MySQLエラー: {err}"
+    except Exception as e:
+        message = f"初期化中にエラーが発生しました: {e}"
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
+
+    return message
+
