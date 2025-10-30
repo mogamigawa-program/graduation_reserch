@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}DELETE文とは（共通なタプルの削除）{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+  <a href="/index/delete?flag=min" class="prev">◀ 前へ</a>
+  <a href="/basic/delete/shared-tuple/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+  <h1>DELETE文（共通なタプルの削除）</h1>
+
+  <section>
+    <h2>共通なタプルの削除とは？</h2>
+    <p>
+      2つのテーブル間で、<strong>共通するデータ（タプル）</strong>を削除したいときに使う方法です。<br>
+      例えば、<code>employees</code> テーブルと <code>departed_employees</code> テーブルの両方に存在する従業員を
+      <code>employees</code> から削除する場合などです。
+    </p>
+  </section>
+
+  <section>
+    <h2>基本構文</h2>
+    <div class="code-block">
+<code>DELETE t1
+FROM テーブル1 AS t1
+INNER JOIN テーブル2 AS t2
+ON t1.共通カラム = t2.共通カラム;</code>
+    </div>
+    <ul>
+      <li><code>t1</code> は削除対象テーブルを表します。</li>
+      <li><code>INNER JOIN</code> で両方に存在するデータを取得します。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>ポイント</h2>
+    <ul>
+      <li>MySQL では、JOINを使ったDELETEがサポートされています。</li>
+      <li>他のDBMS（PostgreSQLなど）では構文が異なる場合があります。</li>
+      <li>実行前に <code>SELECT</code> で対象を確認する習慣をつけましょう。</li>
+    </ul>
+  </section>
+</div>
+
+<div class="nav-buttons">
+  <a href="/index/delete?flag=min" class="prev">◀ 前へ</a>
+  <a href="/basic/delete/shared-tuple/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

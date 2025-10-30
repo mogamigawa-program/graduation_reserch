@@ -751,3 +751,77 @@ form .button-group {
     gap: 15px;
     flex-wrap: wrap;
 }
+
+/* === DELETE JOIN演習ページ専用調整 === */
+.sql-form-wrapper {
+    display: flex;
+    justify-content: center; /* ← フォーム全体を中央に配置 */
+    margin-top: 12px;
+  }
+
+  .sql-form {
+    background: #f9fafb;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px 24px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    line-height: 2;
+    text-align: left;          /* SQL文の中身は左揃え */
+    display: inline-block;
+  }
+  
+  .sql-line {
+    white-space: nowrap;
+  }
+  
+  .sql-line input {
+    display: inline-block;
+    width: 5em;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    vertical-align: middle;
+    text-align: center;
+  }
+  
+  .sql-line input:focus {
+    outline: 2px solid #007bff;
+    background: #eef6ff;
+  }
+  
+  .form-buttons {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .btn {
+    background-color: #1e73be;
+    color: white;
+    padding: 8px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  
+  .btn-reset {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  
+  .btn:hover,
+  .btn-reset:hover {
+    opacity: 0.85;
+  }
+  

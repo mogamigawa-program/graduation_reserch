@@ -1602,6 +1602,63 @@ def delete_all_records_practice():
     desc, table = fetch_table_data(delete_table_name)
     return render_template('delete_all_practice.html', desc=desc, table=table, table_name=delete_table_name)
 
+#delete shared tuple
+# DELETE shared tuple 学習ページ
+@app.route('/basic/delete/shared-tuple/study', methods=['GET', 'POST'])
+def delete_shared_tuple_study():
+    return render_template('delete_shared-multiple_study.html')
+
+# DELETE shared tuple 実行例
+@app.route('/basic/delete/shared-tuple/example', methods=['GET', 'POST'])
+def delete_shared_tuple_example():
+    return render_template('delete_shared-multiple_example.html')
+
+# DELETE shared tuple 演習（穴埋め形式）
+@app.route('/basic/delete/shared-tuple/practice', methods=['GET', 'POST'])
+def delete_shared_tuple_practice():
+    conn = mysql.connector.MySQLConnection(**this_users_dns)
+    cur = conn.cursor(dictionary=True)
+
+    message = None
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        # リセットボタン押下時
+        if action == 'reset':
+            initialize_table('employees', this_users_dns)
+            initialize_table('departed_employees', this_users_dns)
+            message = "データをリセットしました。"
+
+        # 実行ボタン押下時
+        elif action == 'execute':
+            alias1 = request.form.get('alias1', '').strip()
+            col1 = request.form.get('col1', '').strip()
+            col2 = request.form.get('col2', '').strip()
+
+            # 安全チェック（英数字とアンダーバーのみ）
+            import re
+            pattern = r'^[a-zA-Z0-9_]+$'
+            if not (re.match(pattern, alias1) and re.match(pattern, col1) and re.match(pattern, col2)):
+                message = "不正な入力があります。英数字とアンダーバーのみ使用できます。"
+            else:
+                try:
+                    sql = f"DELETE {alias1} FROM employees AS e INNER JOIN departed_employees AS d ON e.{col1} = d.{col2};"
+                    cur.execute(sql)
+                    conn.commit()
+                    message = f"SQLを実行しました：{sql}"
+                except Exception as e:
+                    message = f"エラーが発生しました：{e}"
+
+    # 現在のテーブル状態を再取得
+    employees_desc, employees_table = fetch_table_data('employees')
+    departed_desc, departed_table = fetch_table_data('departed_employees')
+
+    cur.close()
+    conn.close()
+    return render_template('delete_shared-multiple_practice.html', employees_desc=employees_desc, employees_table=employees_table, departed_desc=departed_desc, departed_table=departed_table, message=message)
+
+
 
 
 #quiz 管理
@@ -1745,7 +1802,7 @@ def signup():
             conn.close()
             
             # ユーザーのデータベースにdataset内にある、テーブルをいくつかコピーする
-            tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'sales',
+            tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'departed_employees', 'sales',
                     'quiz_list', 'progress', 'all_users', 'selected_users', 'expenses']
             for table in tables:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)

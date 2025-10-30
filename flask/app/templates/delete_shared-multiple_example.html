@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}DELETE文（共通なタプルの削除） 実行例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+  <a href="/basic/delete/shared-tuple/study" class="prev">◀ 前へ</a>
+  <a href="/basic/delete/shared-tuple/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+  <h1>DELETE文（共通なタプルの削除） 実行例</h1>
+
+  <section>
+    <h2>例題</h2>
+    <p>退職者テーブル（<code>departed_employees</code>）に存在する従業員を、<code>employees</code> から削除します。</p>
+
+    <div class="example-box">
+<code>DELETE e
+FROM employees AS e
+INNER JOIN departed_employees AS d
+ON e.id = d.id;</code>
+    </div>
+
+    <h3>削除前のデータ</h3>
+    <table class="example-table">
+      <caption>employees</caption>
+      <tr><th>id</th><th>name</th></tr>
+      <tr><td>1</td><td>John</td></tr>
+      <tr><td>2</td><td>Lisa</td></tr>
+      <tr><td>3</td><td>Mike</td></tr>
+    </table>
+
+    <table class="example-table">
+      <caption>departed_employees</caption>
+      <tr><th>id</th><th>name</th></tr>
+      <tr><td>2</td><td>Lisa</td></tr>
+      <tr><td>3</td><td>Mike</td></tr>
+    </table>
+
+    <h3>削除後のデータ</h3>
+    <table class="example-table">
+      <caption>employees（削除後）</caption>
+      <tr><th>id</th><th>name</th></tr>
+      <tr><td>1</td><td>John</td></tr>
+    </table>
+
+    <div class="alert-warning">
+      <strong>ポイント：</strong> 共通して存在する id=2,3 の行が削除されました。
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>よくあるミスとエラー集</h2>
+
+    <h3>❌ 1. FROM句のエイリアスを省略してしまう</h3>
+    <div class="error-box">
+<code>DELETE FROM employees
+INNER JOIN departed_employees AS d
+ON employees.id = d.id;</code>
+    </div>
+    <p>
+      → MySQLでは <strong>DELETEするテーブルに別名（エイリアス）を指定</strong>しないとエラーになります。<br>
+      正しくは：
+    </p>
+    <div class="correct-box">
+<code>DELETE e FROM employees AS e
+INNER JOIN departed_employees AS d
+ON e.id = d.id;</code>
+    </div>
+
+    <h3>❌ 2. JOINの条件を間違えて全削除してしまう</h3>
+    <div class="error-box">
+<code>DELETE e FROM employees AS e
+INNER JOIN departed_employees AS d;</code>
+    </div>
+    <p>
+      → <code>ON</code> 条件を指定していないため、すべての行がマッチして削除される危険な構文です。  
+      DELETE JOINを使うときは、<strong>必ずON条件を指定</strong>しましょう。
+    </p>
+
+    <h3>❌ 3. MySQL以外でこの構文を使う</h3>
+    <div class="error-box">
+<code>DELETE e FROM employees AS e
+INNER JOIN departed_employees AS d
+ON e.id = d.id;</code>
+    </div>
+    <p>
+      → MySQL独自の構文です。  
+      PostgreSQLでは以下のように書きます：
+    </p>
+    <div class="correct-box">
+<code>DELETE FROM employees
+USING departed_employees
+WHERE employees.id = departed_employees.id;</code>
+    </div>
+
+    <div class="alert-info">
+      💡 <strong>補足：</strong> 同じ目的でも、DBMSによってDELETE JOINの構文が異なります。<br>
+      学習ではMySQL/MariaDBの構文を使用しています。
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>まとめ</h2>
+    <ul>
+      <li>削除対象のテーブルに<strong>エイリアスを必ず指定</strong>する。</li>
+      <li>JOINには<strong>ON条件</strong>を忘れない。</li>
+      <li>MySQL特有の構文であることを意識する。</li>
+    </ul>
+  </section>
+</div>
+
+<div class="nav-buttons">
+  <a href="/basic/delete/shared-tuple/study" class="prev">◀ 前へ</a>
+  <a href="/basic/delete/shared-tuple/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

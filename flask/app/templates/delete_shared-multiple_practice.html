@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}DELETE文（共通なタプルの削除）演習{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+  <a href="/basic/delete/shared-tuple/example" class="prev">◀ 前へ</a>
+</div>
+
+<div class="learning-container">
+  <h1>DELETE文（共通なタプルの削除）演習</h1>
+
+  <section>
+    <h2>演習内容</h2>
+    <p>
+      下のテーブルを確認し、<strong>退職者（departed_employees）に存在する従業員を employees から削除</strong>してください。<br>
+      SQL文の一部を入力して実行できます。
+    </p>
+  </section>
+
+  <section>
+    <h2>テーブル：employees</h2>
+    <table class="example-table">
+      <tr>
+        {% for row in employees_desc %}
+          <th>{{ row[0] }}</th>
+        {% endfor %}
+      </tr>
+      {% for row in employees_table %}
+        <tr>
+          {% for item in row %}
+            <td>{{ item }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </table>
+
+    <h2>テーブル：departed_employees</h2>
+    <table class="example-table">
+      <tr>
+        {% for row in departed_desc %}
+          <th>{{ row[0] }}</th>
+        {% endfor %}
+      </tr>
+      {% for row in departed_table %}
+      <tr>
+        {% for item in row %}
+          <td>{{ item }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+
+  <section>
+    <h2>SQL文を完成させて実行</h2>
+<div class="sql-form-wrapper">
+  <form method="POST" class="sql-form">
+    <div class="sql-line">
+      DELETE <input type="text" name="alias1" size="2" placeholder="e">
+    </div>
+    <div class="sql-line">
+      FROM employees AS e INNER JOIN departed_employees AS d
+    </div>
+    <div class="sql-line">
+      ON e.<input type="text" name="col1" size="6" placeholder="name"> = d.<input type="text" name="col2" size="6" placeholder="name">;
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" name="action" value="execute" class="btn">実行</button>
+      <button type="submit" name="action" value="reset" class="btn-reset">データをリセット</button>
+    </div>
+  </form>
+</div>
+
+
+
+    {% if message %}
+    <div class="alert-info">{{ message }}</div>
+    {% endif %}
+  </section>
+
+</div>
+
+<div class="nav-buttons">
+  <a href="/basic/delete/shared-tuple/example" class="prev">◀ 前へ</a>
+</div>
+
+{% endblock %}
