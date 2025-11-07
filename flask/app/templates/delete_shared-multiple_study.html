@@ -16,9 +16,8 @@
   <section>
     <h2>共通なタプルの削除とは？</h2>
     <p>
-      2つのテーブル間で、<strong>共通するデータ（タプル）</strong>を削除したいときに使う方法です。<br>
-      例えば、<code>employees</code> テーブルと <code>departed_employees</code> テーブルの両方に存在する従業員を
-      <code>employees</code> から削除する場合などです。
+      2つのテーブル間で、<strong>共通するデータ</strong>を削除したいときに使用します。<br>
+      例えば、退職済み従業員を社員テーブルから削除するなど。
     </p>
   </section>
 
@@ -30,20 +29,29 @@ FROM テーブル1 AS t1
 INNER JOIN テーブル2 AS t2
 ON t1.共通カラム = t2.共通カラム;</code>
     </div>
-    <ul>
-      <li><code>t1</code> は削除対象テーブルを表します。</li>
-      <li><code>INNER JOIN</code> で両方に存在するデータを取得します。</li>
-    </ul>
   </section>
 
   <section>
-    <h2>ポイント</h2>
+    <h2>応用：条件付きDELETE JOIN</h2>
+    <p>
+      JOINによって共通行を削除するだけでなく、<code>WHERE</code>句を使えば条件を絞って削除できます。
+    </p>
+    <div class="code-block">
+<code>DELETE a
+FROM tableA AS a
+JOIN tableB AS b
+ON a.id = b.id
+WHERE a.status = 'inactive';</code>
+    </div>
     <ul>
-      <li>MySQL では、JOINを使ったDELETEがサポートされています。</li>
-      <li>他のDBMS（PostgreSQLなど）では構文が異なる場合があります。</li>
-      <li>実行前に <code>SELECT</code> で対象を確認する習慣をつけましょう。</li>
+      <li>共通idを持ち、かつ <code>status='inactive'</code> のデータのみ削除</li>
+      <li>JOIN条件と削除条件の両方を組み合わせられる</li>
     </ul>
   </section>
+
+  <div class="alert-warning">
+    <strong>注意：</strong> WHERE句を省略すると、JOINに一致するすべての行が削除されます。
+  </div>
 </div>
 
 <div class="nav-buttons">

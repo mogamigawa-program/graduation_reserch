@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}トランザクションとは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/transaction?flag=min" class="prev">◀ 前へ</a>
+    <a href="/transaction/basic-operations/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>トランザクションとは？</h1>
+
+    <section>
+        <h2>トランザクションの概要</h2>
+        <p>
+            トランザクションとは、<strong>一連の処理をまとめて実行・管理する仕組み</strong>です。<br>
+            途中でエラーが発生した場合に、<strong>途中までの変更を取り消す（ROLLBACK）</strong>ことができます。
+        </p>
+    </section>
+
+    <section>
+        <h2>基本構文</h2>
+        <div class="code-block">
+<code>START TRANSACTION;
+-- SQL文を実行
+COMMIT;      -- 変更を確定
+ROLLBACK;    -- 変更を取り消す</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>4つの重要な性質（ACID）</h2>
+        <ul>
+            <li><strong>原子性（Atomicity）</strong>：すべての操作が成功するか、すべて取り消される</li>
+            <li><strong>一貫性（Consistency）</strong>：トランザクション前後でデータの整合性が保たれる</li>
+            <li><strong>独立性（Isolation）</strong>：他の処理の影響を受けずに実行される</li>
+            <li><strong>永続性（Durability）</strong>：確定した変更は失われない</li>
+        </ul>
+    </section>
+
+    <div class="alert-info">
+        <strong>ポイント：</strong> 複数のSQLをまとめて扱うことで、安全にデータ操作ができます。
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/transaction?flag=min" class="prev">◀ 前へ</a>
+    <a href="/transaction/basic-operations/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

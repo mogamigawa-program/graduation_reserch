@@ -7,30 +7,31 @@
 
 <div class="nav-buttons">
   <a href="/basic/delete/shared-tuple/study" class="prev">◀ 前へ</a>
-  <a href="/basic/delete/shared-tuple/practice" class="next">次へ ▶</a>
+  <a href="/basic/delete/shared-tuple/practice/basic" class="next">次へ ▶</a>
 </div>
 
 <div class="learning-container">
   <h1>DELETE文（共通なタプルの削除） 実行例</h1>
 
+  <!-- 基本構文 -->
   <section>
-    <h2>例題</h2>
-    <p>退職者テーブル（<code>departed_employees</code>）に存在する従業員を、<code>employees</code> から削除します。</p>
+    <h2>例①：基本構文</h2>
+    <p>退職者テーブル <code>departed_employees</code> に存在する従業員を、<code>employees</code> から削除します。</p>
 
     <div class="example-box">
 <code>DELETE e
 FROM employees AS e
 INNER JOIN departed_employees AS d
-ON e.id = d.id;</code>
+ON e.name = d.name;</code>
     </div>
 
-    <h3>削除前のデータ</h3>
     <table class="example-table">
-      <caption>employees</caption>
-      <tr><th>id</th><th>name</th></tr>
-      <tr><td>1</td><td>John</td></tr>
-      <tr><td>2</td><td>Lisa</td></tr>
-      <tr><td>3</td><td>Mike</td></tr>
+      <caption>employees（削除前）</caption>
+      <tr><th>id</th><th>name</th><th>department</th></tr>
+      <tr><td>1</td><td>John</td><td>Sales</td></tr>
+      <tr><td>2</td><td>Lisa</td><td>HR</td></tr>
+      <tr><td>3</td><td>Mike</td><td>IT</td></tr>
+      <tr><td>4</td><td>Emma</td><td>Marketing</td></tr>
     </table>
 
     <table class="example-table">
@@ -40,86 +41,116 @@ ON e.id = d.id;</code>
       <tr><td>3</td><td>Mike</td></tr>
     </table>
 
-    <h3>削除後のデータ</h3>
     <table class="example-table">
       <caption>employees（削除後）</caption>
-      <tr><th>id</th><th>name</th></tr>
-      <tr><td>1</td><td>John</td></tr>
+      <tr><th>id</th><th>name</th><th>department</th></tr>
+      <tr><td>1</td><td>John</td><td>Sales</td></tr>
+      <tr><td>4</td><td>Emma</td><td>Marketing</td></tr>
     </table>
 
     <div class="alert-warning">
-      <strong>ポイント：</strong> 共通して存在する id=2,3 の行が削除されました。
+      <strong>ポイント：</strong> 両テーブルに存在する <code>Lisa</code> と <code>Mike</code> が削除されました。
     </div>
   </section>
 
-  <hr>
-
+  <!-- 条件付き構文 -->
   <section>
-    <h2>よくあるミスとエラー集</h2>
+    <h2>例②：条件付き削除（WHERE句あり）</h2>
+    <p>
+      JOINで共通データを対象にしつつ、さらに<code>status='inactive'</code> の行だけを削除します。
+    </p>
 
-    <h3>❌ 1. FROM句のエイリアスを省略してしまう</h3>
+    <div class="example-box">
+<code>DELETE a
+FROM tableA AS a
+JOIN tableB AS b
+ON a.id = b.id
+WHERE a.status = 'inactive';</code>
+    </div>
+
+    <table class="example-table">
+      <caption>tableA（削除前）</caption>
+      <tr><th>id</th><th>name</th><th>status</th></tr>
+      <tr><td>1</td><td>John</td><td>active</td></tr>
+      <tr><td>2</td><td>Lisa</td><td>inactive</td></tr>
+      <tr><td>3</td><td>Mike</td><td>inactive</td></tr>
+      <tr><td>4</td><td>Emma</td><td>active</td></tr>
+    </table>
+
+    <table class="example-table">
+      <caption>tableB</caption>
+      <tr><th>id</th><th>category</th></tr>
+      <tr><td>2</td><td>X</td></tr>
+      <tr><td>3</td><td>Y</td></tr>
+    </table>
+
+    <table class="example-table">
+      <caption>tableA（削除後）</caption>
+      <tr><th>id</th><th>name</th><th>status</th></tr>
+      <tr><td>1</td><td>John</td><td>active</td></tr>
+      <tr><td>4</td><td>Emma</td><td>active</td></tr>
+    </table>
+
+    <div class="alert-warning">
+      <strong>結果：</strong> JOINで一致し、かつ <code>status='inactive'</code> の <code>Lisa</code> と <code>Mike</code> が削除されました。
+    </div>
+  </section>
+
+  <!-- よくあるエラー・ミス -->
+  <section>
+    <h2>よくあるミス・エラー例</h2>
+
+    <h3>❌ 1. エイリアスを省略して構文エラー</h3>
     <div class="error-box">
 <code>DELETE FROM employees
-INNER JOIN departed_employees AS d
-ON employees.id = d.id;</code>
+INNER JOIN departed_employees
+ON employees.name = departed_employees.name;</code>
     </div>
-    <p>
-      → MySQLでは <strong>DELETEするテーブルに別名（エイリアス）を指定</strong>しないとエラーになります。<br>
-      正しくは：
-    </p>
-    <div class="correct-box">
-<code>DELETE e FROM employees AS e
-INNER JOIN departed_employees AS d
-ON e.id = d.id;</code>
-    </div>
+    <p>→ MySQLでは <code>DELETE</code> 句の後に削除対象の別名またはテーブル名を明示する必要があります。</p>
 
-    <h3>❌ 2. JOINの条件を間違えて全削除してしまう</h3>
+    <h3>❌ 2. ON句を省略して全削除</h3>
     <div class="error-box">
 <code>DELETE e FROM employees AS e
 INNER JOIN departed_employees AS d;</code>
     </div>
-    <p>
-      → <code>ON</code> 条件を指定していないため、すべての行がマッチして削除される危険な構文です。  
-      DELETE JOINを使うときは、<strong>必ずON条件を指定</strong>しましょう。
-    </p>
+    <p>→ ON条件がないため、すべての行がマッチして削除されてしまう危険な構文です。</p>
 
-    <h3>❌ 3. MySQL以外でこの構文を使う</h3>
+    <h3>❌ 3. 他のDB（PostgreSQLなど）で同じ構文を使う</h3>
     <div class="error-box">
 <code>DELETE e FROM employees AS e
 INNER JOIN departed_employees AS d
-ON e.id = d.id;</code>
+ON e.name = d.name;</code>
     </div>
-    <p>
-      → MySQL独自の構文です。  
-      PostgreSQLでは以下のように書きます：
-    </p>
+    <p>→ PostgreSQLではこの構文は無効です。代わりに次のように書きます。</p>
     <div class="correct-box">
 <code>DELETE FROM employees
 USING departed_employees
-WHERE employees.id = departed_employees.id;</code>
+WHERE employees.name = departed_employees.name;</code>
     </div>
 
-    <div class="alert-info">
-      💡 <strong>補足：</strong> 同じ目的でも、DBMSによってDELETE JOINの構文が異なります。<br>
-      学習ではMySQL/MariaDBの構文を使用しています。
+    <h3>❌ 4. WHEREを省略してJOIN一致すべて削除</h3>
+    <p>→ 条件をつけないとJOINでマッチしたすべての行が削除されます。</p>
+
+    <div class="alert-error">
+      <strong>注意：</strong> DELETE JOINは強力な操作です。実行前に必ず
+      <code>SELECT</code> で削除対象を確認する習慣をつけましょう。
     </div>
   </section>
 
-  <hr>
-
+  <!-- まとめ -->
   <section>
     <h2>まとめ</h2>
     <ul>
-      <li>削除対象のテーブルに<strong>エイリアスを必ず指定</strong>する。</li>
-      <li>JOINには<strong>ON条件</strong>を忘れない。</li>
-      <li>MySQL特有の構文であることを意識する。</li>
+      <li>MySQL / MariaDBでは <code>DELETE エイリアス FROM ...</code> 構文を使う</li>
+      <li><code>ON</code> と <code>WHERE</code> を正しく組み合わせる</li>
+      <li>PostgreSQLでは構文が異なる</li>
     </ul>
   </section>
 </div>
 
 <div class="nav-buttons">
   <a href="/basic/delete/shared-tuple/study" class="prev">◀ 前へ</a>
-  <a href="/basic/delete/shared-tuple/practice" class="next">次へ ▶</a>
+  <a href="/basic/delete/shared-tuple/practice/basic" class="next">次へ ▶</a>
 </div>
 
 {% endblock %}

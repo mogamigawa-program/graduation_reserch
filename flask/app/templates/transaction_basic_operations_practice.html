@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}トランザクション演習（一文ずつ）{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+{% block content %}
+
+<h1>トランザクション演習（1文ずつ実行）</h1>
+
+<form method="POST">
+    <textarea name="sql" rows="3" placeholder="SQL文を入力してください">{{ sql }}</textarea><br>
+    <div class="btn-container">
+        <button type="submit" name="action" value="init" class="btn btn-secondary">テーブル初期化</button>
+        <button type="submit" name="action" value="start" class="btn">START TRANSACTION</button>
+        <button type="submit" name="action" value="execute" class="btn">このSQLを実行</button>
+        <button type="submit" name="action" value="commit" class="btn">COMMIT</button>
+        <button type="submit" name="action" value="rollback" class="btn btn-secondary">ROLLBACK</button>
+    </div>
+</form>
+
+{% if message %}
+<p class="message">{{ message }}</p>
+{% endif %}
+{% if error_message %}
+<p class="error">{{ error_message }}</p>
+{% endif %}
+{% if session.conn_id %}
+<p class="alert-warning">トランザクション中：未コミットの変更は他ユーザーには見えません。</p>
+{% endif %}
+<hr>
+
+<h2>accounts テーブルの内容</h2>
+<table>
+    <tr>
+        {% for col in desc %}
+        <th>{{ col[0] }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in table %}
+    <tr>
+        {% for cell in row %}
+        <td>{{ cell }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

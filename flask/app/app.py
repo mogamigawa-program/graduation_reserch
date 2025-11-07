@@ -1613,52 +1613,230 @@ def delete_shared_tuple_study():
 def delete_shared_tuple_example():
     return render_template('delete_shared-multiple_example.html')
 
-# DELETE shared tuple 演習（穴埋め形式）
-@app.route('/basic/delete/shared-tuple/practice', methods=['GET', 'POST'])
-def delete_shared_tuple_practice():
-    conn = mysql.connector.MySQLConnection(**this_users_dns)
-    cur = conn.cursor(dictionary=True)
+# ==========================================================
+# DELETE JOIN演習（basic / advance 共通）
+# ==========================================================
+
+@app.route('/basic/delete/shared-tuple/practice/<mode>', methods=['GET', 'POST'])
+def delete_shared_tuple_practice(mode):
+    """
+    DELETE JOIN の練習ページ
+    mode = 'basic' または 'advance'
+    """
 
     message = None
+    table_name = "employees"
+    departed_table = "departed_employees"
+    is_advanced = (mode == 'advance')
 
     if request.method == 'POST':
         action = request.form.get('action')
 
-        # リセットボタン押下時
+        # ✅ データリセット
         if action == 'reset':
-            initialize_table('employees', this_users_dns)
-            initialize_table('departed_employees', this_users_dns)
-            message = "データをリセットしました。"
+            try:
+                initialize_table(table_name, this_users_dns)
 
-        # 実行ボタン押下時
+                # departed_employees初期化
+                safe_exec_sql(f"""
+                    CREATE TABLE IF NOT EXISTS {departed_table} (
+                        id INT PRIMARY KEY AUTO_INCREMENT,
+                        name VARCHAR(64)
+                    )
+                """, commit=True)
+
+                safe_exec_sql(f"TRUNCATE TABLE {departed_table}", commit=True)
+                safe_exec_sql(f"INSERT INTO {departed_table} (name) VALUES ('Lisa'), ('Mike')", commit=True)
+                message = "✅ データをリセットしました。"
+            except Exception as e:
+                message = f"❌ リセット中にエラー: {e}"
+
+        # ✅ SQL実行
         elif action == 'execute':
             alias1 = request.form.get('alias1', '').strip()
             col1 = request.form.get('col1', '').strip()
             col2 = request.form.get('col2', '').strip()
+            where_clause = request.form.get('where_clause', '').strip() if is_advanced else None
 
-            # 安全チェック（英数字とアンダーバーのみ）
-            import re
-            pattern = r'^[a-zA-Z0-9_]+$'
-            if not (re.match(pattern, alias1) and re.match(pattern, col1) and re.match(pattern, col2)):
-                message = "不正な入力があります。英数字とアンダーバーのみ使用できます。"
+            # 🔒 入力バリデーション
+            alias_pattern = r"^[a-zA-Z0-9_]+$"
+            col_pattern = r"^[a-zA-Z0-9_]+$"
+            where_pattern = r"^[a-zA-Z0-9_ .='<>]+$" if is_advanced else ""
+
+            valid = (
+                re.match(alias_pattern, alias1)
+                and re.match(col_pattern, col1)
+                and re.match(col_pattern, col2)
+                and (not is_advanced or re.match(where_pattern, where_clause))
+            )
+
+            if not valid:
+                message = "⚠️ 不正な入力があります（英数字・比較演算子・=・' のみ使用可能）。"
             else:
+                create_backup_table(table_name)
                 try:
-                    sql = f"DELETE {alias1} FROM employees AS e INNER JOIN departed_employees AS d ON e.{col1} = d.{col2};"
-                    cur.execute(sql)
-                    conn.commit()
-                    message = f"SQLを実行しました：{sql}"
+                    sql = f"DELETE {alias1} FROM employees AS e INNER JOIN departed_employees AS d ON e.{col1} = d.{col2}"
+                    if is_advanced and where_clause:
+                        sql += f" WHERE {where_clause}"
+
+                    # ✅ 安全ラッパーで実行（employees / departed_employees のみ許可）
+                    result = safe_exec_sql(
+                        sql,
+                        allowed_tables=['employees', 'departed_employees'],
+                        commit=True
+                    )
+
+                    affected = result.get('rowcount', 0)
+                    message = f"✅ SQLを実行しました（{affected}行削除）"
                 except Exception as e:
-                    message = f"エラーが発生しました：{e}"
+                    message = f"❌ 実行エラー: {e}"
 
-    # 現在のテーブル状態を再取得
-    employees_desc, employees_table = fetch_table_data('employees')
-    departed_desc, departed_table = fetch_table_data('departed_employees')
+    # --- テーブルデータを取得 ---
+    desc_employees, employees = fetch_table_data(table_name)
+    desc_departed, departed = fetch_table_data(departed_table)
 
-    cur.close()
-    conn.close()
-    return render_template('delete_shared-multiple_practice.html', employees_desc=employees_desc, employees_table=employees_table, departed_desc=departed_desc, departed_table=departed_table, message=message)
+    # --- テンプレート分岐 ---
+    html = (
+        'delete_shared-multiple_practice_advanced.html'
+        if is_advanced
+        else 'delete_shared-multiple_practice.html'
+    )
+
+    return render_template(
+        html,
+        desc_employees=desc_employees,
+        employees=employees,
+        desc_departed=desc_departed,
+        departed=departed,
+        message=message
+    )
+
+# ===========================================
+# トランザクションにおける基本操作
+# ===========================================
+
+# --- 学習ページ ---
+@app.route('/transaction/basic-operations/study', methods=['GET', 'POST'])
+def transaction_basic_operations_study():
+    return render_template('transaction_basic_operations_study.html')
 
 
+# --- 実行例ページ ---
+@app.route('/transaction/basic-operations/example', methods=['GET', 'POST'])
+def transaction_basic_operations_example():
+    return render_template('transaction_basic_operations_example.html')
+
+import uuid
+
+active_connections = {}
+
+@app.route('/transaction/basic-operations/practice', methods=['GET', 'POST'])
+def transaction_basic_operations_practice():
+    table_name = "accounts"
+    sql = ""
+    message = ""
+    error_message = ""
+    desc, table = [], []
+
+    # --- 初期化ボタン ---
+    if request.method == 'POST' and request.form.get('action') == 'init':
+        try:
+            user_db = this_users_dns['database']
+            conn = mysql.connector.MySQLConnection(**this_users_dns)
+            cursor = conn.cursor()
+
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+            cursor.execute(f"CREATE TABLE {user_db}.{table_name} AS SELECT * FROM dataset.{table_name}")
+            cursor.close()
+            conn.commit()
+            conn.close()
+            message = "テーブルを初期化しました。"
+        except Exception as e:
+            error_message = f"初期化に失敗しました: {e}"
+
+    # --- トランザクション開始 ---
+    elif request.method == 'POST' and request.form.get('action') == 'start':
+        conn = mysql.connector.MySQLConnection(**this_users_dns)
+        conn.start_transaction()
+        conn_id = str(uuid.uuid4())
+        active_connections[conn_id] = conn
+        session['conn_id'] = conn_id
+        message = "トランザクションを開始しました。"
+
+    # --- SQL実行（更新 or SELECT） ---
+    elif request.method == 'POST' and request.form.get('action') == 'execute':
+        sql = request.form.get('sql', '').strip()
+        conn_id = session.get('conn_id')
+        if conn_id and conn_id in active_connections:
+            conn = active_connections[conn_id]
+            cursor = conn.cursor()
+            try:
+                cursor.execute(sql)
+                message = "SQLを実行しました。"
+            except Exception as e:
+                conn.rollback()
+                error_message = f"エラー発生のためROLLBACKしました: {e}"
+                message = ""
+                conn.close()
+                del active_connections[conn_id]
+                session.pop('conn_id', None)
+            finally:
+                cursor.close()
+        else:
+            error_message = "トランザクションが開始されていません。"
+
+    # --- COMMIT ---
+    elif request.method == 'POST' and request.form.get('action') == 'commit':
+        conn_id = session.get('conn_id')
+        if conn_id and conn_id in active_connections:
+            conn = active_connections[conn_id]
+            conn.commit()
+            message = "COMMITしました。"
+            conn.close()
+            del active_connections[conn_id]
+            session.pop('conn_id', None)
+        else:
+            error_message = "アクティブなトランザクションがありません。"
+
+    # --- ROLLBACK ---
+    elif request.method == 'POST' and request.form.get('action') == 'rollback':
+        conn_id = session.get('conn_id')
+        if conn_id and conn_id in active_connections:
+            conn = active_connections[conn_id]
+            conn.rollback()
+            message = "ROLLBACKしました。"
+            conn.close()
+            del active_connections[conn_id]
+            session.pop('conn_id', None)
+        else:
+            error_message = "アクティブなトランザクションがありません。"
+
+    # --- テーブル状態の取得 ---
+    try:
+        conn_id = session.get('conn_id')
+        if conn_id and conn_id in active_connections:
+            # ✅ トランザクション中 → 同じ接続からSELECTする（未コミット状態を確認可能）
+            conn = active_connections[conn_id]
+            cursor = conn.cursor()
+            cursor.execute(f"DESC {table_name}")
+            desc = cursor.fetchall()
+            cursor.execute(f"SELECT * FROM {table_name}")
+            table = cursor.fetchall()
+            cursor.close()
+        else:
+            # 通常時は別接続でSELECT
+            desc, table = fetch_table_data(table_name)
+    except Exception as e:
+        error_message = f"テーブル読み込みエラー: {e}"
+
+    return render_template(
+        'transaction_basic_operations_practice.html',
+        desc=desc,
+        table=table,
+        sql=sql,
+        message=message,
+        error_message=error_message
+    )
 
 
 #quiz 管理
@@ -1803,7 +1981,7 @@ def signup():
             
             # ユーザーのデータベースにdataset内にある、テーブルをいくつかコピーする
             tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'departed_employees', 'sales',
-                    'quiz_list', 'progress', 'all_users', 'selected_users', 'expenses']
+                    'quiz_list', 'progress', 'all_users', 'selected_users', 'expenses', 'accounts']
             for table in tables:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)
                 cursor = conn.cursor()
@@ -7125,7 +7303,8 @@ def quiz_progress():
             19: "quiz/update_single_column",
             20: "quiz/update_multiple_columns",
             21: "quiz/delete_all_records",
-            22: "quiz/update_join"
+            22: "quiz/update_join",
+            23: "quiz/delete_shared-multiple"
         }
 
         # 完了したクイズの数を計算
@@ -7313,3 +7492,89 @@ def initialize_table(table_name: str, user_dns: dict):
 
     return message
 
+def safe_exec_sql(sql: str, allowed_tables: list = None, commit: bool = False, db_config: dict = None):
+    """
+    危険文字列・多重文・システムスキーマ参照などをチェックしてから SQL を実行する安全ラッパー。
+    - sql: 実行するSQL (1文)
+    - allowed_tables: 許可するテーブル名のリスト（Noneならテーブルチェックは行わない）
+    - commit: 実行後にコミットするか
+    - db_config: mysql接続情報。Noneなら既存 this_users_dns を使う想定。
+    """
+
+    if db_config is None:
+        db_config = this_users_dns  # 既存の接続情報を使う
+
+    # ---- 基本的な危険チェック ----
+    raw = sql.strip()
+
+    # 空文チェック
+    if not raw:
+        raise ValueError("SQL が空です。")
+
+    lower = raw.lower()
+
+    # 複数文(セミコロン)の防止 — 終端の1つのセミコロンは許容する場合もあるが安全のため禁止
+    if ';' in raw and raw.rstrip().endswith(';') and raw.count(';') == 1:
+        # 末尾の1つだけならまだ良い。しかし運用上はセミコロン自体を禁止するのが簡単
+        # ここではセミコロンを禁止する（複数文が混入する可能性があるため）
+        raise ValueError("複数文またはセミコロンの使用は許可されていません。")
+
+    if ';' in raw:
+        raise ValueError("セミコロンを含むSQLは許可されていません。")
+
+    # コメントの禁止（--, /* */）
+    if '--' in raw or '/*' in raw or '*/' in raw:
+        raise ValueError("コメントの使用は許可されていません。")
+
+    # 禁止キーワード（大文字小文字混在を許容）
+    forbidden_keywords = [
+        r'\bdrop\b', r'\btruncate\b', r'\balter\b', r'\bgrant\b', r'\brevoke\b',
+        r'\bcreate\b', r'\bshutdown\b', r'\buse\b', r'\bset\s+password\b'
+    ]
+    for fk in forbidden_keywords:
+        if re.search(fk, lower):
+            raise ValueError(f"禁止されたキーワードを含むため実行不可: {fk}")
+
+    # システムスキーマへのアクセス禁止
+    forbidden_schemas = ['mysql', 'information_schema', 'performance_schema', 'sys']
+    for s in forbidden_schemas:
+        if re.search(r'\b' + re.escape(s) + r'\b', lower):
+            raise ValueError(f"システムスキーマ '{s}' へのアクセスは禁止されています。")
+
+    # テーブル名の抽出（簡易）
+    # SELECT/FROM/INTO/UPDATE/DELETE/INTO/CREATE/ALTER ... のあとに来る識別子を拾う簡易ロジック
+    identifiers = re.findall(r'\b([a-zA-Z_][a-zA-Z0-9_]*)\b', raw)
+    identifiers_lower = [x.lower() for x in identifiers]
+
+    # 許可テーブルが指定されている場合は、SQLが許可テーブルのみ参照しているか確認
+    if allowed_tables:
+        allowed_lower = [t.lower() for t in allowed_tables]
+        # 少なくとも1つは許可テーブル名がSQL中に含まれていること
+        if not any(t in identifiers_lower for t in allowed_lower):
+            raise ValueError(f"許可されたテーブル {allowed_tables} のいずれも SQL に含まれていません。")
+
+        # SQLに含まれるテーブルと思しき識別子が許可テーブルに限定されているか近似チェック
+        #（過剰検出を避けるため、識別子のうち許可リストに含まれないものが
+        # テーブル名であるとは断定しない。ここでは明示的に schema.table 形式がないかチェック）
+        # 追加の厳格チェックが必要ならここを拡張する。
+
+    # 最低限、DELETE文でないなら弾く（教育目的の範囲限定）
+    if not re.match(r'^\s*delete\b', lower):
+        raise ValueError("この実行関数は DELETE 文のみ許可されています。")
+
+    # ---- 実行 ----
+    conn = mysql.connector.MySQLConnection(**db_config)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(raw)
+        if commit:
+            conn.commit()
+        # 実行結果を返す（DELETE は通常行数取得）
+        try:
+            affected = cursor.rowcount
+        except:
+            affected = None
+        return {'rowcount': affected}
+    finally:
+        cursor.close()
+        conn.close()

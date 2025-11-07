@@ -1,19 +1,21 @@
 {% extends "base.html" %}
-{% block title %}DELETE文（共通なタプルの削除）演習（基本）{% endblock %}
+{% block title %}DELETE文（共通なタプルの削除）演習（応用）{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
 {% endblock %}
 {% block content %}
 
 <div class="nav-buttons">
-  <a href="/basic/delete/shared-tuple/example" class="prev">◀ 前へ</a>
-  <a href="/basic/delete/shared-tuple/practice/advance" class="next">応用へ ▶</a>
+  <a href="/basic/delete/shared-tuple/practice/basic" class="prev">◀ 基本へ戻る</a>
+  <a href="/quiz/delete_shared-multiple" class="next">クイズへ ▶</a>
 </div>
 
 <div class="learning-container">
-  <h1>DELETE文（共通なタプルの削除）演習（基本）</h1>
+  <h1>DELETE文（共通なタプルの削除）演習（応用）</h1>
 
-  <p>退職者テーブル（departed_employees）に存在する従業員を、employeesから削除してみましょう。</p>
+  <p>
+    今度は、退職者テーブルに存在し、かつ <code>status = 'inactive'</code> の従業員だけを削除してみましょう。
+  </p>
 
   <section>
     <h2>テーブル：employees</h2>
@@ -42,7 +44,7 @@
       {% for row in departed %}
       <tr>
         {% for col in row %}
-        <td>{{ col }}</td>
+          <td>{{ col }}</td>
         {% endfor %}
       </tr>
       {% endfor %}
@@ -54,13 +56,16 @@
     <div class="sql-form-wrapper">
       <form method="POST" class="sql-form">
         <div class="sql-line">
-          DELETE <input type="text" name="alias1" size="2" placeholder="e">
+          DELETE <input type="text" name="alias1" size="2" placeholder="a">
         </div>
         <div class="sql-line">
-          FROM employees AS e INNER JOIN departed_employees AS d
+          FROM employees AS a INNER JOIN departed_employees AS d
         </div>
         <div class="sql-line">
-          ON e.<input type="text" name="col1" size="6" placeholder="name"> = d.<input type="text" name="col2" size="6" placeholder="name">;
+          ON a.<input type="text" name="col1" size="6" placeholder="name"> = d.<input type="text" name="col2" size="6" placeholder="name">
+        </div>
+        <div class="sql-line">
+          WHERE <input type="text" name="where_clause" size="25" placeholder="a.status = 'inactive'">;
         </div>
 
         <div class="form-buttons">
@@ -77,8 +82,8 @@
 </div>
 
 <div class="nav-buttons">
-  <a href="/basic/delete/shared-tuple/example" class="prev">◀ 前へ</a>
-  <a href="/basic/delete/shared-tuple/practice/advance" class="next">応用へ ▶</a>
+  <a href="/basic/delete/shared-tuple/practice/basic" class="prev">◀ 基本へ戻る</a>
+  <a href="/quiz/delete_shared-multiple" class="next">クイズへ ▶</a>
 </div>
 
 {% endblock %}

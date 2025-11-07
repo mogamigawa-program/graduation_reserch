@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}トランザクション実行例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/transaction/basic-operations/study" class="prev">◀ 前へ</a>
+    <a href="/transaction/basic-operations/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>トランザクションの実行例</h1>
+
+    <section>
+        <h2>成功する例（COMMIT）</h2>
+        <p>下記は、AさんからBさんへ1000円送金する例です。</p>
+        <div class="code-block">
+<code>START TRANSACTION;
+UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
+UPDATE accounts SET balance = balance + 1000 WHERE name = 'B';
+COMMIT;</code>
+        </div>
+        <p><strong>結果：</strong> Aの残高が減り、Bの残高が増えます。</p>
+    </section>
+
+    <section>
+        <h2>失敗する例（ROLLBACK）</h2>
+        <p>存在しないユーザーに送金しようとした場合、途中でエラーが発生します。</p>
+        <div class="code-block">
+<code>START TRANSACTION;
+UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
+UPDATE accounts SET balance = balance + 1000 WHERE name = 'Z'; -- 存在しないユーザー
+COMMIT;</code>
+        </div>
+        <p><strong>結果：</strong> エラーが発生し、すべての変更が取り消されます。</p>
+    </section>
+
+    <div class="alert-warning">
+        <strong>ポイント：</strong> どちらのUPDATEも成功したときのみ確定（COMMIT）されます。
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <a href="/transaction/basic-operations/study" class="prev">◀ 前へ</a>
+    <a href="/transaction/basic-operations/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}
