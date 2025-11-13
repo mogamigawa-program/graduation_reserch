@@ -3,46 +3,81 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
+
 {% block content %}
 
 <h1>トランザクション演習（1文ずつ実行）</h1>
 
-<form method="POST">
-    <textarea name="sql" rows="3" placeholder="SQL文を入力してください">{{ sql }}</textarea><br>
-    <div class="btn-container">
-        <button type="submit" name="action" value="init" class="btn btn-secondary">テーブル初期化</button>
-        <button type="submit" name="action" value="start" class="btn">START TRANSACTION</button>
-        <button type="submit" name="action" value="execute" class="btn">このSQLを実行</button>
-        <button type="submit" name="action" value="commit" class="btn">COMMIT</button>
-        <button type="submit" name="action" value="rollback" class="btn btn-secondary">ROLLBACK</button>
-    </div>
-</form>
+<!-- トランザクション状態 -->
+{% if session.conn_id %}
+<div class="status-badge status-active">トランザクション中（未コミットの変更は他ユーザーから見えません）</div>
+{% else %}
+<div class="status-badge status-idle">トランザクションは開始されていません</div>
+{% endif %}
 
+<!-- 実行履歴 -->
+{% if sql_history %}
+<h2>実行履歴</h2>
+<div class="history-box">
+  {% for line in sql_history %}
+    {% if "COMMIT" in line %}
+      <div class="history-item commit">{{ loop.index }}. {{ line }}</div>
+    {% elif "ROLLBACK" in line %}
+      <div class="history-item rollback">{{ loop.index }}. {{ line }}</div>
+    {% else %}
+      <div class="history-item">{{ loop.index }}. {{ line }}</div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+
+<!-- ★ 横並びレイアウトの開始 -->
+<div class="practice-flex">
+
+    <!-- SQL入力カード -->
+    <div class="sql-input-card">
+        <form method="POST">
+            <textarea name="sql" rows="4" placeholder="例: UPDATE accounts SET balance = balance - 500 WHERE name='A';">{{ sql }}</textarea>
+
+            <div class="btn-container">
+                <button type="submit" name="action" value="init" class="btn btn-secondary">テーブル初期化</button>
+                <button type="submit" name="action" value="start" class="btn">START TRANSACTION</button>
+                <button type="submit" name="action" value="execute" class="btn">このSQLを実行</button>
+                <button type="submit" name="action" value="commit" class="btn">COMMIT</button>
+                <button type="submit" name="action" value="rollback" class="btn btn-secondary">ROLLBACK</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- テーブル表示 -->
+    <div class="table-card table-card--side">
+        <h2>accounts テーブルの内容</h2>
+        <table>
+            <tr>
+                {% for col in desc %}
+                <th>{{ col[0] }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in table %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div><!-- /practice-flex -->
+
+
+<!-- メッセージ -->
 {% if message %}
 <p class="message">{{ message }}</p>
 {% endif %}
 {% if error_message %}
 <p class="error">{{ error_message }}</p>
 {% endif %}
-{% if session.conn_id %}
-<p class="alert-warning">トランザクション中：未コミットの変更は他ユーザーには見えません。</p>
-{% endif %}
-<hr>
-
-<h2>accounts テーブルの内容</h2>
-<table>
-    <tr>
-        {% for col in desc %}
-        <th>{{ col[0] }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in table %}
-    <tr>
-        {% for cell in row %}
-        <td>{{ cell }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
 
 {% endblock %}

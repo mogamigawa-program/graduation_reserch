@@ -1738,21 +1738,28 @@ def transaction_basic_operations_practice():
     error_message = ""
     desc, table = [], []
 
-    # --- 初期化ボタン ---
-    if request.method == 'POST' and request.form.get('action') == 'init':
-        try:
-            user_db = this_users_dns['database']
-            conn = mysql.connector.MySQLConnection(**this_users_dns)
-            cursor = conn.cursor()
+    # 履歴がまだない場合は初期化
+    if 'sql_history' not in session:
+        session['sql_history'] = []
 
-            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-            cursor.execute(f"CREATE TABLE {user_db}.{table_name} AS SELECT * FROM dataset.{table_name}")
-            cursor.close()
-            conn.commit()
-            conn.close()
-            message = "テーブルを初期化しました。"
-        except Exception as e:
-            error_message = f"初期化に失敗しました: {e}"
+        # --- 初期化ボタン ---
+    if request.method == 'POST' and request.form.get('action') == 'init':
+        # 共通初期化関数を使用
+        message = initialize_table(table_name, this_users_dns)
+
+        # トランザクション接続が残っていたら閉じる
+        conn_id = session.get('conn_id')
+        if conn_id and conn_id in active_connections:
+            try:
+                active_connections[conn_id].close()
+            except:
+                pass
+            del active_connections[conn_id]
+            session.pop('conn_id', None)
+
+        # 履歴もリセット
+        session['sql_history'] = []
+
 
     # --- トランザクション開始 ---
     elif request.method == 'POST' and request.form.get('action') == 'start':
@@ -1761,6 +1768,9 @@ def transaction_basic_operations_practice():
         conn_id = str(uuid.uuid4())
         active_connections[conn_id] = conn
         session['conn_id'] = conn_id
+
+        # 履歴をリセットして START を記録
+        session['sql_history'] = ["START TRANSACTION;"]
         message = "トランザクションを開始しました。"
 
     # --- SQL実行（更新 or SELECT） ---
@@ -1773,10 +1783,22 @@ def transaction_basic_operations_practice():
             try:
                 cursor.execute(sql)
                 message = "SQLを実行しました。"
+
+                # 履歴に追加
+                history = session.get('sql_history', [])
+                display_sql = sql if sql.endswith(';') else sql + ';'
+                history.append(display_sql)
+                session['sql_history'] = history
             except Exception as e:
                 conn.rollback()
                 error_message = f"エラー発生のためROLLBACKしました: {e}"
                 message = ""
+
+                # エラーによるロールバックも履歴に残す
+                history = session.get('sql_history', [])
+                history.append("-- エラー発生のため ROLLBACK;")
+                session['sql_history'] = history
+
                 conn.close()
                 del active_connections[conn_id]
                 session.pop('conn_id', None)
@@ -1792,6 +1814,12 @@ def transaction_basic_operations_practice():
             conn = active_connections[conn_id]
             conn.commit()
             message = "COMMITしました。"
+
+            # 履歴に COMMIT 追加
+            history = session.get('sql_history', [])
+            history.append("COMMIT;")
+            session['sql_history'] = history
+
             conn.close()
             del active_connections[conn_id]
             session.pop('conn_id', None)
@@ -1805,6 +1833,12 @@ def transaction_basic_operations_practice():
             conn = active_connections[conn_id]
             conn.rollback()
             message = "ROLLBACKしました。"
+
+            # 履歴に ROLLBACK 追加
+            history = session.get('sql_history', [])
+            history.append("ROLLBACK;")
+            session['sql_history'] = history
+
             conn.close()
             del active_connections[conn_id]
             session.pop('conn_id', None)
@@ -1835,7 +1869,8 @@ def transaction_basic_operations_practice():
         table=table,
         sql=sql,
         message=message,
-        error_message=error_message
+        error_message=error_message,
+        sql_history=session.get('sql_history', [])
     )
 
 

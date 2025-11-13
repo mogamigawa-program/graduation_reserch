@@ -825,3 +825,126 @@ form .button-group {
     opacity: 0.85;
   }
   
+
+/* ====== トランザクション演習ページ用スタイル ====== */
+
+/* ステータスバッジ */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin: 10px auto;
+    text-align: center;
+}
+.status-active {
+    background-color: #d4edda; /* 薄い緑 */
+    color: #155724;
+}
+.status-idle {
+    background-color: #f8d7da; /* 薄い赤 */
+    color: #721c24;
+}
+
+/* 実行履歴 */
+.history-box {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 1.5rem auto;
+    width: 90%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.history-item {
+    font-family: monospace;
+    padding: 4px 0;
+}
+
+.history-item.commit {
+    color: green;
+}
+.history-item.rollback {
+    color: red;
+}
+
+/* SQL入力エリア */
+.sql-input-card {
+    background: #ffffff;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 90%;
+    margin: 2rem auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.sql-input-card textarea {
+    width: 100%;
+    padding: 10px;
+    font-family: monospace;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+}
+
+/* テーブル表示 */
+.table-card {
+    width: 90%;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 2rem auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.table-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-card th {
+    background: #007bff;
+    color: white;
+    padding: 8px;
+}
+
+.table-card td {
+    background: #f9f9f9;
+    padding: 8px;
+}
+
+/* 横並びレイアウト */
+.practice-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    width: 95%;
+    margin: 2rem auto;
+}
+
+/* 左右の幅調整 */
+.sql-input-card {
+    flex: 1;
+    max-width: 45%;
+}
+
+.table-card--side {
+    flex: 1;
+    max-width: 50%;
+}
+
+/* 小さい画面では縦並び */
+@media (max-width: 900px) {
+    .practice-flex {
+        flex-direction: column;
+    }
+    .sql-input-card,
+    .table-card--side {
+        max-width: 100%;
+    }
+}
