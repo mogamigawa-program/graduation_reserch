@@ -1,0 +1,144 @@
+/* ============================================================
+   トランザクション演習（一文ずつ実行）ページ専用CSS
+   ============================================================ */
+/* このページだけ main の制限を解除して横幅を広く使う */
+main {
+    max-width: 100%;
+}
+
+
+/* ------- 横並びレイアウト（最重要） ------- */
+.practice-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    margin-top: 20px;
+
+    gap: 24px;  /* カード間の余白 */
+}
+
+/* ------- 左側：SQL入力カード ------- */
+.sql-input-card {
+    flex: 1;
+    max-width: 48%;
+
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* テキストエリア */
+.sql-input-card textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* ボタン */
+.btn-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+/* ------- 右側：テーブルカード ------- */
+.table-card--side {
+    flex: 1;
+    max-width: 48%;
+
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* テーブルスタイル */
+.table-card--side table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-card--side th {
+    background: #007bff;
+    color: white;
+    padding: 8px;
+}
+
+.table-card--side td {
+    padding: 8px;
+    text-align: center;
+    background: #fff;
+}
+
+/* 削除された行テーブル */
+.removed-table {
+    width: 100%;
+    margin-top: 16px;
+    border: 1px solid #ffbbbb;
+    border-collapse: collapse;
+}
+
+.removed-table td {
+    padding: 8px;
+    background: #ffe5e5;
+}
+
+/* ------- 差分ハイライト ------- */
+.diff-changed {
+    background-color: #ffe8a6 !important;
+    font-weight: bold;
+}
+
+.diff-added-row td {
+    background-color: #d8f8d0 !important;
+    font-weight: bold;
+}
+
+.diff-removed-row td {
+    background-color: #f7c5c5 !important;
+    font-weight: bold;
+}
+
+/* ------- トランザクション状態バッジ ------- */
+.status-badge {
+    margin-top: 20px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.status-active {
+    background: #e6f7ff;
+    border-left: 4px solid #1890ff;
+}
+
+.status-idle {
+    background: #fff3cd;
+    border-left: 4px solid #ffbb00;
+}
+
+/* スマホ・タブレット対応 */
+@media (max-width: 900px) {
+    .practice-flex {
+        flex-direction: column;
+    }
+
+    .sql-input-card,
+    .table-card--side {
+        max-width: 100%;
+    }
+}

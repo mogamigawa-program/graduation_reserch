@@ -1,12 +1,17 @@
 {% extends "base.html" %}
 {% block title %}トランザクション演習（一文ずつ）{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/transaction_basic_operations_practice.css') }}">
 {% endblock %}
 
 {% block content %}
 
 <h1>トランザクション演習（1文ずつ実行）</h1>
+
+<div class="nav-buttons">
+  <a href="/transaction/basic-operations/example" class="prev">◀ 前へ</a>
+  <a href="/quiz/transaction_basic_operations" class="next">次へ ▶</a>
+</div>
 
 <!-- トランザクション状態 -->
 {% if session.conn_id %}
@@ -54,19 +59,35 @@
     <div class="table-card table-card--side">
         <h2>accounts テーブルの内容</h2>
         <table>
-            <tr>
-                {% for col in desc %}
-                <th>{{ col[0] }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in table %}
-            <tr>
+          <tr>
+              {% for col in desc %}
+              <th>{{ col[0] }}</th>
+              {% endfor %}
+          </tr>
+      
+          {% for row in table %}
+          {% set r = loop.index0 %}
+          <tr class="{% if r in added_rows %} diff-added-row {% endif %}">
+              {% for cell in row %}
+              {% set pos = (r, loop.index0) %}
+              <td class="{{ diff.get(pos, '') }}">{{ cell }}</td>
+              {% endfor %}
+          </tr>
+          {% endfor %}
+      </table>
+      {% if removed_rows %}
+        <h3>削除された行</h3>
+        <table class="removed-table">
+            {% for row in removed_rows %}
+            <tr class="diff-removed-row">
                 {% for cell in row %}
                 <td>{{ cell }}</td>
                 {% endfor %}
             </tr>
             {% endfor %}
         </table>
+      {% endif %}
+      
     </div>
 
 </div><!-- /practice-flex -->
@@ -79,5 +100,10 @@
 {% if error_message %}
 <p class="error">{{ error_message }}</p>
 {% endif %}
+
+<div class="nav-buttons">
+  <a href="/transaction/basic-operations/example" class="prev">◀ 前へ</a>
+  <a href="/quiz/transaction_basic_operations" class="next">次へ ▶</a>
+</div>
 
 {% endblock %}

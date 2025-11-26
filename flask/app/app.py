@@ -1742,9 +1742,11 @@ def transaction_basic_operations_practice():
     if 'sql_history' not in session:
         session['sql_history'] = []
 
-        # --- 初期化ボタン ---
+    # diff 用の初期値
+    diff = {}
+
+    # --- 初期化ボタン ---
     if request.method == 'POST' and request.form.get('action') == 'init':
-        # 共通初期化関数を使用
         message = initialize_table(table_name, this_users_dns)
 
         # トランザクション接続が残っていたら閉じる
@@ -1759,7 +1761,7 @@ def transaction_basic_operations_practice():
 
         # 履歴もリセット
         session['sql_history'] = []
-
+        session['before_table'] = []
 
     # --- トランザクション開始 ---
     elif request.method == 'POST' and request.form.get('action') == 'start':
@@ -1769,14 +1771,19 @@ def transaction_basic_operations_practice():
         active_connections[conn_id] = conn
         session['conn_id'] = conn_id
 
-        # 履歴をリセットして START を記録
         session['sql_history'] = ["START TRANSACTION;"]
+        session['before_table'] = []
         message = "トランザクションを開始しました。"
 
-    # --- SQL実行（更新 or SELECT） ---
+    # --- SQL実行（UPDATE / SELECT など） ---
     elif request.method == 'POST' and request.form.get('action') == 'execute':
         sql = request.form.get('sql', '').strip()
         conn_id = session.get('conn_id')
+
+        # 🔥 SQL実行前 snapshot
+        session['before_table'] = get_table_snapshot(table_name)
+
+        # === 明示的トランザクション中の場合（START済み） ===
         if conn_id and conn_id in active_connections:
             conn = active_connections[conn_id]
             cursor = conn.cursor()
@@ -1784,38 +1791,55 @@ def transaction_basic_operations_practice():
                 cursor.execute(sql)
                 message = "SQLを実行しました。"
 
-                # 履歴に追加
+                # 履歴追加
                 history = session.get('sql_history', [])
-                display_sql = sql if sql.endswith(';') else sql + ';'
-                history.append(display_sql)
+                history.append(sql if sql.endswith(';') else sql + ';')
                 session['sql_history'] = history
+
             except Exception as e:
                 conn.rollback()
                 error_message = f"エラー発生のためROLLBACKしました: {e}"
-                message = ""
-
-                # エラーによるロールバックも履歴に残す
                 history = session.get('sql_history', [])
                 history.append("-- エラー発生のため ROLLBACK;")
                 session['sql_history'] = history
-
                 conn.close()
                 del active_connections[conn_id]
                 session.pop('conn_id', None)
+
             finally:
                 cursor.close()
+
+        # === トランザクション未開始 → 暗黙的に1回のトランザクションで実行 ===
         else:
-            error_message = "トランザクションが開始されていません。"
+            try:
+                conn = mysql.connector.MySQLConnection(**this_users_dns)
+                cursor = conn.cursor()
+                cursor.execute(sql)
+                conn.commit()  # 🔥 明示開始なしの場合は自動コミット
+                message = "SQLを実行しました。（自動コミット）"
+
+                # 履歴追加（トランザクション未開始でも履歴に残したいなら）
+                history = session.get('sql_history', [])
+                history.append(sql if sql.endswith(';') else sql + ';')
+                session['sql_history'] = history
+
+            except Exception as e:
+                error_message = f"SQL実行時にエラー: {e}"
+
+            finally:
+                cursor.close()
+                conn.close()
+
 
     # --- COMMIT ---
     elif request.method == 'POST' and request.form.get('action') == 'commit':
         conn_id = session.get('conn_id')
+
         if conn_id and conn_id in active_connections:
             conn = active_connections[conn_id]
             conn.commit()
             message = "COMMITしました。"
 
-            # 履歴に COMMIT 追加
             history = session.get('sql_history', [])
             history.append("COMMIT;")
             session['sql_history'] = history
@@ -1823,18 +1847,22 @@ def transaction_basic_operations_practice():
             conn.close()
             del active_connections[conn_id]
             session.pop('conn_id', None)
+
+            # commitしたので before_table はリセット
+            session['before_table'] = []
+
         else:
             error_message = "アクティブなトランザクションがありません。"
 
     # --- ROLLBACK ---
     elif request.method == 'POST' and request.form.get('action') == 'rollback':
         conn_id = session.get('conn_id')
+
         if conn_id and conn_id in active_connections:
             conn = active_connections[conn_id]
             conn.rollback()
             message = "ROLLBACKしました。"
 
-            # 履歴に ROLLBACK 追加
             history = session.get('sql_history', [])
             history.append("ROLLBACK;")
             session['sql_history'] = history
@@ -1842,14 +1870,19 @@ def transaction_basic_operations_practice():
             conn.close()
             del active_connections[conn_id]
             session.pop('conn_id', None)
+
+            # rollback したので before_table はリセット
+            session['before_table'] = []
+
         else:
             error_message = "アクティブなトランザクションがありません。"
 
-    # --- テーブル状態の取得 ---
+    # --- テーブル状態の取得（差分ハイライト対応） ---
     try:
         conn_id = session.get('conn_id')
+
         if conn_id and conn_id in active_connections:
-            # ✅ トランザクション中 → 同じ接続からSELECTする（未コミット状態を確認可能）
+            # トランザクション中 → 未コミット込みの状態を取得
             conn = active_connections[conn_id]
             cursor = conn.cursor()
             cursor.execute(f"DESC {table_name}")
@@ -1858,11 +1891,20 @@ def transaction_basic_operations_practice():
             table = cursor.fetchall()
             cursor.close()
         else:
-            # 通常時は別接続でSELECT
+            # 通常
             desc, table = fetch_table_data(table_name)
+
+        # 🔥 差分比較
+        before_table = session.get('before_table')
+        if before_table:
+            diff_cells, added_rows, removed_rows = diff_table(before_table, table)
+        else:
+            diff_cells, added_rows, removed_rows = {}, [], []
+
     except Exception as e:
         error_message = f"テーブル読み込みエラー: {e}"
 
+    # --- 完成 ---
     return render_template(
         'transaction_basic_operations_practice.html',
         desc=desc,
@@ -1870,8 +1912,12 @@ def transaction_basic_operations_practice():
         sql=sql,
         message=message,
         error_message=error_message,
-        sql_history=session.get('sql_history', [])
+        sql_history=session.get('sql_history', []),
+        diff=diff_cells,
+        added_rows=added_rows,
+        removed_rows=removed_rows
     )
+
 
 
 #quiz 管理
@@ -7339,7 +7385,8 @@ def quiz_progress():
             20: "quiz/update_multiple_columns",
             21: "quiz/delete_all_records",
             22: "quiz/update_join",
-            23: "quiz/delete_shared-multiple"
+            23: "quiz/delete_shared-single",
+            24: "quiz/transaction_basic_operations"
         }
 
         # 完了したクイズの数を計算
@@ -7613,3 +7660,66 @@ def safe_exec_sql(sql: str, allowed_tables: list = None, commit: bool = False, d
     finally:
         cursor.close()
         conn.close()
+
+# ==========================================================
+# 差分ハイライト共通機能（どの学習ページでも使える）
+# ==========================================================
+
+def get_table_snapshot(table_name: str):
+    """
+    指定テーブルの現在の状態（二次元配列）を取得する。
+    """
+    try:
+        _, table = fetch_table_data(table_name)
+        return table
+    except Exception as e:
+        print("スナップショット取得に失敗:", e)
+        return []
+
+
+def diff_table(before, after):
+    """
+    before と after の二次元テーブルを比較して、
+    ・セル変更 → diff-changed
+    ・行追加 → diff-added-row
+    ・行削除 → diff-removed-row（削除された行は after テーブルには無いので別枠に返す）
+    を返す。
+
+    戻り値:
+        diff_cells: {(r, c): "diff-changed"}
+        added_rows: [row_index]
+        removed_rows: [row_data]  ← 削除された行そのもの
+    """
+    diff_cells = {}
+    added_rows = []
+    removed_rows = []
+
+    # before/after を id をキーにした辞書に変換
+    before_dict = {row[0]: row for row in before}  # id → row
+    after_dict  = {row[0]: row for row in after}
+
+    # --- DELETE（id が before にあって after に無い） ---
+    for id_val in before_dict.keys():
+        if id_val not in after_dict:
+            removed_rows.append(before_dict[id_val])
+
+    # --- INSERT（id が after にあって before に無い） ---
+    for id_val in after_dict.keys():
+        if id_val not in before_dict:
+            # 行追加 → 追加された id
+            # 表示のため added_rows に "after の行番号" を入れる
+            after_row_index = after.index(after_dict[id_val])
+            added_rows.append(after_row_index)
+
+    # --- UPDATE（両方に存在 → セル比較） ---
+    for id_val in before_dict.keys():
+        if id_val in after_dict:
+            before_row = before_dict[id_val]
+            after_row  = after_dict[id_val]
+            row_index = after.index(after_row)
+
+            for c in range(min(len(before_row), len(after_row))):
+                if before_row[c] != after_row[c]:
+                    diff_cells[(row_index, c)] = "diff-changed"
+
+    return diff_cells, added_rows, removed_rows

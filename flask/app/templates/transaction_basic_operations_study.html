@@ -46,6 +46,33 @@ ROLLBACK;    -- 変更を取り消す</code>
     </div>
 </div>
 
+<div class="tips-box">
+    <div class="tips-title">💡 Tips：1文でもトランザクションって知ってた？</div>
+    <p>
+        <strong>UPDATE / INSERT / DELETE</strong> は、
+        <strong>START TRANSACTION</strong> を書かなくても、MySQL が内部で自動的に
+        <strong>1つのトランザクションとして実行</strong>します。
+    </p>
+  
+    <div class="tips-code">
+  <code>
+  -- これを1文だけ実行すると…
+  UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
+  
+  -- 実は内部でこう処理されています
+  START TRANSACTION;
+  UPDATE ...;
+  COMMIT;
+  </code>
+    </div>
+  
+    <p>
+        つまり「1文だけの UPDATE」も実はしっかりトランザクション処理！<br>
+        明示的にトランザクションを始める必要があるのは、<strong>複数の処理をまとめたいとき</strong>だけです。
+    </p>
+  </div>
+  
+
 <div class="nav-buttons">
     <a href="/index/transaction?flag=min" class="prev">◀ 前へ</a>
     <a href="/transaction/basic-operations/example" class="next">次へ ▶</a>

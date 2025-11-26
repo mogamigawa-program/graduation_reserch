@@ -352,10 +352,13 @@ footer {
 }
 
 .example-table {
-    width: 100%;
+    width: 45%;
+    border: 1px solid #ccc;
     border-collapse: collapse;
-    margin-top: 1rem;
+    margin: 10px 0;
+    background: #fff;
 }
+
 
 .example-table caption {
     font-weight: bold;
@@ -363,14 +366,28 @@ footer {
     text-align: left;
 }
 
-.example-table th, .example-table td {
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-    text-align: left;
+.example-table td {
+    padding: 8px;
+    background: #f9f9f9;
+    text-align: center;
 }
 
 .example-table th {
-    background-color: #f2f2f2;
+    background: #007bff;
+    color: white;
+    padding: 8px;
+}
+
+.example-flex {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.section-title {
+    margin-top: 30px;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
 .form-group {
@@ -461,9 +478,8 @@ footer {
 .btn-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
+    gap: 14px;           /* ★ ボタン同士の間隔を安定させる */
+    margin-top: 16px;
 }
 
 .btn-secondary {
@@ -601,6 +617,11 @@ footer {
     margin: 1em 0;
     font-family: monospace;
 }
+
+.code-block code {
+    white-space: pre-wrap;
+}
+
 .learning-container {
     padding: 1em;
 }
@@ -873,13 +894,12 @@ form .button-group {
 
 /* SQL入力エリア */
 .sql-input-card {
-    background: #ffffff;
-    border: 1px solid #ccc;
-    padding: 1rem;
-    border-radius: 8px;
-    width: 90%;
-    margin: 2rem auto;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    flex: 1;
+    max-width: 45%;
+    min-height: 380px;   /* ★ カードの最小高さを確保 */
+    display: flex;        /* 内部レイアウトを縦並びに */
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .sql-input-card textarea {
@@ -931,18 +951,153 @@ form .button-group {
 .sql-input-card {
     flex: 1;
     max-width: 45%;
+    min-height: 380px;   /* ★ カードの最小高さを確保 */
+    display: flex;        /* 内部レイアウトを縦並びに */
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .table-card--side {
     flex: 1;
     max-width: 50%;
+    min-height: 380px;  /* ★ 見た目の高さを揃える */
 }
 
 /* 小さい画面では縦並び */
 @media (max-width: 900px) {
+    .sql-input-card, .table-card--side {
+        max-width: 100%;
+        min-height: auto; /* スマホ時は高さ自由 */
+    }
+}
+
+/* 差分ハイライト */
+.diff-changed {
+    background-color: #ffe8a6 !important;  /* わかりやすい淡黄色 */
+    font-weight: bold;
+    transition: background-color 0.4s ease;
+}
+
+/* UPDATE */
+.diff-changed {
+    background-color: #ffe8a6 !important;
+    font-weight: bold;
+}
+
+/* INSERT */
+.diff-added-row td {
+    background-color: #d8f8d0 !important; /* 薄い緑 */
+    font-weight: bold;
+}
+
+/* DELETE（別枠表示） */
+.diff-removed-row td {
+    background-color: #f7c5c5 !important; /* 薄い赤 */
+    font-weight: bold;
+}
+
+.removed-table {
+    width: 90%;
+    margin: 1rem auto;
+    border: 1px solid #ffaaaa;
+    border-collapse: collapse;
+}
+
+.removed-table td {
+    padding: 6px;
+    border: 1px solid #ffaaaa;
+}
+
+
+/* ===== Tips Box ===== */
+.tips-box {
+    background: #eef7ff;
+    border-left: 5px solid #3399ff;
+    padding: 16px 20px;
+    margin: 30px 0;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    font-size: 0.95rem;
+}
+
+.tips-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: #0077dd;
+}
+
+.tips-box p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.tips-code {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-family: monospace;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* ===========================================
+   横並びレイアウト（重なり防止の決定版）
+   =========================================== */
+   .practice-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    width: 100%;
+    max-width: 1300px;
+
+    margin: 0 auto;
+    margin-top: 20px;
+    gap: 24px;   /* ← カード間に確実な隙間 */
+}
+
+/* 左側のSQLカード */
+.sql-input-card {
+    flex: 1;
+    max-width: 48%;
+
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* 右側のテーブルカード */
+.table-card--side {
+    flex: 1;
+    max-width: 48%;
+
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ボタンの縦間隔 */
+.btn-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+/* スマホ・タブレットでは縦並び */
+@media (max-width: 900px) {
     .practice-flex {
         flex-direction: column;
     }
+
     .sql-input-card,
     .table-card--side {
         max-width: 100%;

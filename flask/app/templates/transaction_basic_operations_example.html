@@ -13,32 +13,98 @@
 <div class="learning-container">
     <h1>トランザクションの実行例</h1>
 
+    <!-- 成功例 -->
     <section>
-        <h2>成功する例（COMMIT）</h2>
+        <h2 class="section-title">成功する例（COMMIT）</h2>
         <p>下記は、AさんからBさんへ1000円送金する例です。</p>
+
         <div class="code-block">
-<code>START TRANSACTION;
-UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
-UPDATE accounts SET balance = balance + 1000 WHERE name = 'B';
-COMMIT;</code>
+<code>
+START TRANSACTION;
+UPDATE accounts 
+    SET balance = balance - 1000 
+    WHERE name = 'A';
+UPDATE accounts 
+    SET balance = balance + 1000 
+    WHERE name = 'B';
+COMMIT;
+</code>
         </div>
-        <p><strong>結果：</strong> Aの残高が減り、Bの残高が増えます。</p>
+
+        <div class="example-flex">
+
+            <!-- Before -->
+            <div>
+                <h3>実行前</h3>
+                <table class="example-table">
+                    <tr><th>name</th><th>balance</th></tr>
+                    <tr><td>A</td><td>10000</td></tr>
+                    <tr><td>B</td><td>8000</td></tr>
+                </table>
+            </div>
+
+            <!-- After -->
+            <div>
+                <h3>COMMIT後</h3>
+                <table class="example-table">
+                    <tr><th>name</th><th>balance</th></tr>
+                    <tr><td>A</td><td style="background:#ffe8a6;">9000</td></tr>
+                    <tr><td>B</td><td style="background:#ffe8a6;">9000</td></tr>
+                </table>
+            </div>
+
+        </div>
+
+        <p><strong>結果：</strong> Aの残高が減り、Bの残高が増えます。（正常に完了）</p>
     </section>
 
+    <!-- 失敗例 -->
     <section>
-        <h2>失敗する例（ROLLBACK）</h2>
+        <h2 class="section-title">失敗する例（ROLLBACK）</h2>
         <p>存在しないユーザーに送金しようとした場合、途中でエラーが発生します。</p>
+
         <div class="code-block">
-<code>START TRANSACTION;
-UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
-UPDATE accounts SET balance = balance + 1000 WHERE name = 'Z'; -- 存在しないユーザー
-COMMIT;</code>
+<code>
+START TRANSACTION;
+UPDATE accounts 
+    SET balance = balance - 1000 
+    WHERE name = 'A';
+UPDATE accounts 
+    SET balance = balance + 1000 
+    WHERE name = 'Z'; -- 存在しないユーザー
+COMMIT;
+</code>
         </div>
-        <p><strong>結果：</strong> エラーが発生し、すべての変更が取り消されます。</p>
+
+        <div class="example-flex">
+
+            <!-- Before -->
+            <div>
+                <h3>実行前</h3>
+                <table class="example-table">
+                    <tr><th>name</th><th>balance</th></tr>
+                    <tr><td>A</td><td>10000</td></tr>
+                    <tr><td>B</td><td>8000</td></tr>
+                </table>
+            </div>
+
+            <!-- After (ROLLBACK) -->
+            <div>
+                <h3>ROLLBACK後</h3>
+                <table class="example-table">
+                    <tr><th>name</th><th>balance</th></tr>
+                    <tr><td>A</td><td>10000</td></tr>
+                    <tr><td>B</td><td>8000</td></tr>
+                </table>
+            </div>
+
+        </div>
+
+        <p><strong>結果：</strong> 途中でエラーが発生し、全ての処理が取り消されます。</p>
     </section>
 
     <div class="alert-warning">
-        <strong>ポイント：</strong> どちらのUPDATEも成功したときのみ確定（COMMIT）されます。
+        <strong>ポイント：</strong> どちらの UPDATE も成功した場合のみ確定（COMMIT）されます。
     </div>
 </div>
 
