@@ -105,19 +105,19 @@ def index_item(item):
         if flag == "min":
             min_index_item = {
                 "データベースとは": [
-                    {"name": "データベースとは", "url": "/databasebasic/whatdatabase"}
+                    {"name": "データベースとは", "url": "/database_basic/what_database/study"}
                 ],
                 "関係データベースとは": [
-                    {"name": "関係データベースとは", "url": "/databasebasic/whatrelationaldatabase"}
+                    {"name": "関係データベースとは", "url": "/database_basic/what_relational_database/study"}
                 ],
                 "キー": [
-                    {"name": "キー", "url": "/partofdatabase/key"}
+                    {"name": "キー", "url": "/part_of_database/key/study"}
                 ],
                 "テーブルの定義": [
-                    {"name": "テーブルの定義", "url": "/partofdatabase/definition"}
+                    {"name": "テーブルの定義", "url": "/part_of_database/definition/study"}
                 ],
                 "テーブルの作成": [
-                    {"name": "テーブルの作成", "url": "/partofdatabase/create"}
+                    {"name": "テーブルの作成", "url": "/part_of_database/create/study"}
                 ],
                 "select": [
                     {"name": "単一条件", "url": "/basic/select/single/study"},
@@ -191,7 +191,7 @@ def index_item(item):
                     {"name": "start→commit or rollback", "url": "/transaction/basic-operations/study"}
                 ],
                 "acid特性": [
-                    {"name": "原始性", "url": "/transaction/acid/atomicity/study"}
+                    {"name": "独立性", "url": "/transaction/acid/isolation/study"}
                 ]
             }
 
@@ -236,6 +236,168 @@ def hello():
     props = {'title': 'Step-by-Step Flask - hello', 'msg': 'Hello World.'}
     html = render_template('hello.html', props=props)
     return html
+
+# --- データベースとは 学習ページ ---
+@app.route('/database_basic/what_database/study')
+def database_basic_what_database_study():
+    return render_template('what_database_study.html')
+
+# --- データベースとは 例ページ ---
+@app.route('/database_basic/what_database/example')
+def database_basic_what_database_example():
+    return render_template('what_database_example.html')
+
+# --- RDB 学習ページ ---
+@app.route('/database_basic/what_relational_database/study')
+def what_relational_database_study():
+    return render_template('what_relational_database_study.html')
+
+# --- RDB 例ページ ---
+@app.route('/database_basic/what_relational_database/example')
+def what_relational_database_example():
+    return render_template('what_relational_database_example.html')
+
+# --- キー：学習ページ ---
+@app.route('/part_of_database/key/study')
+def key_study():
+    return render_template('key_study.html')
+
+# --- キー：例ページ ---
+@app.route('/part_of_database/key/example')
+def key_example():
+    return render_template('key_example.html')
+
+# --- テーブル定義：学習ページ ---
+@app.route('/part_of_database/definition/study')
+def definition_study():
+    return render_template('definition_study.html')
+
+# --- テーブル定義：例ページ ---
+@app.route('/part_of_database/definition/example')
+def definition_example():
+    return render_template('definition_example.html')
+
+# --- テーブル作成：学習ページ ---
+@app.route('/part_of_database/create/study')
+def create_study():
+    return render_template('create_study.html')
+
+# --- テーブル作成：例ページ ---
+@app.route('/part_of_database/create/example')
+def create_example():
+    return render_template('create_example.html')
+
+@app.route('/part_of_database/create/practice', methods=['GET', 'POST'])
+def create_practice():
+    message = ""
+    error_message = ""
+
+    if request.method == "POST":
+        try:
+            table_name = request.form.get('table_name')
+            columns = request.form.getlist('columns[]')
+            datatypes = request.form.getlist('data_types[]')
+            constraints = request.form.getlist('constraints[]')
+
+            # =======================
+            # (1) CREATE文を生成（1行＝1項目）
+            # =======================
+            column_definitions = []
+
+            for col, dtype, cons in zip(columns, datatypes, constraints):
+                if not col or not dtype:
+                    continue
+
+                part = f"{col} {dtype}"
+
+                # 制約が入力されていたら追加
+                if cons.strip():
+                    part += f" {cons.strip()}"
+
+                column_definitions.append(part)
+
+            # 最終カラムにカンマを付けない（フロント仕様に合わせる）
+            column_sql = ", ".join(column_definitions)
+
+            create_sql = f"CREATE TABLE {table_name} ({column_sql})"
+
+            # =======================
+            # (2) テーブル作成処理
+            # =======================
+            conn = mysql.connector.MySQLConnection(**this_users_dns)
+            cursor = conn.cursor()
+
+            cursor.execute(create_sql)
+            conn.commit()
+
+            # =======================
+            # (3) CREATE文を履歴テーブルへ保存
+            # =======================
+            save_sql = """
+                INSERT INTO user_created_tables (table_name, create_sql)
+                VALUES (%s, %s)
+            """
+            cursor.execute(save_sql, (table_name, create_sql))
+            conn.commit()
+
+            # =======================
+            # (4) 履歴が10件超えたらFIFO削除
+            # =======================
+            cursor.execute("SELECT id FROM user_created_tables ORDER BY created_at ASC")
+            records = cursor.fetchall()
+
+            if len(records) > 10:
+                oldest_id = records[0][0]
+                cursor.execute("DELETE FROM user_created_tables WHERE id = %s", (oldest_id,))
+                conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            message = "テーブルを作成しました。"
+
+        except Exception as e:
+            print("ERROR:", e)
+            error_message = "テーブル作成に失敗しました。"
+
+    # =======================
+    # (5) 現在のテーブル一覧
+    # =======================
+    try:
+        conn = mysql.connector.MySQLConnection(**this_users_dns)
+        cursor = conn.cursor()
+
+        cursor.execute("SHOW TABLES")
+        tables = cursor.fetchall()
+
+        # =======================
+        # (6) CREATE文履歴取得
+        # =======================
+        cursor.execute("""
+            SELECT table_name, create_sql, created_at
+            FROM user_created_tables
+            ORDER BY created_at DESC
+        """)
+        history = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        print("ERROR:", e)
+        error_message = "テーブル一覧の取得に失敗しました。"
+        tables = []
+        history = []
+
+    return render_template(
+        'create_practice.html',
+        message=message,
+        error_message=error_message,
+        tables=tables,
+        history=history
+    )
+
+
 
 #条件を１つのみ入力前画面。(cities)
 @app.route('/users')
@@ -1919,6 +2081,151 @@ def transaction_basic_operations_practice():
     )
 
 
+# --- 学習ページ ---
+@app.route('/transaction/acid/isolation/study', methods=['GET', 'POST'])
+def transaction_acid_isolation_study():
+    return render_template('transaction_isolation_study.html')
+
+
+# --- 実行例ページ ---
+@app.route('/transaction/acid/isolation/example', methods=['GET', 'POST'])
+def transaction_acid_isolation_example():
+    return render_template('transaction_isolation_example.html')
+
+# ================================
+# ACID特性：Isolation 演習ページ
+# ================================
+
+@app.route('/transaction/acid/isolation/practice', methods=['GET', 'POST'])
+def transaction_acid_isolation_practice():
+    table_name = "accounts_plus"
+    message = ""
+    error_message = ""
+    conflict_result = None
+    isolation_result = None
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        # --- テーブル初期化（dataset.accounts_plus からコピー） ---
+        if action == 'init':
+            try:
+                message = initialize_table(table_name, this_users_dns)
+            except Exception as e:
+                error_message = f"初期化中にエラーが発生しました: {e}"
+
+        # --- Isolation なし（疑似競合） ---
+        elif action == 'simulate_conflict':
+            try:
+                a_amount = int(request.form.get('a_amount', '0'))
+                b_amount = int(request.form.get('b_amount', '0'))
+
+                # 現在のSuzukiの残高を取得（初期値として使う）
+                conn = mysql.connector.MySQLConnection(**this_users_dns)
+                cursor = conn.cursor()
+                cursor.execute(f"SELECT balance FROM {table_name} WHERE name=%s", ('Suzuki',))
+                row = cursor.fetchone()
+                cursor.close()
+                conn.close()
+
+                if row is None:
+                    raise Exception("Suzuki のレコードが見つかりません。")
+
+                start_balance = row[0]
+
+                # Lost Update を疑似的に再現
+                # Aさん: start_balance を読んで a_amount を加算
+                # Bさん: start_balance を読んで b_amount を加算（最後の更新として上書きされる）
+                expected = start_balance + a_amount + b_amount
+                lost = start_balance + b_amount   # A の更新が消えて、B の結果だけ残る
+
+                conflict_result = {
+                    "start_balance": start_balance,
+                    "a_amount": a_amount,
+                    "b_amount": b_amount,
+                    "expected": expected,
+                    "lost": lost,
+                }
+
+            except ValueError:
+                error_message = "金額は整数で入力してください。"
+            except Exception as e:
+                error_message = f"競合シミュレーション中にエラーが発生しました: {e}"
+
+        # --- Isolation あり（実際にDBを順番に更新） ---
+        elif action == 'simulate_isolation':
+            try:
+                a_amount = int(request.form.get('a_amount', '0'))
+                b_amount = int(request.form.get('b_amount', '0'))
+
+                conn = mysql.connector.MySQLConnection(**this_users_dns)
+                cursor = conn.cursor()
+
+                # 実行前の残高
+                cursor.execute(f"SELECT balance FROM {table_name} WHERE name=%s", ('Suzuki',))
+                row = cursor.fetchone()
+                if row is None:
+                    raise Exception("Suzuki のレコードが見つかりません。")
+                start_balance = row[0]
+
+                # Aさん
+                connA = mysql.connector.MySQLConnection(**this_users_dns)
+                cursorA = connA.cursor()
+                connA.start_transaction()
+                cursorA.execute(f"UPDATE {table_name} SET balance = balance + {a_amount} WHERE name='Suzuki'")
+                connA.commit()
+                cursorA.close()
+                connA.close()
+
+                # Bさん
+                connB = mysql.connector.MySQLConnection(**this_users_dns)
+                cursorB = connB.cursor()
+                connB.start_transaction()
+                cursorB.execute(f"UPDATE {table_name} SET balance = balance - {b_amount} WHERE name='Suzuki'")
+                connB.commit()
+                cursorB.close()
+                connB.close()
+
+                # 実行後の残高
+                cursor.execute(f"SELECT balance FROM {table_name} WHERE name=%s", ('Suzuki',))
+                row2 = cursor.fetchone()
+                final_balance = row2[0] if row2 else None
+
+                cursor.close()
+                conn.close()
+
+                isolation_result = {
+                    "start_balance": start_balance,
+                    "a_amount": a_amount,
+                    "b_amount": b_amount,
+                    "final_balance": final_balance,
+                }
+                message = "Isolationありモードで2人分の更新を実行しました。"
+
+            except ValueError:
+                error_message = "金額は整数で入力してください。"
+            except Exception as e:
+                error_message = f"Isolationありモードの実行中にエラーが発生しました: {e}"
+
+    # --- 現在の accounts_plus テーブルを取得 ---
+    try:
+        desc, table = fetch_table_data(table_name)
+    except Exception as e:
+        desc, table = [], []
+        if not error_message:
+            error_message = f"テーブル読み込み中にエラーが発生しました: {e}"
+
+    return render_template(
+        'transaction_isolation_practice.html',
+        desc=desc,
+        table=table,
+        message=message,
+        error_message=error_message,
+        conflict_result=conflict_result,
+        isolation_result=isolation_result
+    )
+
+
 
 #quiz 管理
 @app.route('/quiz/<quiz_type>', methods=['GET', 'POST'])
@@ -2062,7 +2369,7 @@ def signup():
             
             # ユーザーのデータベースにdataset内にある、テーブルをいくつかコピーする
             tables = ['users', 'products', 'products_initialstate', 'discounts', 'customers', 'inventory', 'employees', 'departed_employees', 'sales',
-                    'quiz_list', 'progress', 'all_users', 'selected_users', 'expenses', 'accounts']
+                    'quiz_list', 'progress', 'all_users', 'selected_users', 'expenses', 'accounts', 'accounts_plus','user_created_tables']
             for table in tables:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)
                 cursor = conn.cursor()
@@ -7386,7 +7693,11 @@ def quiz_progress():
             21: "quiz/delete_all_records",
             22: "quiz/update_join",
             23: "quiz/delete_shared-single",
-            24: "quiz/transaction_basic_operations"
+            24: "quiz/transaction_basic_operations",
+            25: "quiz/transaction_isolation",
+            26: "quiz/database_overview",
+            27: "quiz/key_and_definition",
+            28: "quiz/create_table"
         }
 
         # 完了したクイズの数を計算

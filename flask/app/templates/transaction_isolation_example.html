@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Isolation（独立性） 実例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+<style>
+.example-flex {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.example-table {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    width: 45%;
+}
+.example-table th {
+    background: #007bff;
+    color: white;
+    padding: 8px;
+}
+.example-table td {
+    padding: 8px;
+    background: #fff;
+}
+.diagram {
+    width: 95%;
+    max-width: 850px;
+    display: block;
+    margin: 25px auto;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+.caption {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    color: #555;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/transaction/acid/isolation/study" class="prev">◀ 前へ</a>
+    <a href="/transaction/acid/isolation/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>Isolation の実例</h1>
+
+    <section>
+        <h2>❌ Isolation が弱い場合（Lost Update）</h2>
+
+        <p>2人が同時に同じ口座を操作すると、<strong>更新の消失（Lost Update）</strong>が発生することがあります。</p>
+
+        <!-- ★ 誤った例の図（ファイルパスは後であなたが設定） -->
+        <img src="{{ url_for('static', filename='images/transaction_isolation_miss.jpg') }}"
+             alt="Isolation が弱い場合の例"
+             class="diagram">
+        <div class="caption">Isolation が弱いと、④の更新だけが反映されてしまい、Aさんの更新が消える</div>
+
+        <div class="code-block">
+<code>
+Aさん：
+SELECT balance FROM accounts_plus WHERE name='Suzuki';
+→ 10000
+
+Bさん：
+SELECT balance FROM accounts_plus WHERE name='Suzuki';
+→ 10000
+
+Aさん：
+UPDATE accounts_plus SET balance = 10000 + 1000 WHERE name='Suzuki';
+
+Bさん：
+UPDATE accounts_plus SET balance = 10000 - 500 WHERE name='Suzuki';
+</code>
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>⭕ Isolation が強い場合（正しく順番に実行される）</h2>
+
+        <p>
+            トランザクションを使うことで、複数の更新が<strong>安全に順番どおり実行</strong>され、<br>  
+            Aさんの更新も Bさんの更新も正しく反映されます。
+        </p>
+
+        <!-- ★ 正しい例の図（ファイルパスは後であなたが設定） -->
+        <img src="{{ url_for('static', filename='images/transaction_isolation_correct.jpg') }}"
+             alt="Isolation が強い場合の例"
+             class="diagram">
+        <div class="caption">Isolation が強い場合は安全に順番どおり実行され、AさんとBさんの更新が両方反映される</div>
+
+        <div class="code-block">
+<code>
+Aさん：
+START TRANSACTION;
+UPDATE accounts_plus SET balance = balance + 1000 WHERE name='Suzuki';
+COMMIT;
+
+Bさん：
+START TRANSACTION;
+UPDATE accounts_plus SET balance = balance - 500 WHERE name='Suzuki';
+COMMIT;
+</code>
+        </div>
+    </section>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/transaction/acid/isolation/study" class="prev">◀ 前へ</a>
+    <a href="/transaction/acid/isolation/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

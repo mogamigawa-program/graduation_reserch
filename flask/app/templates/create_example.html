@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}CREATE TABLE の例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/part_of_database/create/study" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/create/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>CREATE TABLE の具体例</h1>
+
+    <section>
+        <h2>例①：ユーザーテーブルの作成</h2>
+
+        <div class="code-block">
+<code>CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT
+);</code>
+        </div>
+
+        <p>もっとも基本的なテーブルの例です。</p>
+    </section>
+
+    <section>
+        <h2>例②：商品テーブルの作成</h2>
+
+        <div class="code-block">
+<code>CREATE TABLE items (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    price INT
+);</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>例③：外部キーを使ったテーブル</h2>
+
+        <p>少しだけ応用ですが、関係データベースっぽくなります。</p>
+
+        <div class="code-block">
+<code>CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    user_id INT,
+    item VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);</code>
+        </div>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/part_of_database/create/study" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/create/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

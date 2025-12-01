@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}ACID特性：Isolation（独立性）{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+<style>
+.tips-box {
+    background: #eef7ff;
+    border-left: 5px solid #3399ff;
+    padding: 16px;
+    margin: 25px 0;
+    border-radius: 8px;
+}
+.isolation-img {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/acid特性?flag=min" class="prev">◀ トランザクションTOPへ</a>
+    <a href="/transaction/acid/isolation/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>ACID特性：Isolation（独立性）とは？</h1>
+
+    <section>
+        <p>
+            <strong>Isolation（独立性）</strong>とは、  
+            「同時に複数のユーザーがデータベースにアクセスしても、  
+            お互いの処理が干渉しないようにする」ための仕組みです。
+        </p>
+    </section>
+
+    <section class="isolation-img">
+        <h2>❌ Isolation が弱い場合（問題例）</h2>
+        <p>同時に2人が同じ口座を更新すると、下のような問題が発生することがあります。</p>
+        <ul>
+            <li><strong>Lost Update（更新の消失）</strong>  
+                → Aさんの更新が、Bさんの更新に上書きされて消える
+            </li>
+            <li><strong>Dirty Read</strong>  
+                → Bさんが、Aさんの「まだコミットされていない値」を読んでしまう
+            </li>
+        </ul>
+    </section>
+
+    <section class="isolation-img">
+        <h2>⭕ Isolation が強い場合</h2>
+        <p>
+            データベースは、同じデータを更新するトランザクションを  
+            「順番に安全に実行」してくれます。
+        </p>
+        <p>これにより……</p>
+        <ul>
+            <li>更新が消えない</li>
+            <li>矛盾した状態を読み取らない</li>
+            <li>整合性が保たれる</li>
+        </ul>
+    </section>
+
+    <div class="tips-box">
+        <strong>💡 Tips：</strong><br>
+        UPDATE や DELETE は 1文だけでも、  
+        実は MySQL 内部で自動的に  
+        <strong>1つのトランザクションとして実行</strong>されています。  
+        明示的にトランザクションを使うのは、  
+        「複数の処理を安全にまとめたい時」です。
+    </div>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/acid特性?flag=min" class="prev">◀ トランザクションTOPへ</a>
+    <a href="/transaction/acid/isolation/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

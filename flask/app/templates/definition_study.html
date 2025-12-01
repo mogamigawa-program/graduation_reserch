@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}テーブルの定義とは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/テーブルの定義?flag=min" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/definition/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>テーブルの定義とは</h1>
+
+    <section>
+        <h2>テーブルとは？</h2>
+        <p>
+            テーブルは、<strong>データを入れるための箱（表）</strong>です。  
+            Excel の表とよく似ていて、行と列でデータを管理します。
+        </p>
+    </section>
+
+    <section>
+        <h2>テーブルの構成要素</h2>
+        <ul>
+            <li><strong>カラム（列）</strong>：項目名（name, age など）</li>
+            <li><strong>データ型</strong>：どんな値を入れるか（数値、文字、日付など）</li>
+            <li><strong>レコード（行）</strong>：1件分のデータ</li>
+            <li><strong>主キー</strong>：データを一意に識別する番号</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>データ型（代表例）</h2>
+        <ul>
+            <li><strong>INT</strong>：整数（年齢など）</li>
+            <li><strong>VARCHAR(n)</strong>：文字列（名前など）</li>
+            <li><strong>DATE</strong>：日付（誕生日など）</li>
+        </ul>
+        <p>とりあえずこのあたりを覚えておけば十分です。</p>
+    </section>
+
+    <section>
+        <h2>簡単なテーブル定義の例</h2>
+
+        <div class="code-block">
+<code>users テーブル
++----+----------+------+
+| id | name     | age  |
++----+----------+------+
+| 1  | Taro     | 20   |
+| 2  | Hanako   | 22   |
++----+----------+------+</code>
+        </div>
+
+        <p>これを SQL で定義するとどうなるかは、次の「テーブル作成」で詳しく学びます。</p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/part_of_database/definition/study" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/definition/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

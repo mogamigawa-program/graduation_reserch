@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}関係データベースとは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/関係データベースとは?flag=min" class="prev">◀ 前へ</a>
+    <a href="/database_basic/what_relational_database/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>関係データベース（RDB）とは</h1>
+
+    <section>
+        <h2>RDB の概要</h2>
+        <p>
+            関係データベース（Relational DataBase / RDB）とは、<br>
+            <strong>「表（テーブル）」を使ってデータを整理して管理するデータベース</strong> のことです。
+        </p>
+        <p>
+            1つのテーブルは「Excel のシート」のような形をしており、  
+            行（レコード）と列（カラム）で構成されています。
+        </p>
+    </section>
+
+    <section>
+        <h2>RDB の特徴</h2>
+        <ul>
+            <li><strong>表形式で分かりやすい</strong></li>
+            <li><strong>データ同士の関係を表現できる</strong>（例：ユーザーと注文）</li>
+            <li><strong>大量データでも検索が速い</strong></li>
+            <li><strong>安全にデータを守る仕組み（制約）がある</strong></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>RDB の構成要素</h2>
+        <ul>
+            <li><strong>テーブル（表）</strong>：データを入れる箱</li>
+            <li><strong>カラム（列）</strong>：項目（名前、年齢など）</li>
+            <li><strong>レコード（行）</strong>：1件分のデータ</li>
+            <li><strong>主キー（Primary Key）</strong>：データの識別番号</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>なぜ「関係」データベースと呼ばれるの？</h2>
+        <p>
+            複数のテーブルを<strong>「関係づけて」データを扱える</strong>からです。
+        </p>
+        <p>例えば以下のように「users テーブル」と「orders テーブル」を結びつけられます：</p>
+
+        <div class="code-block">
+<code>users テーブル
++----+----------+
+| id | name     |
++----+----------+
+|  1 | Taro     |
+|  2 | Hanako   |
++----+----------+
+
+orders テーブル
++----+----------+-----------+
+| id | user_id  | item      |
++----+----------+-----------+
+| 1  | 1        | Book      |
+| 2  | 2        | T-shirt   |
++----+----------+-----------+</code>
+        </div>
+
+        <p>
+            これにより「誰がどの注文をしたか？」を簡単に扱えます。  
+            これが RDB の最大の強みです。
+        </p>
+    </section>
+
+    <section>
+        <h2>RDB で使う言語：SQL</h2>
+        <p>
+            RDB を操作するために使用するのが <strong>SQL（エスキューエル）</strong> です。<br>
+            このアプリでは SQL の使い方を学んでいきます。
+        </p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/関係データベースとは?flag=min" class="prev">◀ 前へ</a>
+    <a href="/database_basic/what_relational_database/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

@@ -1103,3 +1103,28 @@ form .button-group {
         max-width: 100%;
     }
 }
+
+.learning-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+.learning-table th,
+.learning-table td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: center;
+}
+.result-box {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+}
+.isolation-form > div {
+    margin: 6px 0;
+}
+.isolation-form input[type="text"] {
+    width: 120px;
+}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}テーブル定義の例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/part_of_database/definition/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/key_and_definition" class="next">まとめクイズへ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>テーブル定義の具体例</h1>
+
+    <section>
+        <h2>例①：ユーザー情報のテーブル</h2>
+
+        <table class="example-table">
+            <caption>users テーブル</caption>
+            <tr><th>カラム名</th><th>データ型</th><th>説明</th></tr>
+            <tr><td>id</td><td>INT</td><td>主キー</td></tr>
+            <tr><td>name</td><td>VARCHAR(50)</td><td>名前</td></tr>
+            <tr><td>age</td><td>INT</td><td>年齢</td></tr>
+        </table>
+
+        <p>このように、各カラムは「名前」「データ型」「役割」を持ちます。</p>
+    </section>
+
+    <section>
+        <h2>例②：商品テーブル</h2>
+
+        <table class="example-table">
+            <caption>items テーブル</caption>
+            <tr><th>カラム名</th><th>データ型</th><th>説明</th></tr>
+            <tr><td>id</td><td>INT</td><td>主キー</td></tr>
+            <tr><td>name</td><td>VARCHAR(100)</td><td>商品名</td></tr>
+            <tr><td>price</td><td>INT</td><td>価格</td></tr>
+        </table>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/part_of_database/definition/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/key_and_definition" class="next">まとめクイズへ ▶</a>
+</div>
+
+{% endblock %}

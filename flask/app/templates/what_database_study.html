@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}データベースとは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/データベースとは?flag=min" class="prev">◀ 前へ</a>
+    <a href="/database_basic/what_database/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>データベースとは</h1>
+
+    <section>
+        <h2>データベースの役割</h2>
+        <p>
+            データベースは、<strong>大量のデータを安全・正確・高速に管理するための仕組み</strong>です。<br>
+            例として、アプリのユーザー情報、商品情報、注文履歴など、整理されたデータを保存します。
+        </p>
+    </section>
+
+    <section>
+        <h2>なぜデータベースが必要なのか？</h2>
+        <ul>
+            <li>大量のデータを効率よく扱える</li>
+            <li>複数人・複数アプリから同時にアクセスできる</li>
+            <li>データの整合性を保てる（勝手に矛盾を防ぐ）</li>
+            <li>安全にバックアップできる</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>データベースとExcelの違い</h2>
+        <p>Excelは小規模なデータ管理には便利ですが、複数人操作や大量データには向いていません。</p>
+
+        <table class="learning-table">
+            <tr>
+                <th>項目</th>
+                <th>Excel</th>
+                <th>データベース</th>
+            </tr>
+            <tr>
+                <td>同時編集</td>
+                <td>✕</td>
+                <td>◯（複数ユーザーOK）</td>
+            </tr>
+            <tr>
+                <td>大量データ</td>
+                <td>苦手</td>
+                <td>得意</td>
+            </tr>
+            <tr>
+                <td>データ整合性</td>
+                <td>保証されない</td>
+                <td>制約で守れる</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>データベースのイメージ</h2>
+        <div class="code-block">
+<code>users テーブル
++----+----------+------+
+| id | name     | age  |
++----+----------+------+
+|  1 | Taro     |  20  |
+|  2 | Hanako   |  22  |
++----+----------+------+</code>
+        </div>
+        <p>
+            このように「テーブル」という形でデータを整理して管理します。<br>
+            このテーブルに対してSQLを使い「追加・検索・更新・削除」を行います。
+        </p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/データベースとは?flag=min" class="prev">◀ 前へ</a>
+    <a href="/database_basic/what_database/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

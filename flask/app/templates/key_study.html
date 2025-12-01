@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}キーとは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/キー?flag=min" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/key/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>キーとは</h1>
+
+    <section>
+        <h2>キー（Key）の役割</h2>
+        <p>
+            キーとは、<strong>「データを区別するための特別な項目」</strong>のことです。  
+            同じようなデータがたくさんあっても、キーがあれば正しく見つけたり、つながりを作ることができます。
+        </p>
+    </section>
+
+    <section>
+        <h2>主キー（Primary Key）とは</h2>
+        <p>
+            主キーは、<strong>1つのデータを一意に識別するための番号</strong>です。  
+            重複せず、絶対に空欄（NULL）にはできません。
+        </p>
+
+        <div class="code-block">
+<code>users テーブル
++----+----------+------+
+| id | name     | age  |
++----+----------+------+
+| 1  | Taro     | 20   |
+| 2  | Hanako   | 22   |
++----+----------+------+</code>
+        </div>
+
+        <p>この例では <strong>id</strong> が主キーです。</p>
+    </section>
+
+    <section>
+        <h2>外部キー（Foreign Key）とは</h2>
+        <p>
+            外部キーは、<strong>別のテーブルの主キーを参照するための番号</strong>です。  
+            テーブル同士をつなぐ「橋」のような役割をします。
+        </p>
+
+        <div class="code-block">
+<code>orders テーブル
++----+----------+-----------+
+| id | user_id  | item      |
++----+----------+-----------+
+| 1  | 1        | Book      |
+| 2  | 2        | T-shirt   |
++----+----------+-----------+</code>
+        </div>
+
+        <p><strong>user_id → users.id</strong> というつながりができます。</p>
+    </section>
+
+    <section>
+        <h2>一意キー（Unique）とは</h2>
+        <p>
+            一意キーは、<strong>重複を禁止するための制約</strong>です。  
+            主キーほど厳しくはないですが、同じ値を入れられません。
+        </p>
+        <p>例：メールアドレスなどは重複させないようによく設定されます。</p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/キー?flag=min" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/key/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

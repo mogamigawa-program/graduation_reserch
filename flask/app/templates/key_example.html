@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}キーの具体例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/part_of_database/key/study" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/definition/study" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>キーの具体例</h1>
+
+    <section>
+        <h2>例①：ユーザー管理</h2>
+        <p>主キーを使うことで、同じ名前でも間違えずに区別できます。</p>
+
+        <div class="example-flex">
+            <table class="example-table">
+                <caption>users テーブル</caption>
+                <tr><th>id</th><th>name</th></tr>
+                <tr><td>1</td><td>Taro</td></tr>
+                <tr><td>2</td><td>Taro</td></tr>
+            </table>
+        </div>
+
+        <p>名前が同じでも、主キー（id）が違えば別人として扱えます。</p>
+    </section>
+
+    <section>
+        <h2>例②：購入履歴の管理</h2>
+        <p>外部キーで「どのユーザーの注文か」を表せます。</p>
+
+        <div class="example-flex">
+            <table class="example-table">
+                <caption>orders テーブル</caption>
+                <tr><th>id</th><th>user_id</th><th>item</th></tr>
+                <tr><td>1</td><td>1</td><td>Pen</td></tr>
+                <tr><td>2</td><td>1</td><td>Notebook</td></tr>
+                <tr><td>3</td><td>2</td><td>Bag</td></tr>
+            </table>
+        </div>
+
+        <p><strong>user_id → users.id</strong> により、注文者が分かります。</p>
+    </section>
+
+    <section>
+        <h2>例③：メールアドレスの重複禁止</h2>
+        <p>一意キーの例です。</p>
+
+        <div class="example-box">
+<code>email VARCHAR(100) UNIQUE</code>
+        </div>
+
+        <p>同じメールアドレスを2回入れようとするとエラーになります。</p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/part_of_database/key/study" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/definition/study" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

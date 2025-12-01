@@ -49,7 +49,16 @@ INSERT INTO `user_databases` VALUES
 (47,'admin_db'),
 (49,'test_db'),
 (50,'1_db'),
-(51,'2_db');
+(51,'2_db'),
+(52,'5_db'),
+(53,'6_db'),
+(54,'7_db'),
+(55,'4_db'),
+(56,'i_db'),
+(57,'11_db'),
+(58,'a_db'),
+(59,'f_db'),
+(60,'s_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -67,7 +76,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -80,7 +89,16 @@ INSERT INTO `users` VALUES
 (47,'admin','$2b$12$aFUuUd/94xJevU6uNukLGe3Rvn/9mLCO47urOyrNmrhFRio.7BRgq',1),
 (49,'test','$2b$12$SvPZk/VFSQaWDQC9A5YYL.wohPp/9j1Nkjq84SvMKKvYxXN84ZgWS',0),
 (50,'1','$2b$12$fKH9cA0Cw7ygN.TGmxD5uO1ZopyyrQzSsnZVeSof7wocZSx9NKwRq',0),
-(51,'2','$2b$12$x9kcDFzrNmbL0HXYVtlYleBUwXUFzm0rx2P38o77RlF4yFrU5CK/O',0);
+(51,'2','$2b$12$x9kcDFzrNmbL0HXYVtlYleBUwXUFzm0rx2P38o77RlF4yFrU5CK/O',0),
+(52,'5','$2b$12$N2CgClq7hTisbsU00lUd6uipiozZSjPJaoP/SoBZJiFNQg0zzJn6e',0),
+(53,'6','$2b$12$uicqJM.mMJY6lLo8MyijdO7N8sDMQtVdAIIPVyw758jFSimwjKZlG',0),
+(54,'7','$2b$12$0I2YU2cvWQnhNbUL.6U9U.iZYxC5zbON67MPTpi2HazQJQu06kCde',0),
+(55,'4','$2b$12$Kmqz9yM3wP8wrqXpXLUsreADUxS3XWzfrvB1VFUzh5FxM3GFHUqf.',0),
+(56,'i','$2b$12$koNkn4rTZnfN5JtsnP4UKuWmCWq5O6Vy09wLLRYO.3bVMsQUDDw0K',0),
+(57,'11','$2b$12$FrfDVXQ2Hhg2JCMfPicYB.ZlKkixiIRr66MkucqsVmC07LHS01lBq',0),
+(58,'a','$2b$12$6qvbY1/d2j8aWCBtYjrwTun.BD8ekIp0NBeT4uFPPBhWbZz/J4.dm',0),
+(59,'f','$2b$12$nIe6l5UVJh8lt.DR7HfKLuf4b3vYwnXrIAwf1CY4lMk0ZXVugbuyO',0),
+(60,'s','$2b$12$3zwPPYRXv4aKFrH6VA5cKe6PL7pUh13s6zGshWx12dKWNLELjF6Q6',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -91,6 +109,63 @@ UNLOCK TABLES;
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dataset` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 
 USE `dataset`;
+
+--
+-- Table structure for table `accounts`
+--
+
+DROP TABLE IF EXISTS `accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `accounts` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `balance` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounts`
+--
+
+LOCK TABLES `accounts` WRITE;
+/*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES
+(1,'A',10000),
+(2,'B',8000),
+(3,'C',12000);
+/*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `accounts_plus`
+--
+
+DROP TABLE IF EXISTS `accounts_plus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `accounts_plus` (
+  `id` int(11) NOT NULL,
+  `name` varchar(20) DEFAULT NULL,
+  `balance` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounts_plus`
+--
+
+LOCK TABLES `accounts_plus` WRITE;
+/*!40000 ALTER TABLE `accounts_plus` DISABLE KEYS */;
+INSERT INTO `accounts_plus` VALUES
+(1,'Suzuki',10000),
+(2,'Tanaka',15000),
+(3,'Sato',8000),
+(4,'Ito',20000);
+/*!40000 ALTER TABLE `accounts_plus` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `all_users`
@@ -141,7 +216,7 @@ CREATE TABLE `choices` (
   `is_correct` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `idx_question_id` (`question_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=296 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=356 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -322,7 +397,67 @@ INSERT INTO `choices` VALUES
 (292,43,'UPDATE a, b ON a.id = b.id SET a.value = 10;',0),
 (293,43,'UPDATE users u JOIN orders o ON u.id = o.user_id SET u.status = \"active\";',1),
 (294,43,'UPDATE users AS u, orders AS o SET u.status = \"active\" JOIN ON u.id = o.user_id;',0),
-(295,43,'UPDATE users JOIN orders USING (user_id) WHERE u.status = \"active\";',0);
+(295,43,'UPDATE users JOIN orders USING (user_id) WHERE u.status = \"active\";',0),
+(296,44,'DELETE FROM tableA a JOIN tableB b ON a.id = b.id;',0),
+(297,44,'DELETE a FROM tableA AS a JOIN tableB AS b ON a.id = b.id;',1),
+(298,44,'DELETE FROM a, b WHERE a.id = b.id;',0),
+(299,44,'DELETE b FROM tableA AS a JOIN tableB AS b ON a.id = b.id;',0),
+(300,45,'DELETE a FROM tableA AS a JOIN tableB AS b ON a.id = b.id;',1),
+(301,45,'DELETE FROM tableA AS a, tableB AS b WHERE a.id = b.id;',0),
+(302,45,'DELETE FROM tableA a WHERE a.id IN (SELECT id FROM tableB b);',0),
+(303,45,'DELETE b FROM tableA AS a JOIN tableB AS b ON a.id = b.id;',0),
+(304,46,'削除する列を指定する',0),
+(305,46,'削除対象テーブルを決める',0),
+(306,46,'削除順序を指定する',0),
+(307,46,'2つのテーブルを結合する条件を指定する',1),
+(308,47,'DELETE FROM tableA JOIN tableB ON tableA.id = tableB.id;',0),
+(309,47,'DELETE FROM tableA AS a, tableB AS b WHERE a.id = b.id;',0),
+(310,47,'DELETE a FROM tableA AS a JOIN tableB AS b ON a.id = b.id;',1),
+(311,47,'DELETE FROM tableA USING tableB WHERE tableA.id = tableB.id;',0),
+(312,48,'DELETE FROM tableA WHERE id IN (SELECT id FROM tableB WHERE status = \'inactive\');',0),
+(313,48,'DELETE a FROM tableA AS a JOIN tableB AS b ON a.id = b.id WHERE a.status = \'inactive\';',1),
+(314,48,'DELETE FROM tableA AS a, tableB AS b WHERE a.id = b.id AND a.status = \'inactive\';',0),
+(315,48,'DELETE b FROM tableA AS a JOIN tableB AS b ON a.id = b.id WHERE a.status = \'inactive\';',0),
+(316,49,'1つのSQL文のみを指す言葉である',0),
+(317,49,'複数の操作をまとめて実行し、全体を一つの処理単位として扱う仕組み',1),
+(318,49,'SQL文のエラーを自動修正する仕組み',0),
+(319,49,'データベース全体をバックアップする仕組み',0),
+(320,50,'原子性（Atomicity）',0),
+(321,50,'一貫性（Consistency）',0),
+(322,50,'独立性（Isolation）',0),
+(323,50,'効率性（Efficiency）',1),
+(324,51,'START TRANSACTION;',1),
+(325,51,'BEGIN UPDATE;',0),
+(326,51,'OPEN TRANSACTION;',0),
+(327,51,'BEGIN SESSION;',0),
+(328,52,'データを確定して保存する命令',0),
+(329,52,'トランザクションを終了し、接続を切断する命令',0),
+(330,52,'トランザクション中の変更をすべて取り消す命令',1),
+(331,52,'実行計画を再構築する命令',0),
+(332,53,'INSERTとUPDATEをまとめて実行し、最後にCOMMITする',0),
+(333,53,'SELECT文のみを1回だけ実行しCOMMITする',1),
+(334,53,'ROLLBACKで処理を取り消すことができる',0),
+(335,53,'一連の操作を安全に実行するために使う',0),
+(336,54,'すべての処理が成功するか失敗するかを保証する性質',0),
+(337,54,'障害発生時にデータを保持する性質',0),
+(338,54,'トランザクションが互いに干渉しないように独立して実行される性質',1),
+(339,54,'データの整合性を保ち続けるための規則',0),
+(340,55,'他トランザクションの未確定の変更が見えてしまう',1),
+(341,55,'データが永続的に保存されなくなる',0),
+(342,55,'データベース全体が停止する',0),
+(343,55,'自動的にコミットされてしまう',0),
+(344,56,'Isolationは守られていない',0),
+(345,56,'Atomicityが守られている',0),
+(346,56,'Durabilityが守られている',0),
+(347,56,'Isolationは守られている',1),
+(348,57,'障害時にデータを保持すること',0),
+(349,57,'他トランザクションに途中状態を見せないこと',1),
+(350,57,'更新を永続的に保存すること',0),
+(351,57,'データベースの速度を最適化すること',0),
+(352,58,'テーブル定義が壊れる',0),
+(353,58,'整合性制約がすべて無効になる',0),
+(354,58,'別トランザクションが未確定の変更を読めてしまう',1),
+(355,58,'更新内容が永続的に保存されない',0);
 /*!40000 ALTER TABLE `choices` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -977,7 +1112,7 @@ CREATE TABLE `questions` (
   `question_text` text NOT NULL,
   `explanation` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1029,7 +1164,22 @@ INSERT INTO `questions` VALUES
 (40,'UPDATE_JOIN','UPDATE JOIN 構文における ON 句の役割として正しいのはどれ？','ON句は2つのテーブルを結合する条件を指定します。これがないとどの行を対応づけるか分からなくなります。'),
 (41,'UPDATE_JOIN','次の文を実行した場合、どのテーブルのデータが更新される？\nUPDATE products p JOIN categories c ON p.category_id = c.id SET p.price = 0;','UPDATE句の直後に書かれたテーブル（この例ではproducts）が更新対象になります。JOIN側のテーブルは更新されません。'),
 (42,'UPDATE_JOIN','UPDATE JOIN 構文で、更新対象をさらに絞り込みたい場合はどこに条件を追加する？','WHERE句を使用して、結合後のデータの中から特定条件に一致する行だけを更新できます。'),
-(43,'UPDATE_JOIN','別名を使ったUPDATE JOIN構文の例として正しいのはどれ？','テーブル名に別名を付けることで、複数テーブルを扱う際に記述を簡略化できます。');
+(43,'UPDATE_JOIN','別名を使ったUPDATE JOIN構文の例として正しいのはどれ？','テーブル名に別名を付けることで、複数テーブルを扱う際に記述を簡略化できます。'),
+(44,'DELETE_SHARED-MULTIPLE','2つのテーブルに共通する行を削除する正しい構文はどれ？（別名使用）','DELETE JOIN構文では、DELETE句の直後に削除対象の別名を指定し、JOINで共通部分を結合します。'),
+(45,'DELETE_SHARED-MULTIPLE','DELETE JOIN構文で削除対象を指定する正しい方法はどれ？','DELETE句の直後に削除対象テーブルの別名を指定します。JOINで結合しても、削除されるのは指定したテーブルのみです。'),
+(46,'DELETE_SHARED-MULTIPLE','DELETE JOIN構文のON句はどのような役割を持つ？','ON句では、削除対象テーブルと結合テーブルの共通カラムを指定して、対応する行を特定します。'),
+(47,'DELETE_SHARED-MULTIPLE','別名を使ったDELETE JOIN構文の正しい例はどれ？','DELETE句の後には削除対象テーブルの別名を、JOIN句では結合条件を指定します。'),
+(48,'DELETE_SHARED-MULTIPLE','共通idかつstatusが\"inactive\"の行を削除する正しいSQLはどれ？（別名使用）','JOINで共通部分を結合し、WHERE句で追加条件を指定します。'),
+(49,'TRANSACTION_BASIC_OPERATIONS','トランザクションの説明として正しいものはどれ？','トランザクションとは、一連の処理を1つの単位として扱い、すべて成功またはすべて失敗のどちらかにする仕組みです。'),
+(50,'TRANSACTION_BASIC_OPERATIONS','トランザクションの「ACID特性」に含まれないものはどれ？','ACID特性は、原子性(Atomicity)、一貫性(Consistency)、独立性(Isolation)、永続性(Durability)の4つです。'),
+(51,'TRANSACTION_BASIC_OPERATIONS','トランザクションを開始するSQL文はどれ？','トランザクションを開始するには「START TRANSACTION;」または「BEGIN;」を使います。'),
+(52,'TRANSACTION_BASIC_OPERATIONS','次のうち、ROLLBACKの説明として正しいものはどれ？','ROLLBACKはトランザクション中の変更を取り消し、開始前の状態に戻す命令です。'),
+(53,'TRANSACTION_BASIC_OPERATIONS','次のうち、トランザクションの使い方として誤っているのはどれ？','トランザクションは、複数の関連操作をまとめて実行するために使います。SELECTだけの処理で使う必要はありません。'),
+(54,'TRANSACTION_ISOLATION','Isolation（分離性）の最も正しい説明はどれ？','Isolationは、トランザクション同士が干渉せず独立して実行される性質です。'),
+(55,'TRANSACTION_ISOLATION','Isolationが守られていない場合に起こるもっとも基本的な問題はどれ？','Isolationが不足すると、未確定の変更が他のトランザクションから見えてしまいます。'),
+(56,'TRANSACTION_ISOLATION','次の状況はIsolationが守られているか？\n「T1がCOMMIT前の変更を、T2が読むことができない。」','COMMIT前の変更を他トランザクションが読めないのはIsolationが保たれている状態です。'),
+(57,'TRANSACTION_ISOLATION','Isolationがもっとも重視している目的はどれ？','Isolationは、他のトランザクションに途中経過を見せないための仕組みです。'),
+(58,'TRANSACTION_ISOLATION','Isolationが正しく機能していない場合の挙動として正しいものはどれ？','Isolation不足では、他トランザクションが未確定の変更を読めてしまう状態が起こります。');
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1046,7 +1196,7 @@ CREATE TABLE `quiz_list` (
   `total_questions` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `quiz_name` (`quiz_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1077,7 +1227,10 @@ INSERT INTO `quiz_list` VALUES
 (19,'UPDATE SINGLE COLUMN',5),
 (20,'UPDATE MULTIPLE COLUMNS',5),
 (21,'DELETE ALL RECORDS',5),
-(22,'UPDATE JOIN',5);
+(22,'UPDATE JOIN',5),
+(23,'DELETE SHARED MULTIPLE',5),
+(24,'TRANSACTION BASIC OPERATIONS',5),
+(25,'TRANSACTION ISOLATION',5);
 /*!40000 ALTER TABLE `quiz_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1378,4 +1531,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-11-05 10:28:13
+-- Dump completed on 2025-12-01 17:27:07

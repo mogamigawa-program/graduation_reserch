@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}データベースの具体例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/database_basic/what_database/study" class="prev">◀ 前へ</a>
+    <a href="/index" class="next">トップへ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>データベースの具体例</h1>
+
+    <section>
+        <h2>身近なアプリはすべてデータベースで動いている</h2>
+        <p>私たちが普段使っているアプリは、ほぼ例外なくデータベースを利用しています。</p>
+
+        <table class="learning-table">
+            <tr>
+                <th>サービス</th>
+                <th>データベースで扱っているもの</th>
+            </tr>
+            <tr>
+                <td>LINE</td>
+                <td>ユーザー、友達リスト、メッセージ履歴</td>
+            </tr>
+            <tr>
+                <td>Twitter / X</td>
+                <td>投稿、フォロワー、DM</td>
+            </tr>
+            <tr>
+                <td>コンビニ</td>
+                <td>在庫情報、商品情報、売上履歴</td>
+            </tr>
+            <tr>
+                <td>大学システム</td>
+                <td>成績、学生情報、履修登録</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>データベースがないとどうなる？</h2>
+        <div class="alert-warning">
+            <strong>問題点：</strong> Excel のような手動管理では、<br>
+            ・データが壊れる<br>
+            ・最新版がわからなくなる<br>
+            ・複数人で開けない<br>
+            など多くのトラブルが起こります。
+        </div>
+
+        <p>データベースなら、これらを自動で防いでくれます。</p>
+    </section>
+
+    <section>
+        <h2>テーブルの具体イメージ</h2>
+        <p>例えばショッピングサイトの「注文履歴」は次のようなテーブルで管理されています：</p>
+
+        <div class="code-block">
+<code>orders テーブル
++----+------------+------------+----------+
+| id | user_id    | item_name  | price    |
++----+------------+------------+----------+
+| 1  | 2          | Book       | 1200     |
+| 2  | 2          | T-Shirt    | 2500     |
+| 3  | 1          | Keyboard   | 6400     |
++----+------------+------------+----------+
+</code>
+        </div>
+
+        <p>このように、データは常にテーブル形式で整理されて保存されます。</p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/database_basic/what_database/study" class="prev">◀ 前へ</a>
+    <a href="/index" class="next">トップへ ▶</a>
+</div>
+
+{% endblock %}

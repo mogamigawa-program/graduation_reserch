@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}テーブルの作成（CREATE TABLE）{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/テーブルの作成?flag=min" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/create/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>テーブルの作成（CREATE TABLE）</h1>
+
+    <section>
+        <h2>CREATE TABLE 文とは？</h2>
+        <p>
+            <strong>テーブルを新しく作るための SQL 文</strong>です。  
+            中にどんなデータを入れるのか（名前、データ型、主キーなど）を定義します。
+        </p>
+    </section>
+
+    <section>
+        <h2>基本構文</h2>
+
+        <div class="code-block">
+<code>CREATE TABLE テーブル名 (
+    カラム名 データ型,
+    カラム名 データ型,
+    ...
+);</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>例：users テーブルを作る</h2>
+
+        <div class="code-block">
+<code>CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT
+);</code>
+        </div>
+
+        <p>
+            この SQL を実行すると、  
+            <strong>id・name・age の3つの項目を持つ users テーブル</strong>ができます。
+        </p>
+    </section>
+
+    <section>
+        <h2>ポイント</h2>
+        <ul>
+            <li>PRIMARY KEY を付けると、そのカラムは重複不可・NULL不可になります</li>
+            <li>VARCHAR(50) は「最大50文字までの文字列」</li>
+            <li>INT は整数を入れるカラム</li>
+        </ul>
+        <p>初心者はまずこのレベルだけ覚えれば十分です。</p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/テーブルの作成?flag=min" class="prev">◀ 前へ</a>
+    <a href="/part_of_database/create/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

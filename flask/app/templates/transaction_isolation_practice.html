@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}ACID特性：Isolation 演習{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/transaction/acid/isolation/example" class="prev">◀ 前へ</a>
+    <a href="/quiz/transaction_isolation" class="next">クイズページへ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>ACID特性：Isolation 演習</h1>
+
+    <!-- メッセージ表示 -->
+    {% if message %}
+      <p class="message">{{ message }}</p>
+    {% endif %}
+    {% if error_message %}
+      <p class="error">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- 初期化ボタン -->
+    <section>
+        <h2>1. テーブルの初期化</h2>
+        <p>演習用テーブル <code>accounts_plus</code> を初期状態に戻します。</p>
+        <form method="POST">
+            <button type="submit" name="action" value="init" class="btn btn-secondary">
+                accounts_plus を初期化
+            </button>
+        </form>
+    </section>
+
+    <hr>
+
+    <!-- 現在のテーブル表示 -->
+    <section>
+        <h2>2. 現在の accounts_plus テーブル</h2>
+        {% if desc and table %}
+        <table class="learning-table">
+            <tr>
+                {% for col in desc %}
+                  <th>{{ col[0] }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in table %}
+            <tr>
+                {% for cell in row %}
+                  <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>テーブルが見つかりません。初期化ボタンを押して作成してください。</p>
+        {% endif %}
+    </section>
+
+    <hr>
+
+    <!-- Isolation なしモード（疑似競合） -->
+    <section>
+        <h2>3. Isolation なし（競合が起きる例）</h2>
+        <p>
+            2人が同じ口座（<strong>Suzuki</strong>）を同時に操作する場面を疑似的に再現します。<br>
+            AさんとBさんが<strong>どちらも「同じ元の残高」を見て</strong>、それぞれ更新します。
+        </p>
+
+        <form method="POST" class="isolation-form">
+            <input type="hidden" name="action" value="simulate_conflict">
+            <div>
+                <label>Aさんの操作金額（例：1000）:</label>
+                <input type="text" name="a_amount" value="{{ conflict_result.a_amount if conflict_result }}">
+                <span>（プラスなら入金、マイナスなら出金）</span>
+            </div>
+            <div>
+                <label>Bさんの操作金額（例：-500）:</label>
+                <input type="text" name="b_amount" value="{{ conflict_result.b_amount if conflict_result }}">
+                <span>（プラスなら入金、マイナスなら出金）</span>
+            </div>
+            <button type="submit" class="btn">競合ありでシミュレーション</button>
+        </form>
+
+        {% if conflict_result %}
+        <div class="result-box">
+            <h3>シミュレーション結果</h3>
+            <p>Suzuki の実行前の残高：<strong>{{ conflict_result.start_balance }} 円</strong></p>
+
+            <table class="learning-table" style="max-width: 480px;">
+                <tr>
+                    <th></th>
+                    <th>残高</th>
+                </tr>
+                <tr>
+                    <td>理想的な結果<br><small>(AとB両方の更新が反映)</small></td>
+                    <td style="background:#d8f8d0;">
+                        {{ conflict_result.expected }} 円
+                        <br><small>＝ {{ conflict_result.start_balance }} + {{ conflict_result.a_amount }} + {{ conflict_result.b_amount }}</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Isolationが弱い場合<br><small>(Bの更新でAが上書きされる)</small></td>
+                    <td style="background:#f7c5c5;">
+                        {{ conflict_result.lost }} 円
+                        <br><small>＝ {{ conflict_result.start_balance }} + {{ conflict_result.b_amount }}</small>
+                    </td>
+                </tr>
+            </table>
+
+            <p>
+                <strong>ポイント：</strong><br>
+                Aさんの更新（{{ conflict_result.a_amount }} 円分）が、
+                最後に来たBさんの更新によって<strong>上書きされて消えてしまう</strong>状態が
+                <strong>Lost Update（更新の消失）</strong>です。
+                この例では<strong>実際のDBは書き換えていません</strong>（あくまで「こうなってしまう世界」をシミュレーションしています）。
+            </p>
+        </div>
+        {% endif %}
+    </section>
+
+    <hr>
+
+    <!-- Isolation ありモード（実際にDBを更新） -->
+    <section>
+        <h2>4. Isolation あり（安全な例）</h2>
+        <p>
+            同じくAさんとBさんが <strong>Suzuki</strong> の口座を操作しますが、今度は<br>
+            <strong>トランザクションを使って順番に処理</strong>します。
+            実際に <code>accounts_plus</code> の内容が更新されます。
+        </p>
+
+        <form method="POST" class="isolation-form">
+            <input type="hidden" name="action" value="simulate_isolation">
+            <div>
+                <label>Aさんの操作金額:</label>
+                <input type="text" name="a_amount" value="{{ isolation_result.a_amount if isolation_result }}">
+                <span>（プラス入金 / マイナス出金）</span>
+            </div>
+            <div>
+                <label>Bさんの操作金額:</label>
+                <input type="text" name="b_amount" value="{{ isolation_result.b_amount if isolation_result }}">
+                <span>（プラス入金 / マイナス出金）</span>
+            </div>
+            <button type="submit" class="btn">Isolationありで実行</button>
+        </form>
+
+        {% if isolation_result %}
+        <div class="result-box">
+            <h3>実行結果</h3>
+            <p>実行前の Suzuki の残高：<strong>{{ isolation_result.start_balance }} 円</strong></p>
+            <p>Aさんの操作：<strong>{{ isolation_result.a_amount }} 円</strong></p>
+            <p>Bさんの操作：<strong>{{ isolation_result.b_amount }} 円</strong></p>
+            <p>
+                実行後の Suzuki の残高：<strong style="background:#d8f8d0;">
+                    {{ isolation_result.final_balance }} 円
+                </strong>
+            </p>
+            <p>
+                <strong>ポイント：</strong><br>
+                Aさんのトランザクション、Bさんのトランザクションを<br>
+                <strong>順番に安全に実行</strong>しているため、  
+                AさんとBさんの更新が両方とも反映された結果になっています。
+            </p>
+        </div>
+        {% endif %}
+    </section>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/transaction/acid/isolation/example" class="prev">◀ 前へ</a>
+    <a href="/quiz/transaction_isolation" class="next">クイズページへ ▶</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}関係データベースの例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/database_basic/what_relational_database/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/database_overview" class="next">まとめクイズへ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>関係データベースの具体例</h1>
+
+    <section>
+        <h2>例①：ショッピングサイト</h2>
+        <p>ショッピングサイトでは、ユーザー情報と注文情報を別のテーブルで管理します。</p>
+
+        <div class="example-flex">
+            <table class="example-table">
+                <caption>users テーブル</caption>
+                <tr><th>id</th><th>name</th></tr>
+                <tr><td>1</td><td>Taro</td></tr>
+                <tr><td>2</td><td>Hanako</td></tr>
+            </table>
+
+            <table class="example-table">
+                <caption>orders テーブル</caption>
+                <tr><th>id</th><th>user_id</th><th>item</th></tr>
+                <tr><td>1</td><td>1</td><td>Book</td></tr>
+                <tr><td>2</td><td>2</td><td>T-shirt</td></tr>
+            </table>
+        </div>
+
+        <p>
+            このように、<strong>orders.user_id が users.id を参照することで「誰が買ったか」がわかる</strong>ようになっています。
+        </p>
+    </section>
+
+    <section>
+        <h2>例②：学校の成績管理</h2>
+        <p>
+            生徒の情報とテスト結果を別のテーブルで持つことで、  
+            データが整理され、重複せず、扱いやすくなります。
+        </p>
+
+        <div class="example-flex">
+            <table class="example-table">
+                <caption>students テーブル</caption>
+                <tr><th>id</th><th>name</th></tr>
+                <tr><td>1</td><td>Sato</td></tr>
+                <tr><td>2</td><td>Yamada</td></tr>
+            </table>
+
+            <table class="example-table">
+                <caption>scores テーブル</caption>
+                <tr><th>id</th><th>student_id</th><th>score</th></tr>
+                <tr><td>1</td><td>1</td><td>85</td></tr>
+                <tr><td>2</td><td>1</td><td>92</td></tr>
+                <tr><td>3</td><td>2</td><td>76</td></tr>
+            </table>
+        </div>
+
+        <p>
+            <strong>scores.student_id → students.id</strong>  
+            という関係で「誰の点数か？」が決まります。
+        </p>
+    </section>
+
+    <section>
+        <h2>例③：コンビニの在庫管理</h2>
+        <p>商品情報と在庫数を別々に持つことで、管理がシンプルになります。</p>
+
+        <div class="example-flex">
+            <table class="example-table">
+                <caption>items テーブル</caption>
+                <tr><th>id</th><th>name</th></tr>
+                <tr><td>1</td><td>Water</td></tr>
+                <tr><td>2</td><td>Sandwich</td></tr>
+            </table>
+
+            <table class="example-table">
+                <caption>stocks テーブル</caption>
+                <tr><th>id</th><th>item_id</th><th>quantity</th></tr>
+                <tr><td>1</td><td>1</td><td>30</td></tr>
+                <tr><td>2</td><td>2</td><td>12</td></tr>
+            </table>
+        </div>
+
+        <p><strong>複数のテーブルが「関係」して動く</strong>のが RDB の強みです。</p>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/database_basic/what_relational_database/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/database_overview" class="next">まとめクイズへ ▶</a>
+</div>
+
+{% endblock %}
