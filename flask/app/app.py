@@ -64,6 +64,7 @@ def check_login():
 @app.route("/index")
 def main():
     index_item = [
+        "初めての方へ",
         "データベースの基礎",
         "データベースの要素",
         "基本操作",
@@ -83,13 +84,14 @@ def index_item(item):
     try:
         if flag == "normal":
             normal_index_item = {
+                "初めての方へ": ["注意事項", "プログラミング基礎知識"],
                 "データベースの基礎": ["データベースとは", "関係データベースとは"],
                 "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
                 "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
-                "高度な検索": ["自己結合", "更新操作"],
+                # "高度な検索": ["自己結合", "更新操作"],
                 "集約と分析": ["集約関数", "ソートとグループ化"],
-                "集合演算": ["union", "except", "intersect"],
-                "テーブル制約と管理": ["テーブルに対する制約", "alter"],
+                # "集合演算": ["union", "except", "intersect"],
+                # "テーブル制約と管理": ["テーブルに対する制約", "alter"],
                 "トランザクション": ["トランザクションにおける基本操作", "acid特性"]    
             }
             index_item = normal_index_item[item]
@@ -104,6 +106,12 @@ def index_item(item):
 
         if flag == "min":
             min_index_item = {
+                "注意事項": [
+                    {"name": "注意事項", "url": "/info/app-notice"}
+                ],
+                "プログラミング基礎知識": [
+                    {"name": "プログラミング基礎知識", "url": "/info/programming-basics"}
+                ],
                 "データベースとは": [
                     {"name": "データベースとは", "url": "/database_basic/what_database/study"}
                 ],
@@ -141,10 +149,10 @@ def index_item(item):
                     {"name": "全レコード更新、計算", "url": "/basic/update/all-records/study"},
                     {"name": "join", "url": "/basic/update/join/study"}
                 ],
-                "upsert": [
-                    {"name": "replace構文", "url": "/basic/upsert/replace/study"},
-                    {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key/study"}
-                ],
+                # "upsert": [
+                #     {"name": "replace構文", "url": "/basic/upsert/replace/study"},
+                #     {"name": "insert on duplicate key update", "url": "/basic/upsert/duplicate-key/study"}
+                # ],
                 "delete": [
                     {"name": "単一条件", "url": "/basic/delete/single/study"},
                     {"name": "複数条件", "url": "/basic/delete/multiple/study"},
@@ -172,13 +180,13 @@ def index_item(item):
                     {"name": "group by", "url": "/aggregation/group-by/study"},
                     {"name": "having", "url": "/aggregation/having/study"}
                 ],
-                "テーブルに対する制約": [
-                    {"name": "主キー", "url": "/constraints/primary-key/study"},
-                    {"name": "一意性制約", "url": "/constraints/unique/study"},
-                    {"name": "NOT NULL制約", "url": "/constraints/not-null/study"},
-                    {"name": "外部キー制約", "url": "/constraints/foreign-key/study"},
-                    {"name": "DEFAULT値", "url": "/constraints/default/study"}
-                ],
+                # "テーブルに対する制約": [
+                #     {"name": "主キー", "url": "/constraints/primary-key/study"},
+                #     {"name": "一意性制約", "url": "/constraints/unique/study"},
+                #     {"name": "NOT NULL制約", "url": "/constraints/not-null/study"},
+                #     {"name": "外部キー制約", "url": "/constraints/foreign-key/study"},
+                #     {"name": "DEFAULT値", "url": "/constraints/default/study"}
+                # ],
                 "alter": [
                     {"name": "カラムの追加", "url": "/table-management/alter/add-column/study"},
                     {"name": "カラムの削除", "url": "/table-management/alter/drop-column/study"},
@@ -198,6 +206,7 @@ def index_item(item):
             # ✅ 小項目 → 親カテゴリの逆引き用辞書を作成
             reverse_index = {}
             for parent, children in {
+                "初めての方へ": ["注意事項", "プログラミング基礎知識"],
                 "データベースの基礎": ["データベースとは", "関係データベースとは"],
                 "データベースの要素": ["キー", "テーブルの定義", "テーブルの作成"],
                 "基本操作": ["select", "join", "insert", "update", "upsert", "delete"],
@@ -236,6 +245,18 @@ def hello():
     props = {'title': 'Step-by-Step Flask - hello', 'msg': 'Hello World.'}
     html = render_template('hello.html', props=props)
     return html
+
+# --- アプリ利用時の注意事項ページ ---
+@app.route('/info/app-notice')
+def app_notice():
+    return render_template('app_notice.html')
+
+
+# --- プログラミング基礎知識ページ ---
+@app.route('/info/programming-basics')
+def programming_basics():
+    return render_template('programming_basics.html')
+
 
 # --- データベースとは 学習ページ ---
 @app.route('/database_basic/what_database/study')
@@ -3185,7 +3206,9 @@ def cross_join_advance():
     )
 
 
-# CROSS JOIN クイズページ(cross_join_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/basic/join/cross_join/quiz', methods=['GET', 'POST'])
 def cross_join_quiz():
     questions = [
@@ -3202,14 +3225,9 @@ def cross_join_quiz():
         },
         {
             'question': "次のCROSS JOINの結果は何レコードになりますか？\nテーブルAに3行2列、テーブルBに4行5列のデータがあります。",
-            'choices': [
-                "3レコード",
-                "4レコード",
-                "7レコード",
-                "12レコード"
-            ],
+            'choices': ["3レコード", "4レコード", "7レコード", "12レコード"],
             'answer': "12レコード",
-            'explanation': "CROSS JOINの結果は、テーブルAの行数×テーブルBの行数になります。この場合、3×4＝12レコードです。"
+            'explanation': "CROSS JOINの結果は行数の掛け算です。この場合 3×4＝12レコードです。"
         },
         {
             'question': "CROSS JOINの結果が非常に多くの行になる場合、どのような問題が発生する可能性がありますか？",
@@ -3220,7 +3238,7 @@ def cross_join_quiz():
                 "SQL文が遅くなることはない"
             ],
             'answer': "メモリの使用量が増える可能性がある",
-            'explanation': "CROSS JOINで生成される組み合わせの数が増えると、結果として大量のメモリを消費する可能性があります。"
+            'explanation': "組み合わせが増えるほど結果も増え、メモリ消費が増える可能性があります。"
         },
         {
             'question': "CROSS JOINを使用する際に注意すべきことは何ですか？",
@@ -3231,7 +3249,7 @@ def cross_join_quiz():
                 "結果は常に昇順に並べられること"
             ],
             'answer': "テーブルの数が多い場合にパフォーマンスに影響が出る可能性がある",
-            'explanation': "テーブルの行数が多くなるほど、CROSS JOINの結果として生成される組み合わせの数も多くなり、パフォーマンスに影響を与えることがあります。"
+            'explanation': "生成される組み合わせ数が増えてパフォーマンスに影響します。"
         },
         {
             'question': "次のSQL文の結果は？\nSELECT * FROM products CROSS JOIN customers;",
@@ -3242,29 +3260,19 @@ def cross_join_quiz():
                 "エラーが発生する"
             ],
             'answer': "productsとcustomersのすべてのレコードが組み合わせられる",
-            'explanation': "CROSS JOINを使用すると、2つのテーブルのすべてのレコードの組み合わせが表示されます。"
+            'explanation': "CROSS JOINは全組み合わせ（デカルト積）です。"
         },
         {
             'question': "次のSQL文でCROSS JOINの結果をフィルタリングするには、どの句を使用しますか？\nSELECT * FROM products CROSS JOIN customers;",
-            'choices': [
-                "WHERE句",
-                "GROUP BY句",
-                "HAVING句",
-                "ORDER BY句"
-            ],
+            'choices': ["WHERE句", "GROUP BY句", "HAVING句", "ORDER BY句"],
             'answer': "WHERE句",
-            'explanation': "CROSS JOINの結果をフィルタリングするにはWHERE句を使用します。"
+            'explanation': "結果を絞るにはWHERE句を使います。"
         },
         {
             'question': "CROSS JOINの別名として使用される言葉は？",
-            'choices': [
-                "自己結合",
-                "内部結合",
-                "完全結合",
-                "デカルト積"
-            ],
+            'choices': ["自己結合", "内部結合", "完全結合", "デカルト積"],
             'answer': "デカルト積",
-            'explanation': "CROSS JOINはデカルト積（Cartesian Product）とも呼ばれます。"
+            'explanation': "CROSS JOINはデカルト積とも呼ばれます。"
         },
         {
             'question': "CROSS JOINの用途として適切なものはどれですか？",
@@ -3275,61 +3283,74 @@ def cross_join_quiz():
                 "特定の条件に基づいてレコードを削除する"
             ],
             'answer': "レポート作成のためにすべての組み合わせを生成する",
-            'explanation': "CROSS JOINは、すべての組み合わせを生成する際に役立ちます。"
+            'explanation': "全組み合わせを作って集計する用途などに使えます。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    if request.method == 'GET':
+        return render_template('cross_join_quiz.html', questions=questions, submitted=False)
 
-        # クイズの問題に対するスコア計算
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        if user_answers.get(f'answer_{idx}', '') == question['answer']:
+            score += 1
+
+    quiz_name = 'CROSS JOIN'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'CROSS JOIN'
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('cross_join_quiz.html', error_message=error_message)
+            return render_template(
+                'cross_join_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'cross_join_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'cross_join_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 #INNER JOIN 学習ページ(inner_join_study.html)
@@ -3525,6 +3546,9 @@ def inner_join_study_example():
                            inner_join_result=inner_join_result, columns=columns)
 
 # INNER JOIN クイズページ(inner_join_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/basic/join/inner_join/quiz', methods=['GET', 'POST'])
 def inner_join_quiz():
     questions = [
@@ -3618,57 +3642,78 @@ def inner_join_quiz():
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'inner_join_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
-        
-        # データベース接続
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
+
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'INNER JOIN'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'INNER JOIN'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('inner_join_quiz.html', error_message=error_message)
+            return render_template(
+                'inner_join_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
 
+        # ★DB修正なし前提：毎回INSERTして履歴として残す（completed_atはNOW()で明示）
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'inner_join_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'inner_join_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 #LEFT OUTER JOIN 学習ページ(left_outer_join_study.html)
@@ -3866,6 +3911,9 @@ def left_outer_join_study_example():
                            left_outer_join_result=left_outer_join_result, columns=columns)
 
 # LEFT OUTER JOIN クイズページ(left_outer_join_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/basic/join/left_outer_join/quiz', methods=['GET', 'POST'])
 def left_outer_join_quiz():
     questions = [
@@ -3878,7 +3926,7 @@ def left_outer_join_quiz():
                 "INNER JOINはNULLを返すことがある"
             ],
             'answer': "LEFT OUTER JOINは右側のテーブルに一致するレコードがない場合も左側のレコードを返す",
-            'explanation': "INNER JOINは一致するレコードのみを返しますが、LEFT OUTER JOINは右側に一致するレコードがない場合でも、左側のテーブルのレコードを返します。"
+            'explanation': "INNER JOINは一致するレコードのみを返しますが、LEFT OUTER JOINは右側に一致するレコードがない場合でも左側のレコードを返します。"
         },
         {
             'question': "LEFT OUTER JOINの主な特徴は次のうちどれですか？",
@@ -3889,7 +3937,7 @@ def left_outer_join_quiz():
                 "一致しないレコードはすべて除外される"
             ],
             'answer': "左側のテーブルのすべてのレコードを返し、右側の一致するレコードを返す",
-            'explanation': "LEFT OUTER JOINは、左側のテーブルのすべてのレコードを返し、右側のテーブルから一致するレコードを追加します。"
+            'explanation': "LEFT OUTER JOINは左側のすべてのレコードを返し、右側から一致するレコードを追加します。"
         },
         {
             'question': "次のSQL文の結果は？\nSELECT * FROM products LEFT OUTER JOIN discounts ON products.product_id = discounts.product_id;",
@@ -3900,7 +3948,7 @@ def left_outer_join_quiz():
                 "エラーが発生する"
             ],
             'answer': "productsテーブルのすべてのレコードと一致するdiscountsのレコード",
-            'explanation': "LEFT OUTER JOINでは、productsのすべてのレコードが表示され、一致するdiscountsのレコードが追加されます。"
+            'explanation': "LEFT OUTER JOINではproductsのすべてのレコードが表示され、一致するdiscountsが追加されます。"
         },
         {
             'question': "LEFT OUTER JOINを使用する主な理由は次のうちどれですか？",
@@ -3911,7 +3959,7 @@ def left_outer_join_quiz():
                 "データを削除するため"
             ],
             'answer': "片方のテーブルのすべてのレコードを保持するため",
-            'explanation': "LEFT OUTER JOINは、左側のテーブルのすべてのレコードを保持しつつ、右側のテーブルの一致するレコードを追加します。"
+            'explanation': "LEFT OUTER JOINは左側のテーブルを必ず残したいときに使います。"
         },
         {
             'question': "LEFT OUTER JOINを使用して一致しないレコードをNULLとして返すのはどのテーブルですか？",
@@ -3922,7 +3970,7 @@ def left_outer_join_quiz():
                 "どちらでもない"
             ],
             'answer': "右側のテーブル",
-            'explanation': "一致しないレコードは右側のテーブルのデータがNULLとして返されます。"
+            'explanation': "右側のテーブルに一致がない場合、右側の列がNULLになります。"
         },
         {
             'question': "次のSQL文の結果は？\nSELECT products.product_name, discounts.discount_rate FROM products LEFT OUTER JOIN discounts ON products.product_id = discounts.product_id WHERE discounts.discount_rate IS NULL;",
@@ -3933,7 +3981,7 @@ def left_outer_join_quiz():
                 "一致する製品がない"
             ],
             'answer': "割引が適用されていない製品",
-            'explanation': "WHERE句でdiscount_rateがNULLである製品をフィルタリングすることで、割引が適用されていない製品を取得します。"
+            'explanation': "discount_rate が NULL の行＝割引が存在しない製品です。"
         },
         {
             'question': "次のSQL文は正しいですか？\nSELECT * FROM products LEFT OUTER JOIN customers;",
@@ -3944,7 +3992,7 @@ def left_outer_join_quiz():
                 "不明"
             ],
             'answer': "いいえ",
-            'explanation': "LEFT OUTER JOINを使用する場合は、ON句を指定する必要があります。"
+            'explanation': "LEFT OUTER JOINを使う場合はON句が必要です。"
         },
         {
             'question': "LEFT OUTER JOINを使用して、どのような場合にNULL値が発生しますか？",
@@ -3955,61 +4003,82 @@ def left_outer_join_quiz():
                 "NULL値は発生しない"
             ],
             'answer': "右側のテーブルに一致するレコードがない場合",
-            'explanation': "LEFT OUTER JOINでは、右側のテーブルに一致するレコードがない場合、右側の列はNULLとして返されます。"
+            'explanation': "左側は残るため、右側が一致しないと右側列がNULLになります。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'left_outer_join_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
-    
-    # データベース接続
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
+
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'LEFT OUTER JOIN'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'LEFT OUTER JOIN'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('left_puter_join_quiz.html', error_message=error_message)
+            return render_template(
+                'left_outer_join_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
 
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'left_outer_join_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'left_outer_join_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 #RIGHT OUTER JOIN 学習ページ(right_outer_join_study.html)
@@ -4207,6 +4276,9 @@ def right_outer_join_study_example():
                            right_outer_join_result=right_outer_join_result, columns=columns)
 
 # RIGHT OUTER JOIN クイズページ(right_outer_join_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/basic/join/right_outer_join/quiz', methods=['GET', 'POST'])
 def right_outer_join_quiz():
     questions = [
@@ -4219,7 +4291,7 @@ def right_outer_join_quiz():
                 "左側のテーブルのすべてのレコードを返し、右側の一致するレコードを返す"
             ],
             'answer': "右側のテーブルのすべてのレコードを返し、左側の一致するレコードを返す",
-            'explanation': "RIGHT OUTER JOINは、右側のテーブルのすべてのレコードを返し、左側の一致するレコードを追加します。"
+            'explanation': "RIGHT OUTER JOINは右側のテーブルの全レコードを返し、左側の一致するレコードを追加します。"
         },
         {
             'question': "RIGHT OUTER JOINとLEFT OUTER JOINの主な違いは何ですか？",
@@ -4230,7 +4302,7 @@ def right_outer_join_quiz():
                 "LEFT OUTER JOINは右側のテーブルに一致するレコードがない場合も右側のレコードを返す"
             ],
             'answer': "RIGHT OUTER JOINは右側のテーブルに一致するレコードがない場合も左側のレコードを返す",
-            'explanation': "RIGHT OUTER JOINは右側のテーブルに一致するレコードがない場合でも、左側のテーブルのレコードをNULLとして返します。"
+            'explanation': "RIGHT OUTER JOINは右側に一致がなくても右側を残し、左側はNULLになります。"
         },
         {
             'question': "RIGHT OUTER JOINの結果、左側のテーブルに一致しないレコードはどうなりますか？",
@@ -4241,7 +4313,7 @@ def right_outer_join_quiz():
                 "何も表示されない"
             ],
             'answer': "NULLとして表示される",
-            'explanation': "RIGHT OUTER JOINでは、左側のテーブルに一致しないレコードはNULLとして表示されます。"
+            'explanation': "RIGHT OUTER JOINでは左側に一致がない場合、左側の列がNULLになります。"
         },
         {
             'question': "次のSQL文の結果は？\nSELECT * FROM products RIGHT OUTER JOIN customers ON products.product_id = customers.product_id WHERE customers.customer_id IS NOT NULL;",
@@ -4252,7 +4324,7 @@ def right_outer_join_quiz():
                 "NULL値のない製品のみ"
             ],
             'answer': "購入者の情報のみ",
-            'explanation': "WHERE句でcustomer_idがNULLでないレコードをフィルタリングすることで、購入者の情報のみを取得します。"
+            'explanation': "WHERE句でcustomer_idがNULLでない行を残すため、購入者の情報のみになります。"
         },
         {
             'question': "次のSQL文の結果は？\nSELECT * FROM customers RIGHT OUTER JOIN products ON customers.product_id = products.product_id;",
@@ -4263,7 +4335,7 @@ def right_outer_join_quiz():
                 "共通するレコードがない場合、結果は空になる"
             ],
             'answer': "productsテーブルのすべてのレコードと一致するcustomersのレコード",
-            'explanation': "RIGHT OUTER JOINでは、右側のテーブルであるproductsのすべてのレコードが表示され、一致するcustomersのレコードが追加されます。"
+            'explanation': "RIGHT OUTER JOINは右側（products）を全件残し、左側（customers）を一致分だけ追加します。"
         },
         {
             'question': "RIGHT OUTER JOINを使用する主な理由は次のうちどれですか？",
@@ -4274,7 +4346,7 @@ def right_outer_join_quiz():
                 "データを削除するため"
             ],
             'answer': "右側のテーブルのすべてのレコードを保持するため",
-            'explanation': "RIGHT OUTER JOINは、右側のテーブルのすべてのレコードを保持しつつ、左側の一致するレコードを追加します。"
+            'explanation': "RIGHT OUTER JOINは右側テーブルを必ず残したいときに使います。"
         },
         {
             'question': "RIGHT OUTER JOINを使用して一致しないレコードをNULLとして返すのはどのテーブルですか？",
@@ -4285,7 +4357,7 @@ def right_outer_join_quiz():
                 "どちらでもない"
             ],
             'answer': "左側のテーブル",
-            'explanation': "一致しないレコードは左側のテーブルのデータがNULLとして返されます。"
+            'explanation': "一致しない場合は左側の列がNULLとして返ります。"
         },
         {
             'question': "次のSQL文の結果は？\nSELECT customers.customer_id, products.product_name FROM customers RIGHT OUTER JOIN products ON customers.product_id = products.product_id WHERE customers.customer_id IS NULL;",
@@ -4296,61 +4368,82 @@ def right_outer_join_quiz():
                 "一致するレコードがない"
             ],
             'answer': "購入者がいない商品",
-            'explanation': "WHERE句でcustomer_idがNULLである商品をフィルタリングすることで、購入者がいない商品を取得します。"
+            'explanation': "customer_id がNULLの行＝customers側が一致しなかった商品です。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'right_outer_join_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'RIGHT OUTER JOIN'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'RIGHT OUTER JOIN'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('right_outer_join_quiz.html', error_message=error_message)
+            return render_template(
+                'right_outer_join_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
 
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'right_outer_join_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'right_outer_join_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 #複数のテーブルJOIN 学習ページ(multiple_table_join_study.html)
@@ -5184,6 +5277,9 @@ def update_advance():
 
 
 # UPDATE文 クイズページ(update_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/basic/update/quiz', methods=['GET', 'POST'])
 def update_quiz():
     questions = [
@@ -5240,7 +5336,7 @@ def update_quiz():
                 "UPDATE table (column1, column2) VALUES (value1, value2);"
             ],
             'answer': "UPDATE table SET column1 = value1, column2 = value2;",
-            'explanation': "複数のカラムを同時に変更するには、SET句でカラム名と値をカンマで区切って指定します。"
+            'explanation': "SET句でカラム名と値をカンマ区切りで指定します。"
         },
         {
             'question': "次のUPDATE文でNULL値がどのように処理されますか？\nUPDATE products SET status = NULL WHERE product_id = 2;",
@@ -5251,61 +5347,83 @@ def update_quiz():
                 "statusが0に設定される"
             ],
             'answer': "statusがNULLに設定される",
-            'explanation': "NULLは特別な値であり、statusカラムに設定することが可能です。"
+            'explanation': "NULLは特別な値であり、カラムに設定することが可能です。"
         },
         # 他の問題を追加...
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'update_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'UPDATE'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'UPDATE'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('update_quiz.html', error_message=error_message)
+            return render_template(
+                'update_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'update_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'update_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 # 全レコードUPDATE (update_all_column_study)
@@ -5595,6 +5713,9 @@ def aggregate_count_example():
 
 
 # COUNT クイズページ(aggregate_count_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/count/quiz', methods=['GET', 'POST'])
 def aggregate_count_quiz():
     questions = [
@@ -5607,7 +5728,7 @@ def aggregate_count_quiz():
                 "文字列データを連結する"
             ],
             'answer': "指定したカラムの非NULL値の数を数える",
-            'explanation': "COUNT関数は、指定したカラムの非NULL値の数をカウントします。COUNT(*)は、NULLを含むすべての行をカウントしますが、カラム名を指定した場合は非NULL値のみが対象です。"
+            'explanation': "COUNT関数は指定したカラムの非NULL値の数をカウントします。COUNT(*)はNULLを含む全行が対象です。"
         },
         {
             'question': "次のクエリの結果はどうなりますか？ SELECT COUNT(*) FROM sales;",
@@ -5618,7 +5739,7 @@ def aggregate_count_quiz():
                 "エラーが発生する"
             ],
             'answer': "salesテーブルのすべての行数が返される",
-            'explanation': "COUNT(*)はテーブル内のすべての行をカウントします。NULL値を含む行もカウントされます。"
+            'explanation': "COUNT(*)はテーブル内のすべての行をカウントします（NULLを含む）。"
         },
         {
             'question': "COUNT関数にNULL値を含むカラムを指定した場合、結果はどうなりますか？",
@@ -5629,7 +5750,7 @@ def aggregate_count_quiz():
                 "エラーが発生する"
             ],
             'answer': "NULL値を無視して非NULL値のみをカウントする",
-            'explanation': "COUNT関数は、指定したカラムにNULL値が含まれている場合、そのNULL値を無視して非NULL値の数のみをカウントします。"
+            'explanation': "COUNT(カラム) はNULLを無視して非NULL値だけを数えます。"
         },
         {
             'question': "COUNT関数は次のどのケースで役立ちますか？",
@@ -5640,7 +5761,7 @@ def aggregate_count_quiz():
                 "すべての商品の名前をリストアップする"
             ],
             'answer': "販売された商品の数を数える",
-            'explanation': "COUNT関数は、特定の条件を満たす行数をカウントするのに役立ちます。たとえば、販売された商品の数をカウントする場合に使用します。"
+            'explanation': "特定条件を満たす行数（件数）を数える用途で使います。"
         },
         {
             'question': "次のクエリで返される結果は？ SELECT COUNT(price) FROM sales;",
@@ -5651,61 +5772,82 @@ def aggregate_count_quiz():
                 "価格の平均が返される"
             ],
             'answer': "NULL値を含まないpriceカラムの行数が返される",
-            'explanation': "COUNT(price)は、priceカラムにNULLでない値がある行の数をカウントします。"
+            'explanation': "COUNT(price) は price がNULLでない行だけを数えます。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'aggregate_count_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'COUNT'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'COUNT'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('aggregate_count_quiz.html', error_message=error_message)
+            return render_template(
+                'aggregate_count_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
 
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'aggregate_count_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'aggregate_count_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 # SUM 学習ページ(aggregate_sum_study.html)
@@ -5845,6 +5987,9 @@ def aggregate_sum_example():
     return render_template('aggregation_sum_example.html')
 
 # SUM クイズページ(aggregate_sum_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/sum/quiz', methods=['GET', 'POST'])
 def aggregate_sum_quiz():
     questions = [
@@ -5857,7 +6002,7 @@ def aggregate_sum_quiz():
                 "最小値を見つける"
             ],
             'answer': "数値データの合計を計算する",
-            'explanation': "SUM関数は、指定された数値カラムの合計値を計算するために使用されます。"
+            'explanation': "SUM関数は指定された数値カラムの合計値を計算するために使用されます。"
         },
         {
             'question': "次のクエリの結果はどうなりますか？ SELECT SUM(price) FROM sales;",
@@ -5868,7 +6013,7 @@ def aggregate_sum_quiz():
                 "エラーが発生する"
             ],
             'answer': "priceカラムの合計値が返される",
-            'explanation': "SUM(price)は、salesテーブルのpriceカラムのすべての値の合計を返します。"
+            'explanation': "SUM(price)はsalesテーブルのpriceカラムの合計を返します。"
         },
         {
             'question': "SUM関数は次のどのケースで役立ちますか？",
@@ -5879,7 +6024,7 @@ def aggregate_sum_quiz():
                 "文字列を連結する"
             ],
             'answer': "販売された商品の合計金額を計算する",
-            'explanation': "SUM関数は、売上の合計や合計金額を計算する場合に便利です。"
+            'explanation': "売上など合計金額を計算する場合に便利です。"
         },
         {
             'question': "次のクエリで返される結果は？ SELECT SUM(quantity) FROM sales WHERE price > 100;",
@@ -5890,7 +6035,7 @@ def aggregate_sum_quiz():
                 "エラーが発生する"
             ],
             'answer': "価格が100より大きい商品の数量の合計が返される",
-            'explanation': "SUM(quantity)は、条件に一致する商品の数量を合計します。この場合、price > 100の条件を満たす商品の数量が対象です。"
+            'explanation': "条件に一致する行だけが集計対象になります。"
         },
         {
             'question': "次のクエリについて正しい説明はどれですか？ SELECT SUM(price) AS total_price FROM sales;",
@@ -5901,60 +6046,82 @@ def aggregate_sum_quiz():
                 "行数が返される"
             ],
             'answer': "価格の合計値がtotal_priceとして返される",
-            'explanation': "SUM(price) AS total_priceは、合計値をtotal_priceというエイリアス名で返します。"
+            'explanation': "AS total_price で列名（エイリアス）を付けています。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'aggregate_sum_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'SUM'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'SUM'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('aggregate_sum_quiz.html', error_message=error_message)
+            return render_template(
+                'aggregate_sum_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'aggregate_sum_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'aggregate_sum_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 # AVG 学習ページ (aggregate_avg_study.html)
@@ -6093,6 +6260,9 @@ def aggregate_avg_example():
     return render_template('aggregation_avg_example.html')
 
 # AVG クイズページ(aggregate_avg_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/avg/quiz', methods=['GET', 'POST'])
 def aggregate_avg_quiz():
     questions = [
@@ -6127,7 +6297,7 @@ def aggregate_avg_quiz():
                 "NULL"
             ],
             'answer': "Electronicsカテゴリの商品数量の平均",
-            'explanation': "このクエリは、categoryが'Electronics'である商品のquantityカラムの平均を計算します。"
+            'explanation': "categoryが'Electronics'である行のquantityの平均を計算します。"
         },
         {
             'question': "AVG関数を使用する際に、次のうち無視される値はどれですか？",
@@ -6149,60 +6319,82 @@ def aggregate_avg_quiz():
                 "行数が返される"
             ],
             'answer': "価格の平均値がavg_priceとして返される",
-            'explanation': "AVG(price) AS avg_priceは、平均値をavg_priceというエイリアス名で返します。"
+            'explanation': "AVG(price) AS avg_price は平均値に avg_price という別名を付けます。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'aggregate_avg_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'AVG'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'AVG'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('aggregate_avg_quiz.html', error_message=error_message)
+            return render_template(
+                'aggregate_avg_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'aggregate_avg_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'aggregate_avg_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 # MAX 学習ページ (aggregate_max_study.html)
@@ -6341,6 +6533,9 @@ def aggregate_max_example():
     return render_template('aggregation_max_example.html')
 
 # MAX クイズページ(aggregate_max_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/max/quiz', methods=['GET', 'POST'])
 def aggregate_max_quiz():
     questions = [
@@ -6375,7 +6570,7 @@ def aggregate_max_quiz():
                 "NULL"
             ],
             'answer': "Furnitureカテゴリの商品数量の最大値",
-            'explanation': "このクエリは、categoryが'Furniture'である商品のquantityカラムの最大値を計算します。"
+            'explanation': "categoryが'Furniture'である行のquantityの最大値を計算します。"
         },
         {
             'question': "次のクエリについて正しい説明はどれですか？ SELECT MAX(salary) AS highest_salary FROM employees;",
@@ -6397,60 +6592,82 @@ def aggregate_max_quiz():
                 "日付型データのみ"
             ],
             'answer': "数値型と文字列型の両方",
-            'explanation': "MAX関数は、数値型データと文字列型データの両方に使用できます。文字列の場合、辞書順で最大の値が返されます。"
+            'explanation': "MAX関数は数値にも文字列にも使えます（文字列は辞書順の最大）。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'aggregate_max_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'MAX'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'MAX'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('aggregate_max_quiz.html', error_message=error_message)
+            return render_template(
+                'aggregate_max_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'aggregate_max_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'aggregate_max_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 # MIN 学習ページ (aggregate_min_study.html)
 @app.route('/aggregation/min/study', methods=['GET', 'POST'])
@@ -6588,6 +6805,9 @@ def aggregate_min_example():
     return render_template('aggregation_min_example.html')
 
 # MIN クイズページ(aggregate_min_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/min/quiz', methods=['GET', 'POST'])
 def aggregate_min_quiz():
     questions = [
@@ -6611,7 +6831,7 @@ def aggregate_min_quiz():
                 "エラーが発生する"
             ],
             'answer': "productsテーブルの最も安い価格",
-            'explanation': "MIN(price)は、productsテーブルのpriceカラムの中で最も小さい値を返します。"
+            'explanation': "MIN(price)はproductsテーブルのpriceカラムの最小値を返します。"
         },
         {
             'question': "次のクエリで返される値はどれですか？ SELECT MIN(sale_date) FROM sales;",
@@ -6622,7 +6842,7 @@ def aggregate_min_quiz():
                 "エラーが発生する"
             ],
             'answer': "最古の日付",
-            'explanation': "MIN関数は、日付データに対しても最小値を計算でき、最も古い日付を返します。"
+            'explanation': "MINは日付にも使え、最も古い日付（最小値）を返します。"
         },
         {
             'question': "次のクエリについて正しい説明はどれですか？ SELECT MIN(age) AS youngest FROM employees;",
@@ -6633,7 +6853,7 @@ def aggregate_min_quiz():
                 "エラーが発生する"
             ],
             'answer': "最小の年齢がyoungestという名前で返される",
-            'explanation': "MIN(age) AS youngestは、最小の年齢をyoungestというエイリアス名で返します。"
+            'explanation': "MIN(age) AS youngest は最小年齢に youngest という別名を付けます。"
         },
         {
             'question': "MIN関数は、次のどのタイプのデータに使用できますか？",
@@ -6644,60 +6864,82 @@ def aggregate_min_quiz():
                 "日付型データのみ"
             ],
             'answer': "数値型と文字列型の両方",
-            'explanation': "MIN関数は、数値型データ、文字列型データ、日付型データに使用できます。文字列の場合、辞書順で最小の値が返されます。"
+            'explanation': "MIN関数は数値にも文字列にも使えます（文字列は辞書順の最小）。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'aggregate_min_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'MIN'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'MIN'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('aggregate_min_quiz.html', error_message=error_message)
+            return render_template(
+                'aggregate_min_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'aggregate_min_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'aggregate_min_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 #以下はソートとグループ化!
@@ -6864,6 +7106,9 @@ def organize_groupby_advance():
 
 
 # GROUP BY句 クイズページ(organize_groupby_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/group-by/quiz', methods=['GET', 'POST'])
 def organize_groupby_quiz():
     questions = [
@@ -6876,7 +7121,7 @@ def organize_groupby_quiz():
                 "すべての行を結合する"
             ],
             'answer': "合計値、平均値、最大値、最小値などの集計",
-            'explanation': "GROUP BY句を使用すると、集計関数（SUM、AVG、MAX、MINなど）と組み合わせてデータを集計できます。"
+            'explanation': "GROUP BY句は集約関数（SUM/AVG/MAX/MINなど）と組み合わせて集計できます。"
         },
         {
             'question': "次のSQL文でGROUP BY句を使用する主な理由は何ですか？",
@@ -6887,7 +7132,7 @@ def organize_groupby_quiz():
                 "テーブルを結合するため"
             ],
             'answer': "データを集約してグループ化するため",
-            'explanation': "GROUP BY句を使用すると、データを特定の列ごとにグループ化し、集計関数を適用できます。"
+            'explanation': "特定の列ごとにグループ化し、集計関数を適用できます。"
         },
         {
             'question': "GROUP BYを使用する際に、集約関数で使用できるものはどれですか？",
@@ -6898,7 +7143,7 @@ def organize_groupby_quiz():
                 "すべての選択肢"
             ],
             'answer': "すべての選択肢",
-            'explanation': "GROUP BYを使用すると、SUM、COUNT、AVGなどの集約関数を使ってデータを集計できます。"
+            'explanation': "GROUP BYはSUM/COUNT/AVGなどの集約関数と併用できます。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT category, COUNT(DISTINCT product_name) FROM sales GROUP BY category;",
@@ -6908,7 +7153,7 @@ def organize_groupby_quiz():
                 "カテゴリーごとの平均価格を表示する"
             ],
             'answer': "カテゴリーごとのユニークな商品の数を表示する",
-            'explanation': "DISTINCTを使用することで、カテゴリーごとに重複を排除したユニークな商品の数を表示します。"
+            'explanation': "DISTINCTで重複を除外したproduct_nameの件数をカテゴリ別に数えます。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT category, AVG(price) FROM sales GROUP BY category;",
@@ -6918,7 +7163,7 @@ def organize_groupby_quiz():
                 "すべての商品の合計価格を表示する"
             ],
             'answer': "カテゴリーごとの商品の平均価格を表示する",
-            'explanation': "AVG関数は、各カテゴリーごとの商品の平均価格を計算して表示します。"
+            'explanation': "AVG(price)でカテゴリごとの平均価格を計算します。"
         },
         {
             'question': "次のSQL文の結果は何ですか？\nSELECT category, MAX(price) FROM sales GROUP BY category;",
@@ -6928,7 +7173,7 @@ def organize_groupby_quiz():
                 "カテゴリーごとの最大価格を表示する"
             ],
             'answer': "カテゴリーごとの最大価格を表示する",
-            'explanation': "MAX関数を使用すると、カテゴリーごとの最大価格が表示されます。"
+            'explanation': "MAX(price)でカテゴリごとの最大価格を表示します。"
         },
         {
             'question': "以下のSQLクエリの結果を予測してください: SELECT category, COUNT(*) FROM sales GROUP BY category;",
@@ -6938,7 +7183,7 @@ def organize_groupby_quiz():
                 "カテゴリーごとの平均価格を表示する"
             ],
             'answer': "カテゴリーごとの商品の数を表示する",
-            'explanation': "COUNT(*)関数は、カテゴリーごとの商品の数をカウントして表示します。"
+            'explanation': "COUNT(*)でカテゴリ別の行数（件数）を数えます。"
         },
         {
             'question': "GROUP BY句を正しく使用したクエリはどれですか？",
@@ -6948,7 +7193,7 @@ def organize_groupby_quiz():
                 "SELECT category, MAX(price) FROM sales GROUP BY category;"
             ],
             'answer': "SELECT category, MAX(price) FROM sales GROUP BY category;",
-            'explanation': "GROUP BY句を使用する際は、集計関数を適切に使用して、指定した列でデータをグループ化する必要があります。"
+            'explanation': "非集約列（category）でGROUP BYし、集約列（MAX(price)）を併用しています。"
         },
         {
             'question': "GROUP BYを使用して集計する際に、COUNT関数で得られる値は何を表しますか？",
@@ -6958,7 +7203,7 @@ def organize_groupby_quiz():
                 "グループ内のデータの平均値"
             ],
             'answer': "グループ内の行数",
-            'explanation': "COUNT関数は、グループ内の行数をカウントして、その数を返します。"
+            'explanation': "COUNTはグループ内の行数（件数）を返します。"
         },
         {
             'question': "SELECT product_name, price, SUM(quantity) FROM sales GROUP BY product_name;のエラーの原因は？",
@@ -6968,62 +7213,82 @@ def organize_groupby_quiz():
                 "salesテーブルにproduct_name列が存在しない"
             ],
             'answer': "price列がGROUP BYまたは集約関数に含まれていない",
-            'explanation': "GROUP BYを使用する場合、集約されない列（ここではprice）もGROUP BY句または集約関数に含める必要があります。"
+            'explanation': "集約しない列（price）はGROUP BYに含めるか、集約関数で包む必要があります。"
         }
     ]
 
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'organize_groupby_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
 
-        # データベース接続
+    quiz_name = 'GROUP BY'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'GROUP BY'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('organize_groupby_quiz.html', error_message=error_message)
+            return render_template(
+                'organize_groupby_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
 
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'organize_groupby_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'organize_groupby_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 # HAVING句 学習ページ(organize_having.html)
@@ -7181,6 +7446,9 @@ def organize_having_advance():
     )
 
 # HAVING句 クイズページ(organize_having_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/having/quiz', methods=['GET', 'POST'])
 def organize_having_quiz():
     questions = [
@@ -7193,7 +7461,7 @@ def organize_having_quiz():
                 "テーブルの作成や変更を行うための句"
             ],
             'answer': "GROUP BYでグループ化されたデータに対して条件を設定するための句",
-            'explanation': "HAVING句はGROUP BY句と組み合わせて使用され、グループ化された結果に対して条件を設定するために使用されます。WHERE句とは異なり、行単位ではなくグループ単位でフィルタリングを行います。"
+            'explanation': "HAVING句はGROUP BYの結果（グループ）に対して条件を付けます。WHEREは行単位、HAVINGはグループ単位です。"
         },
         {
             'question': "以下のSQLクエリの結果を予測してください: SELECT category, SUM(quantity) FROM sales GROUP BY category HAVING SUM(quantity) >= 100;",
@@ -7203,7 +7471,7 @@ def organize_having_quiz():
                 "エラーが発生する"
             ],
             'answer': "各カテゴリーの合計数量が100以上の行を表示する",
-            'explanation': "HAVING句はグループ化されたデータに対して条件を設定します。このクエリは、各カテゴリーの合計数量が100以上の行のみを表示します。"
+            'explanation': "HAVINGはグループ化後の集計結果に条件を付けます。"
         },
         {
             'question': "HAVING句を正しく使用したクエリはどれですか？",
@@ -7213,7 +7481,7 @@ def organize_having_quiz():
                 "SELECT category, SUM(price) FROM sales WHERE SUM(price) > 500;"
             ],
             'answer': "SELECT category, SUM(price) FROM sales GROUP BY category HAVING SUM(price) > 500;",
-            'explanation': "HAVING句はGROUP BYでグループ化された結果に対して条件を設定するため、正しいクエリはGROUP BY句とHAVING句を併用しています。"
+            'explanation': "HAVINGは基本的にGROUP BYとセットで使い、集計結果に条件を付けます。"
         },
         {
             'question': "HAVING句とWHERE句の主な違いは何ですか？",
@@ -7223,7 +7491,7 @@ def organize_having_quiz():
                 "HAVING句では条件を設定できない"
             ],
             'answer': "HAVING句はグループ化されたデータに適用される",
-            'explanation': "WHERE句は行単位でデータをフィルタリングしますが、HAVING句はGROUP BY句でグループ化されたデータに対して条件を設定します。"
+            'explanation': "WHEREはグループ化前（行単位）、HAVINGはグループ化後（グループ単位）です。"
         },
         {
             'question': "以下のSQLでエラーが発生する原因は？ SELECT category, SUM(quantity) AS total FROM sales GROUP BY category HAVING total > 50;",
@@ -7233,7 +7501,7 @@ def organize_having_quiz():
                 "GROUP BY句で正しくグループ化されていない"
             ],
             'answer': "カラムのエイリアスをHAVING句で使用している",
-            'explanation': "HAVING句ではエイリアスを直接使用することができません。集計関数やその結果を条件として使う必要があります。"
+            'explanation': "DBによってはHAVINGでエイリアスが使えないことがあります（安全なのは HAVING SUM(quantity) > 50 のように書く）。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT category, COUNT(*) FROM sales GROUP BY category HAVING COUNT(*) > 5;",
@@ -7243,7 +7511,7 @@ def organize_having_quiz():
                 "エラーが発生する"
             ],
             'answer': "カテゴリーごとのレコード数が5以上のカテゴリーを表示する",
-            'explanation': "HAVING句により、カテゴリーごとのレコード数が5以上のカテゴリーのみを表示します。"
+            'explanation': "HAVINGでCOUNT(*)の結果（グループの件数）に条件を付けています。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT category, SUM(price) FROM sales GROUP BY category HAVING SUM(price) < 1000;",
@@ -7253,7 +7521,7 @@ def organize_having_quiz():
                 "エラーが発生する"
             ],
             'answer': "カテゴリーごとの合計価格が1000未満のカテゴリーを表示する",
-            'explanation': "HAVING句はグループ化されたデータに対して条件を設定するため、合計価格が1000未満のカテゴリーを表示します。"
+            'explanation': "合計価格が1000未満のカテゴリだけを残します。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT category, AVG(price) FROM sales GROUP BY category HAVING AVG(price) BETWEEN 200 AND 400;",
@@ -7263,7 +7531,7 @@ def organize_having_quiz():
                 "カテゴリーごとの平均価格が200未満のカテゴリーを表示する"
             ],
             'answer': "カテゴリーごとの平均価格が200から400の範囲のカテゴリーを表示する",
-            'explanation': "HAVING句で条件を設定することで、カテゴリーごとの平均価格が200から400の範囲にあるカテゴリーのみを表示します。"
+            'explanation': "HAVINGでグループの平均値が範囲内のものだけを残します。"
         },
         {
             'question': "次のSQLクエリにおけるHAVING句の役割は何ですか？ SELECT product_name, SUM(quantity) FROM sales GROUP BY product_name HAVING SUM(quantity) > 50;",
@@ -7273,7 +7541,7 @@ def organize_having_quiz():
                 "製品ごとの販売数量が50を超えたデータを削除する"
             ],
             'answer': "製品ごとの販売数量が50以上の製品を表示する",
-            'explanation': "HAVING句はグループ化されたデータに条件を設定するため、販売数量が50以上の製品をフィルタリングします。"
+            'explanation': "製品ごとのSUM(quantity)が条件を満たすものだけを表示します。"
         },
         {
             'question': "次のSQLクエリにおけるエラーの原因は何ですか？ SELECT category, COUNT(*) FROM sales GROUP BY category HAVING COUNT(*) = 0;",
@@ -7283,61 +7551,82 @@ def organize_having_quiz():
                 "GROUP BY句の結果がゼロでない場合、HAVING句は機能しない"
             ],
             'answer': "COUNT(*)でゼロの結果は存在しない",
-            'explanation': "COUNT(*)はグループ化されたデータの行数をカウントしますが、ゼロの結果が存在しないため、HAVING句で0を指定することは意味がありません。"
+            'explanation': "GROUP BYでできるグループは必ず1行以上あるため、COUNT(*)=0のグループは生まれません。"
         }
     ]
 
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'organize_having_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
 
-        # データベース接続
+    quiz_name = 'HAVING'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'HAVING'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('organize_having_quiz.html', error_message=error_message)
+            return render_template(
+                'organize_having_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'organize_having_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'organize_having_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
+
 
 
 # ORDER BY句 学習ページ(organize_orderby.html)
@@ -7489,6 +7778,9 @@ def organize_orderby_advance():
     )
 
 # ORDER BY句 クイズページ(organize_orderby_quiz.html)
+from flask import request, render_template
+import mysql.connector
+
 @app.route('/aggregation/order-by/quiz', methods=['GET', 'POST'])
 def organize_orderby_quiz():
     questions = [
@@ -7500,7 +7792,7 @@ def organize_orderby_quiz():
                 "商品の名前順に並べる"
             ],
             'answer': "価格の低い順に商品を並べる",
-            'explanation': "ORDER BY price ASCは、価格を昇順（低い順）で並べることを意味します。"
+            'explanation': "ORDER BY price ASC は価格を昇順（低い順）に並べます。"
         },
         {
             'question': "以下のクエリを実行した結果、どのように並べ替えられますか？ SELECT category, sale_date FROM sales ORDER BY sale_date DESC;",
@@ -7510,7 +7802,7 @@ def organize_orderby_quiz():
                 "カテゴリーごとに並べる"
             ],
             'answer': "販売日が新しい順に並べる",
-            'explanation': "ORDER BY sale_date DESCは、販売日を降順（新しい順）で並べることを意味します。"
+            'explanation': "ORDER BY sale_date DESC は販売日を降順（新しい順）に並べます。"
         },
         {
             'question': "次のクエリの結果を予測してください: SELECT category, price FROM sales ORDER BY category ASC, price DESC;",
@@ -7520,7 +7812,7 @@ def organize_orderby_quiz():
                 "カテゴリーと価格の両方を昇順に並べる"
             ],
             'answer': "カテゴリーごとに昇順、価格は各カテゴリー内で降順に並べる",
-            'explanation': "ORDER BY句で複数のカラムを指定する場合、最初のカラムでグループ化し、次のカラムでそのグループ内の並び替えを行います。"
+            'explanation': "複数指定は、先頭のカラムで並べ、その同値の中を次のカラムで並べます。"
         },
         {
             'question': "`ORDER BY`句で複数のカラムを指定する場合、どのような順序で並び替えが実行されますか？",
@@ -7531,7 +7823,7 @@ def organize_orderby_quiz():
                 "並び替えはクエリの実行順序に依存する"
             ],
             'answer': "最初のカラムを並べ替え、次に2つ目のカラムで並び替える",
-            'explanation': "ORDER BY句で複数のカラムを指定すると、最初のカラムで並び替えを行い、その後、同じ値を持つ行について2つ目のカラムで並び替えを行います。"
+            'explanation': "先に指定した列が優先、同値のとき次の列で並べ替えます。"
         },
         {
             'question': "次のSQLクエリを実行した場合、NULL値はどのように並べ替えられますか？ SELECT product_name, category FROM sales ORDER BY category DESC;",
@@ -7542,7 +7834,7 @@ def organize_orderby_quiz():
                 "NULL値はランダムな位置に配置される"
             ],
             'answer': "NULL値は最初に配置される",
-            'explanation': "ORDER BY DESCを指定した場合、NULL値は最初に配置されます。SQLでは、NULL値は「値がない」と解釈されるため、昇順では最後、降順では最初に配置されます。"
+            'explanation': "（一般的な説明として）DESCだとNULLが先、ASCだとNULLが後ろになりやすいです。"
         },
         {
             'question': "次のSQLクエリを実行した場合、NULL値はどのように並べ替えられますか？ SELECT product_name, category FROM sales ORDER BY category ASC;",
@@ -7553,7 +7845,7 @@ def organize_orderby_quiz():
                 "NULL値はランダムな位置に配置される"
             ],
             'answer': "NULL値は最後に配置される",
-            'explanation': "ORDER BY ASCでは、NULL値は「値がない」と解釈され、昇順（ASC）で並べる際、NULLは最後に配置されます。"
+            'explanation': "（一般的な説明として）ASCだとNULLが後ろになりやすいです。"
         },
         {
             'question': "次のSQLクエリを実行した場合、どのように並べ替えられますか？ SELECT product_name, price FROM sales ORDER BY price DESC;",
@@ -7563,7 +7855,7 @@ def organize_orderby_quiz():
                 "商品の名前順に並べる"
             ],
             'answer': "価格の高い順に並べる",
-            'explanation': "ORDER BY price DESCは、価格を降順（高い順）で並べることを意味します。"
+            'explanation': "ORDER BY price DESC は価格を降順（高い順）に並べます。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT product_name, sale_date FROM sales ORDER BY sale_date ASC;",
@@ -7573,7 +7865,7 @@ def organize_orderby_quiz():
                 "価格が高い順に並べる"
             ],
             'answer': "販売日が古い順に並べる",
-            'explanation': "ORDER BY sale_date ASCは、販売日を昇順（古い順）で並べることを意味します。"
+            'explanation': "ORDER BY sale_date ASC は販売日を昇順（古い順）に並べます。"
         },
         {
             'question': "ORDER BY句で指定した複数のカラムに異なる並べ替え順序を使用した場合、どのように動作しますか？",
@@ -7583,7 +7875,7 @@ def organize_orderby_quiz():
                 "ORDER BY句は複数のカラムで並べ替えを行わない"
             ],
             'answer': "最初に指定されたカラムで並べ替え、その後、2番目のカラムで並べ替えを行う",
-            'explanation': "ORDER BY句で複数のカラムを指定する際、最初のカラムで並べ替え、その後同じ値を持つ行について、2番目のカラムで並べ替えを行います。"
+            'explanation': "先頭の並び替えが優先で、同値のとき次の列で並べ替えます。"
         },
         {
             'question': "次のSQLクエリの結果を予測してください: SELECT product_name, price FROM sales ORDER BY price ASC LIMIT 5;",
@@ -7593,126 +7885,165 @@ def organize_orderby_quiz():
                 "すべての商品を表示する"
             ],
             'answer': "価格の低い順に上位5件の製品を表示する",
-            'explanation': "ORDER BY price ASCで価格を昇順に並べ、LIMIT 5でその中から上位5件を表示します。"
+            'explanation': "ASCで安い順にして、LIMIT 5で先頭5件を取ります。"
         }
     ]
 
-    if request.method == 'POST':
-        user_answers = request.form.to_dict()
-        score = 0
+    # GET
+    if request.method == 'GET':
+        return render_template(
+            'organize_orderby_quiz.html',
+            questions=questions,
+            submitted=False
+        )
 
-        for idx, question in enumerate(questions):
-            user_answer = user_answers.get(f'answer_{idx}', '')
-            if user_answer == question['answer']:
-                score += 1
+    # POST
+    user_answers = request.form.to_dict()
+    score = 0
 
-        # データベース接続
+    for idx, question in enumerate(questions):
+        user_answer = user_answers.get(f'answer_{idx}', '')
+        if user_answer == question['answer']:
+            score += 1
+
+    quiz_name = 'ORDER BY'
+
+    try:
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor()
 
-        # クイズIDを設定（クイズ名に基づいてIDを取得）
-        quiz_name = 'ORDER BY'
+        # quiz_id 取得
         cursor.execute("SELECT id FROM quiz_list WHERE quiz_name = %s", (quiz_name,))
-        result = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if result:
-            quiz_id = result[0]  # クイズ名に基づいてIDを取得
-
-            # 進捗状況の更新または挿入
-            cursor.execute(""" 
-                INSERT INTO progress (quiz_id, score)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE score = VALUES(score)
-            """, (quiz_id, score))
-
-            conn.commit()
+        if not row:
             cursor.close()
             conn.close()
-        else:
-            # クイズ名に該当するIDが見つからない場合の処理
-            error_message = "指定されたクイズが見つかりません"
-            return render_template('organize_orderby_quiz.html', error_message=error_message)
+            return render_template(
+                'organize_orderby_quiz.html',
+                questions=questions,
+                submitted=True,
+                score=score,
+                total=len(questions),
+                user_answers=user_answers,
+                error_message="指定されたクイズが見つかりません"
+            )
 
+        quiz_id = row[0]
+
+        # ★DB修正なし前提：毎回INSERTして履歴として残す
+        cursor.execute(
+            "INSERT INTO progress (quiz_id, score, completed_at) VALUES (%s, %s, NOW())",
+            (quiz_id, score)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
         return render_template(
             'organize_orderby_quiz.html',
             questions=questions,
             submitted=True,
             score=score,
             total=len(questions),
-            user_answers=user_answers
+            user_answers=user_answers,
+            error_message=f"進捗保存でエラー: {str(e)}"
         )
 
     return render_template(
         'organize_orderby_quiz.html',
         questions=questions,
-        submitted=False
+        submitted=True,
+        score=score,
+        total=len(questions),
+        user_answers=user_answers
     )
 
 
+
 # クイズ進捗ページ(quiz_progress.html)
+from collections import OrderedDict
+from flask import render_template
+import mysql.connector
+
 @app.route('/quiz_progress', methods=['GET'])
 def quiz_progress():
     try:
-        # データベース接続
         conn = mysql.connector.MySQLConnection(**this_users_dns)
         cursor = conn.cursor(dictionary=True)
 
-        # 全クイズのリストを取得
+        # quiz_name -> パス（表示順の基準）
+        quiz_files = OrderedDict([
+            ("DATABASE OVERVIEW", "quiz/database_overview"),
+            ("KEY AND DEFINITION", "quiz/key_and_definition"),
+            ("CREATE TABLE", "quiz/create_table"),
+            ("SELECT SINGLE CONDITION", "quiz/select_single_condition"),
+            ("SELECT MULTIPLE CONDITIONS", "quiz/select_multiple_conditions"),
+            ("CROSS JOIN", "basic/join/cross_join/quiz"),
+            ("INNER JOIN", "basic/join/inner_join/quiz"),
+            ("LEFT OUTER JOIN", "basic/join/left_outer_join/quiz"),
+            ("RIGHT OUTER JOIN", "basic/join/right_outer_join/quiz"),
+            ("JOIN SAMMARY", "basic/join/join_quiz"),
+            ("INSERT", "quiz/insert"),
+            ("INSERT SELECT", "quiz/insert_select"),
+            ("UPDATE SINGLE COLUMN", "quiz/update_single_column"),
+            ("UPDATE MULTIPLE COLUMNS", "quiz/update_multiple_columns"),
+            ("UPDATE JOIN", "quiz/update_join"),
+            ("UPDATE CALCULATION", "quiz/update_calculation"),
+            ("DELETE SINGLE", "quiz/delete_single"),
+            ("DELETE MULTIPLE", "quiz/delete_multiple"),
+            ("DELETE ALL RECORDS", "quiz/delete_all_records"),
+            ("DELETE SHARED MULTIPLE", "quiz/delete_shared-single"),
+            ("COUNT", "aggregation/count/quiz"),
+            ("SUM", "aggregation/sum/quiz"),
+            ("AVG", "aggregation/avg/quiz"),
+            ("MIN", "aggregation/min/quiz"),
+            ("MAX", "aggregation/max/quiz"),
+            ("ORDER BY", "aggregation/order-by/quiz"),
+            ("GROUP BY", "aggregation/group-by/quiz"),
+            ("HAVING", "aggregation/having/quiz"),
+            ("TRANSACTION BASIC OPERATIONS", "quiz/transaction_basic_operations"),
+            ("TRANSACTION ISOLATION", "quiz/transaction_isolation"),
+        ])
+
+        # クイズ一覧
         cursor.execute("SELECT id, quiz_name, total_questions FROM quiz_list")
-        quiz_list = cursor.fetchall()
+        quiz_list_db = cursor.fetchall()
 
-        # 各クイズの進捗状況を取得
-        cursor.execute("SELECT quiz_id, score, completed_at FROM progress")
+        # ★progressは quiz_idごとに最新1件だけ取得（DB修正なしの核心）
+        cursor.execute("""
+            SELECT p.quiz_id, p.score, p.completed_at
+            FROM progress p
+            JOIN (
+                SELECT quiz_id, MAX(completed_at) AS max_completed_at
+                FROM progress
+                GROUP BY quiz_id
+            ) latest
+              ON p.quiz_id = latest.quiz_id
+             AND p.completed_at = latest.max_completed_at
+        """)
         progress_data = cursor.fetchall()
-
-        # クイズIDをキーに辞書を作成
         progress_dict = {item['quiz_id']: item for item in progress_data} if progress_data else {}
 
-        # クイズIDに対応するファイル名をマッピング
-        quiz_files = {
-            1: "basic/join/cross_join/quiz",
-            2: "basic/join/inner_join/quiz",
-            3: "basic/join/left_outer_join/quiz",
-            4: "basic/join/right_outer_join/quiz",
-            5: "basic/join/join_quiz",
-            6: "basic/update/quiz",
-            7: "aggregation/count/quiz",
-            8: "aggregation/sum/quiz",
-            9: "aggregation/avg/quiz",
-            10: "aggregation/max/quiz",
-            11: "aggregation/min/quiz",
-            12: "aggregation/group-by/quiz",
-            13: "aggregation/having/quiz",
-            14: "aggregation/order-by/quiz",
-            15: "quiz/insert",
-            16: "quiz/insert_select",
-            17: "quiz/delete_single",
-            18: "quiz/delete_multiple",
-            19: "quiz/update_single_column",
-            20: "quiz/update_multiple_columns",
-            21: "quiz/delete_all_records",
-            22: "quiz/update_join",
-            23: "quiz/delete_shared-single",
-            24: "quiz/transaction_basic_operations",
-            25: "quiz/transaction_isolation",
-            26: "quiz/database_overview",
-            27: "quiz/key_and_definition",
-            28: "quiz/create_table"
-        }
+        # quiz_files の順に並び替え（quiz_name基準）
+        quiz_by_name = {q["quiz_name"]: q for q in quiz_list_db}
+        quiz_list = [quiz_by_name[name] for name in quiz_files.keys() if name in quiz_by_name]
 
-        # 完了したクイズの数を計算
+        # quiz_filesに無いものがDBにあれば末尾に
+        remaining = [q for q in quiz_list_db if q["quiz_name"] not in quiz_files]
+        quiz_list.extend(sorted(remaining, key=lambda x: x["id"]))
+
         completed_quizzes = sum(1 for quiz in quiz_list if quiz['id'] in progress_dict)
         total_quizzes = len(quiz_list)
-
-        # 全体の進捗率を計算
         progress_rate = 0 if total_quizzes == 0 else round((completed_quizzes / total_quizzes) * 100, 2)
 
         cursor.close()
         conn.close()
 
     except Exception as e:
-        error_message = f"エラーが発生しました: {str(e)}"
-        return render_template('quiz_progress.html', error_message=error_message)
+        return render_template('quiz_progress.html', error_message=f"エラーが発生しました: {str(e)}")
 
     return render_template(
         'quiz_progress.html',
@@ -7721,6 +8052,9 @@ def quiz_progress():
         progress_dict=progress_dict,
         quiz_files=quiz_files
     )
+
+
+
 
 
 
@@ -8034,3 +8368,165 @@ def diff_table(before, after):
                     diff_cells[(row_index, c)] = "diff-changed"
 
     return diff_cells, added_rows, removed_rows
+
+
+#-------------------------------------------------------------------------#
+#
+# 
+# ここから藪下が作成！！！！！！！！！！！！！！！！！！
+#
+# 
+# -------------------------------------------------------------------------#
+
+# select_single 学習ページ
+@app.route('/basic/select/single/study', methods=['GET', 'POST'])
+def select_single_study():
+    return render_template('select_single_study.html')
+
+# select_single 実行例ページ
+@app.route('/basic/select/single/example', methods=['GET', 'POST'])
+def select_single_example():
+    return render_template('select_single_example.html')
+
+# select_single 演習ページ
+@app.route('/basic/select/single/practice', methods=['GET', 'POST'])
+def select_single_practice():
+    query = None
+    query_result = None
+    error_message = None
+
+    try:
+        # salesテーブルのデータを取得
+        conn = mysql.connector.MySQLConnection(**this_users_dns)
+        cursor = conn.cursor()
+
+        # salesテーブルの内容を取得
+        cursor.execute("SELECT * FROM sales")
+        sales_data = cursor.fetchall()
+
+        cursor.execute("DESC sales")
+        sales_desc = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        error_message = f"エラーが発生しました: {str(e)}"
+        return render_template(
+            'select_single_practice.html',
+            query=query,
+            query_result=query_result,
+            error_message=error_message,
+            sales_data=[],
+            sales_desc=[]
+        )
+
+    if request.method == 'POST':
+        try:
+            condition = request.form.get('condition_1')
+            if not condition:
+                raise ValueError("条件が入力されていません。")
+
+            # AND / OR を禁止
+            forbidden_keywords = [' AND ', ' OR ']
+            if any(keyword in condition.upper() for keyword in forbidden_keywords):
+                raise ValueError("複数条件は使用できません。単一条件のみ入力してください。")
+
+            # クエリ生成
+            query = f"SELECT * FROM sales WHERE {condition};"
+
+            conn = mysql.connector.MySQLConnection(**this_users_dns)
+            cursor = conn.cursor()
+            cursor.execute(query)
+            result = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+
+            query_result = {"columns": columns, "data": result}
+
+            cursor.close()
+            conn.close()
+
+        except Exception as e:
+            error_message = str(e)
+
+    return render_template(
+        'select_single_practice.html',
+        query=query,
+        query_result=query_result,
+        error_message=error_message,
+        sales_data=sales_data,
+        sales_desc=sales_desc
+    )
+
+# select_multiple 学習ページ
+@app.route('/basic/select/multiple/study', methods=['GET', 'POST'])
+def select_multiple_study():
+    return render_template('select_multiple_study.html')
+
+# select_multiple 実行例ページ
+@app.route('/basic/select/multiple/example', methods=['GET', 'POST'])
+def select_multiple_example():
+    return render_template('select_multiple_example.html')
+
+# select_multiple 演習ページ
+@app.route('/basic/select/multiple/practice', methods=['GET', 'POST'])
+def select_multiple_practice():
+    query = None
+    query_result = None
+    error_message = None
+
+    try:
+        # salesテーブルのデータを取得
+        conn = mysql.connector.MySQLConnection(**this_users_dns)
+        cursor = conn.cursor()
+
+        # salesテーブルの内容を取得
+        cursor.execute("SELECT * FROM sales")
+        sales_data = cursor.fetchall()
+
+        cursor.execute("DESC sales")
+        sales_desc = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        error_message = f"エラーが発生しました: {str(e)}"
+        return render_template(
+            'select_multiple_practice.html',
+            query=query,
+            query_result=query_result,
+            error_message=error_message,
+            sales_data=[],
+            sales_desc=[]
+        )
+
+    if request.method == 'POST':
+        try:
+            condition = request.form.get('condition_1')
+            if not condition:
+                raise ValueError("条件が入力されていません。")
+
+            # クエリ生成
+            query = f"SELECT * FROM sales WHERE {condition};"
+
+            conn = mysql.connector.MySQLConnection(**this_users_dns)
+            cursor = conn.cursor()
+            cursor.execute(query)
+            result = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+
+            query_result = {"columns": columns, "data": result}
+
+            cursor.close()
+            conn.close()
+
+        except Exception as e:
+            error_message = str(e)
+
+    return render_template(
+        'select_multiple_practice.html',
+        query=query,
+        query_result=query_result,
+        error_message=error_message,
+        sales_data=sales_data,
+        sales_desc=sales_desc
+    )

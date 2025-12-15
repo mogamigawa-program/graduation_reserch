@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}SELECT文の実行例(単数条件){% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/select/single/study" class="prev">◀ 前へ</a>
+    <a href="/basic/select/single/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>SELECT文（単一条件）実行例</h1>
+
+    <section>
+        <h2>対象テーブル：students</h2>
+        <p>次のような <code>students</code> テーブルがあります。</p>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>student_id</th><th>name</th><th>age</th><th>grade</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>田中</td><td>18</td><td>A</td></tr>
+                <tr><td>2</td><td>佐藤</td><td>20</td><td>B</td></tr>
+                <tr><td>3</td><td>鈴木</td><td>19</td><td>A</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>実行例①：年齢が18歳の学生を抽出</h2>
+        <div class="code-block"><code>SELECT * FROM students WHERE age = 18;</code></div>
+        <p><strong>実行結果：</strong> 「田中」のデータのみが表示されます。</p>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>student_id</th><th>name</th><th>age</th><th>grade</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>田中</td><td>18</td><td>A</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>実行例②：成績がAの学生を抽出</h2>
+        <div class="code-block"><code>SELECT name, grade FROM students WHERE grade = 'A';</code></div>
+        <p><strong>実行結果：</strong> 成績がAの学生（「田中」と「鈴木」）の名前と成績が表示されます。</p>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>name</th><th>grade</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>田中</td><td>A</td></tr>
+                <tr><td>鈴木</td><td>A</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>よくあるエラーと注意点</h2>
+
+        <div class="alert-warning">
+            <strong>⚠ 条件に一致する行がない</strong>
+            <div class="code-block"><code>SELECT * FROM students WHERE age = 25;</code></div>
+            <p>→ 実行結果は空になります（該当データが存在しません）。</p>
+        </div>
+
+        <div class="alert-error">
+            <strong>⚠ 文字列をクォートで囲まない</strong>
+            <div class="code-block"><code>SELECT * FROM students WHERE name = 佐藤;</code></div>
+            <p>→ エラーになります（文字列は <code>'佐藤'</code> のようにシングルクォートで囲みましょう）。</p>
+        </div>
+
+        <div class="alert-info">
+            <strong>💡 表示カラムの指定</strong>
+            <div class="code-block"><code>SELECT name, age FROM students WHERE grade = 'A';</code></div>
+            <p>→ <code>*</code> ではなく、必要な列だけを表示することもできます。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>補足：すべてのデータを確認したい場合</h2>
+        <p>テーブル全体を確認するには、次のように書きます。</p>
+        <div class="code-block"><code>SELECT * FROM students;</code></div>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/select/single/study" class="prev">◀ 前へ</a>
+    <a href="/basic/select/single/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

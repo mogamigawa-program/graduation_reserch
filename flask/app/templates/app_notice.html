@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}アプリ利用時の注意事項{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/注意事項?flag=min" class="prev">◀ 前へ</a>
+    <a href="/index" class="next">トップへ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>このアプリを利用する上での注意事項</h1>
+
+    <section>
+        <h2>1. このアプリで使用している SQL について</h2>
+        <p>
+            本アプリで紹介している SQL 文は <strong>MySQL / MariaDB</strong> で実際に使用できる書き方に基づいています。
+            そのため、PostgreSQL・Oracle・SQL Server など他のDBでは構文が異なる場合があります。
+        </p>
+    </section>
+
+    <section>
+        <h2>2. 実行できる SQL 文について</h2>
+        <p>安全に学習できるよう、実行可能な SQL 文は学習項目に関連するものに制限されています。</p>
+        <ul>
+            <li>DELETE, INSERT, UPDATE などの基本構文のみ実行可能</li>
+            <li>DROP DATABASE や ALTER USER など危険な構文は自動でブロック</li>
+            <li>予想外の操作を避けるため、構文チェックを実施しています</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>3. ユーザーごとの独立した学習環境</h2>
+        <p>
+            各ユーザーには独立した練習データベースが割り当てられており、
+            他のユーザーのデータを参照・変更することはできません。
+        </p>
+        <p>データが壊れても「初期化」ボタンで元に戻せます。</p>
+    </section>
+
+    <section>
+        <h2>4. 実際の業務データベースとは異なります</h2>
+        <p>
+            本アプリは学習用の簡易環境です。  
+            実務のデータベースでは権限管理、セキュリティ、同時アクセスなど多くの要素が関わります。
+        </p>
+    </section>
+
+    <section>
+        <h2>5. 実行結果は学習データのみに反映されます</h2>
+        <p>
+            実行結果はあなた専用のサンプルデータだけに反映されます。  
+            個人情報や本番データに影響が及ぶことはありません。
+        </p>
+    </section>
+
+    <section>
+        <h2>6. エラーは自然なものです</h2>
+        <p>
+            SQL は少しの書き間違いでエラーになりますが、これは正常な学習プロセスです。
+            エラー文を確認して、少しずつ正しい書き方に近づけていきましょう。
+        </p>
+    </section>
+
+    <section>
+        <h2>7. 推奨環境</h2>
+        <ul>
+            <li>PC（スマホでは一部レイアウトが崩れる可能性あり）</li>
+            <li>Chrome / Firefox / Edge の最新バージョン</li>
+            <li>JavaScript 有効</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>8. 禁止事項</h2>
+        <ul>
+            <li>ブラウザの「戻る」ボタンを使用してページを遷移しないでください。</li>
+            <li>不正なSQL文の連続実行</li>
+            <li>他ユーザーになりすます行為</li>
+            <li>システム改ざん・攻撃目的のアクセス</li>
+            <li>サーバーに高負荷を与える操作</li>
+        </ul>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/注意事項?flag=min" class="prev">◀ 前へ</a>
+    <a href="/index" class="next">トップへ ▶</a>
+</div>
+
+{% endblock %}

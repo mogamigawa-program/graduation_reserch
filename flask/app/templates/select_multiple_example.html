@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}SELECT文の実行例(複数条件){% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/select/multiple/study" class="prev">◀ 前へ</a>
+    <a href="/basic/select/multiple/practice" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>SELECT文（複数条件）実行例</h1>
+
+    <section>
+        <h2>対象テーブル：stationery（文房具）</h2>
+        <p>次のような <code>stationery（文房具）</code> テーブルがあります。</p>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>item_id</th><th>type</th><th>color</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Pen</td><td>Blue</td><td>120</td></tr>
+                <tr><td>2</td><td>Eraser</td><td>Red</td><td>80</td></tr>
+                <tr><td>3</td><td>Notebook</td><td>Green</td><td>250</td></tr>
+                <tr><td>4</td><td>Pencil</td><td>Yellow</td><td>100</td></tr>
+                <tr><td>5</td><td>Pen</td><td>Black</td><td>150</td></tr>
+            </tbody>
+        </table>
+    </section><br>
+
+    <section>
+        <h2>実行例①：種類が"Pen"かつ色が"Blue"</h2>
+        <div class="code-block"><code>SELECT * FROM stationery WHERE type = 'Pen' AND color = 'Blue';</code></div>
+        <p><strong>実行結果：</strong> 種類がペンで色が青の文房具のみ表示されます。</p>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>item_id</th><th>type</th><th>color</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Pen</td><td>Blue</td><td>120</td></tr>
+            </tbody>
+        </table>
+    </section><br>
+
+    <section>
+        <h2>実行例②：種類が"Eraser"または色が"Green"</h2>
+        <div class="code-block"><code>SELECT * FROM stationery WHERE type = 'Eraser' OR color = 'Green';</code></div>
+        <p><strong>実行結果：</strong> 種類が消しゴムの文房具全てと、色が緑の文房具が表示されます。</p>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>item_id</th><th>type</th><th>color</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>2</td><td>Eraser</td><td>Red</td><td>80</td></tr>
+                <tr><td>3</td><td>Notebook</td><td>Green</td><td>250</td></tr>
+            </tbody>
+        </table>
+    </section><br>
+
+    <section>
+        <h2>実行例③：種類が"Notebook"かつ色が"Green"、または値段が150円以上</h2>
+        <div class="code-block"><code>SELECT * FROM stationery WHERE (type = 'Notebook' AND color = 'Green') OR price >= 150;</code></div>
+        <p><strong>実行結果：</strong> 次のいずれかに該当する文房具が表示されます：</p>
+        <ul>
+            <li>種類がノートかつ色が緑</li>
+            <li>値段が150円以上の文房具</li>
+        </ul>
+
+        <table class="example-table">
+            <thead>
+                <tr><th>item_id</th><th>type</th><th>color</th><th>price</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Pen</td><td>Blue</td><td>120</td></tr>
+                <tr><td>3</td><td>Notebook</td><td>Green</td><td>250</td></tr>
+                <tr><td>5</td><td>Pen</td><td>Black</td><td>150</td></tr>
+            </tbody>
+        </table>
+    </section><br>
+
+    <section>
+        <h2>よくあるエラーと注意点</h2>
+
+        <div class="alert-warning">
+            <strong>⚠ 条件に一致する行がない</strong>
+            <div class="code-block"><code>SELECT * FROM stationery WHERE color = 'Purple' AND type = 'Pen';</code></div>
+            <p>→ 実行結果は空になります（該当データが存在しません）。</p>
+        </div>
+
+        <div class="alert-error">
+            <strong>⚠ 文字列をクォートで囲まない</strong>
+            <div class="code-block"><code>SELECT * FROM stationery WHERE type = Pen;</code></div>
+            <p>→ エラーになります（文字列は <code>'Pen'</code> のようにシングルクォートで囲みましょう）。</p>
+        </div>
+
+        <div class="alert-info">
+            <strong>💡 表示カラムの指定</strong>
+            <div class="code-block"><code>SELECT type, color FROM stationery WHERE price >= 150;</code></div>
+            <p>→ <code>*</code> ではなく、必要な列だけを表示することもできます。</p>
+        </div>
+    </section>
+
+</div>
+
+
+<div class="nav-buttons">
+    <a href="/basic/select/multiple/study" class="prev">◀ 前へ</a>
+    <a href="/basic/select/multiple/practice" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}SELECT文とは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/select?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/select/single/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>SELECT文（単一条件）の学習</h1>
+
+    <section>
+        <h2>1. このページで学ぶこと</h2>
+        <p>
+            <strong>SELECT文</strong>は、データベースの中から必要なデータを取り出すための命令（SQL文）です。<br>
+            このページでは、「<strong>1つの条件</strong>だけでデータを取り出す方法」を学びます。
+        </p>
+    </section>
+
+    <section>
+        <h2>2. 基本の書き方</h2>
+        <p>以下が、SELECT文の基本的な形です。</p>
+        <div class="code-block">
+<code>SELECT 列名 FROM テーブル名 WHERE 条件;</code>
+        </div>
+        <ul>
+            <li><code>SELECT</code>：取り出したい列（カラム）を指定します</li>
+            <li><code>FROM</code>：どのテーブルから取り出すかを指定します</li>
+            <li><code>WHERE 条件</code>：どの行を取り出すかを条件で指定します（例：年齢が20以上）</li>
+        </ul>
+
+        <div class="alert-info">
+            <strong>※</strong> <code>「SELECT * FROM テーブル名;」</code> と書くと、テーブル内の<strong>すべてのカラム</strong>を抽出できます。
+        </div>
+    </section>
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/select?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/select/single/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}初めてのプログラミング基礎{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/プログラミング基礎知識?flag=min" class="prev">◀ 前へ</a>
+    <a href="/index" class="next">トップへ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>初めてのプログラミング基礎</h1>
+
+    <!-- 1. プログラミングとは？ -->
+    <section>
+        <h2>プログラミングとは？</h2>
+        <p>
+            プログラミングとは、コンピュータに対して「何をどうしてほしいか」を正確に伝える
+            <strong>手順書（レシピ）を書く作業</strong>です。
+        </p>
+        <p>
+            コンピュータは人間と違って推測できないため、曖昧な指示は理解できません。
+            <br>例：<strong>「いい感じに並べて」→ NG</strong>
+        </p>
+        <p>
+            必要なのは<strong>順番・条件・繰り返し</strong>を明確に書くことです。
+        </p>
+    </section>
+
+    <!-- 2. プログラムの基本構成 -->
+    <section>
+        <h2>プログラムの3つの基本要素</h2>
+        <ul>
+            <li><strong>変数：</strong>値を保存しておく「名前付きの箱」</li>
+            <li><strong>条件分岐：</strong>もし○○なら ××する（判断）</li>
+            <li><strong>繰り返し：</strong>同じ処理を何度も行う</li>
+        </ul>
+
+        <div class="code-block"><code>
+age = 20
+
+if age >= 18:
+    print("大人です")
+
+for i in range(3):
+    print("こんにちは")
+        </code></div>
+    </section>
+
+    <!-- 3. コンピュータの特徴 -->
+    <section>
+        <h2>コンピュータができないこと・苦手なこと</h2>
+        <ul>
+            <li>曖昧な指示を理解できない</li>
+            <li>書いた通りにしか動かない（善意の補正がない）</li>
+            <li>順番が違うと正しく動かない</li>
+            <li>“まあこれでしょ” という推測をしてくれない</li>
+        </ul>
+    </section>
+
+    <!-- 4. エラーについて -->
+    <section>
+        <h2>エラー（バグ）とは？</h2>
+        <p>
+            プログラムが想定した動きをしない状態をバグと呼びます。
+            初心者も上級者も必ず何度も経験します。
+        </p>
+        <p>よくある例：</p>
+        <ul>
+            <li>スペルミス（例：pritn → print）</li>
+            <li>カッコの閉じ忘れ</li>
+            <li>変数名が一致していない</li>
+            <li>意図しない値が入っている</li>
+        </ul>
+    </section>
+
+    <!-- 5. デバッグの基本 -->
+    <section>
+        <h2>デバッグの基本</h2>
+        <div class="tips-box">
+            <p class="tips-title">デバッグは “間違い探し” に近い作業です。</p>
+            <p>初心者が覚えておくべきポイント：</p>
+            <ul>
+                <li>エラー文は「ヒント」なので読む</li>
+                <li>どこまで動いたかを確認する</li>
+                <li>1行ずつ順番に追いかける</li>
+                <li>小さく試して、少しずつ修正する</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 6. アルゴリズム -->
+    <section>
+        <h2>アルゴリズムとは？</h2>
+        <p>
+            アルゴリズムとは、問題を解決するための
+            <strong>“手順そのもの”</strong>です。プログラムはその手順をコンピュータ向けに書いたものです。
+        </p>
+
+        <div class="code-block"><code>
+例：1〜5の合計を求めたい
+↓
+1を足す → 2を足す → 3を足す → 4を足す → 5を足す（これが手順＝アルゴリズム）
+        </code></div>
+    </section>
+
+    <!-- 7. データベースで使う演算子と計算 -->
+    <section>
+        <h2>データベースで使う演算子と計算</h2>
+        <p>
+            SQL では、データを条件で絞り込んだり、値を計算したりするために
+            <strong>演算子</strong>を使います。
+            これはプログラミング言語とほぼ同じ考え方です。
+        </p>
+
+        <h3>① 比較演算子（条件を作る）</h3>
+        <p>「どのデータを使うか」を決めるために使います。</p>
+
+        <div class="code-block"><code>
+=   等しい
+!=, <>  等しくない
+>   より大きい
+<   より小さい
+>=  以上
+<=  以下
+        </code></div>
+
+        <p>例：</p>
+        <div class="code-block"><code>
+age >= 20   -- 20歳以上
+price < 1000 -- 1000円未満
+        </code></div>
+
+        <h3>② 論理演算子（条件を組み合わせる）</h3>
+        <p>複数の条件を同時に使いたいときに使います。</p>
+
+        <div class="code-block"><code>
+AND  両方の条件を満たす
+OR   どちらか一方を満たす
+NOT  条件を否定する
+        </code></div>
+
+        <p>例：</p>
+        <div class="code-block"><code>
+age >= 20 AND gender = '男'
+age < 18 OR age >= 65
+        </code></div>
+
+        <h3>③ 算術演算子（計算する）</h3>
+        <p>数値の計算も SQL の中で行えます。</p>
+
+        <div class="code-block"><code>
++  足し算
+-  引き算
+*  掛け算
+/  割り算
+        </code></div>
+
+        <p>例：</p>
+        <div class="code-block"><code>
+price * 1.1   -- 税込み価格を計算
+salary / 12  -- 月給を計算
+        </code></div>
+
+        <h3>④ SQLでは「計算結果」もデータとして扱う</h3>
+        <p>
+            SQL の特徴として、<strong>計算結果そのものを表示したり、条件に使ったり</strong>できます。
+        </p>
+
+        <div class="code-block"><code>
+SELECT price * quantity AS total_price
+FROM orders;
+        </code></div>
+
+        <p>
+            このように SQL は
+            <strong>「データを取り出す」＋「その場で計算する」</strong>
+            ことができる言語です。
+        </p>
+    </section>
+
+
+    <!-- 8. SQLを学ぶ前に知っておくと良いこと -->
+    <section>
+        <h2>SQLを学ぶ前に知っておくと良いこと</h2>
+        <ul>
+            <li>SQLも「コンピュータへの指示」である</li>
+            <li>曖昧な書き方をすると意図しない結果になる</li>
+            <li>文法ミスは必ずエラーになる（コンピュータは融通が効かない）</li>
+            <li>小さな例で動かして、挙動を確認するのが大切</li>
+        </ul>
+
+        <p>特に SQL は “順番” よりも “キーワードの並び” が大事です。</p>
+    </section>
+
+    <!-- 9. 初心者へのメッセージ -->
+    <section>
+        <h2>初心者へのメッセージ</h2>
+        <p>
+            プログラミングはスポーツと同じで、<strong>練習すれば必ず上達します。</strong><br>
+            最初はわからなくて当然。失敗もエラーも学びの一部です。
+        </p>
+        <p>
+            このアプリで手を動かしながら、「書く → 動かす → 直す」の循環に慣れていきましょう。
+        </p>
+    </section>
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/index/プログラミング基礎知識?flag=min" class="prev">◀ 前へ</a>
+    <a href="/index" class="next">トップへ ▶</a>
+</div>
+
+{% endblock %}

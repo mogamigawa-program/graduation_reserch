@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}UPDATE文（計算）の実行例{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/update/calc/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/update_calculation" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>UPDATE文で計算を行う（実行例）</h1>
+
+    <section>
+        <p>
+            UPDATE文では、<strong>カラムの現在の値を使って計算</strong>し、その結果を更新できます。<br>
+            在庫数の増減や価格の変更など、実務でも非常によく使われる書き方です。
+        </p>
+    </section>
+
+    <!-- 初期状態 -->
+    <section>
+        <h2>products テーブル（初期状態）</h2>
+
+        <table class="example-table">
+            <tr>
+                <th>product_id</th>
+                <th>product_name</th>
+                <th>price</th>
+                <th>stock</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>りんご</td>
+                <td>100</td>
+                <td>50</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>みかん</td>
+                <td>80</td>
+                <td>8</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- 例1 -->
+    <section class="section-title">例1：在庫を 10 減らす</section>
+
+    <div class="code-block">
+<code>UPDATE products
+SET stock = stock - 10
+WHERE product_id = 1;</code>
+    </div>
+
+    <p>
+        product_id が 1 の商品の在庫数を、現在の値から <strong>10 引いた値</strong> に更新します。
+    </p>
+
+    <table class="example-table">
+        <tr>
+            <th>product_id</th>
+            <th>product_name</th>
+            <th>price</th>
+            <th>stock</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>りんご</td>
+            <td>100</td>
+            <td class="diff-changed">40</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>みかん</td>
+            <td>80</td>
+            <td>8</td>
+        </tr>
+    </table>
+
+    <!-- 例2 -->
+    <section class="section-title">例2：価格を 10% 上げる</section>
+
+    <div class="code-block">
+<code>UPDATE products
+SET price = price * 1.1;</code>
+    </div>
+
+    <p>
+        すべての商品の価格を <strong>1.1倍（10%増）</strong> に更新します。
+    </p>
+
+    <table class="example-table">
+        <tr>
+            <th>product_id</th>
+            <th>product_name</th>
+            <th>price</th>
+            <th>stock</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>りんご</td>
+            <td class="diff-changed">110</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>みかん</td>
+            <td class="diff-changed">88</td>
+            <td>8</td>
+        </tr>
+    </table>
+
+    <!-- 例3 -->
+    <section class="section-title">例3：在庫が少ない商品だけ補充する</section>
+
+    <div class="code-block">
+<code>UPDATE products
+SET stock = stock + 5
+WHERE stock &lt; 10;</code>
+    </div>
+
+    <p>
+        在庫数が 10 未満の商品だけを対象に、<strong>在庫を 5 増やします</strong>。
+    </p>
+
+    <table class="example-table">
+        <tr>
+            <th>product_id</th>
+            <th>product_name</th>
+            <th>price</th>
+            <th>stock</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>りんご</td>
+            <td>100</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>みかん</td>
+            <td>80</td>
+            <td class="diff-changed">13</td>
+        </tr>
+    </table>
+
+    <!-- 注意 -->
+    <div class="alert-warning">
+        <strong>注意：</strong><br>
+        ・WHERE句を付けないと <strong>すべての行</strong> が更新されます。<br>
+        ・計算結果がマイナスになる可能性がある場合は、条件をしっかり指定しましょう。
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/update/calc/study" class="prev">◀ 前へ</a>
+    <a href="/quiz/update_calculation" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

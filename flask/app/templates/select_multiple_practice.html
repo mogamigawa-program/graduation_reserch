@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}SELECT文を学ぼう{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/basic/select/multiple/example" class="prev">◀ 前へ</a>
+    <a href="/quiz/select_multiple_conditions" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>SELECT文（複数条件）の演習</h1>
+
+    <p>
+        <strong>SELECT文</strong>は、テーブルから必要なデータを取得するために使用されます。
+        特定の条件に一致する行だけを取り出すこともできます。
+    </p>
+
+    <p>
+        例えば、次のようにして <code>sales</code> テーブルから price が420以上の"Apple"の列を取得します。
+    </p>
+
+    <div class="example-box">
+        <p><strong>例:</strong></p>
+        <code>SELECT * FROM sales WHERE product_name = 'Apple' AND price >= 420;</code>
+    </div>
+
+    <h2>練習してみよう</h2>
+    <p>以下の <code>{{ table_name }}</code> テーブルからデータを取得してみよう。</p>
+
+    <table class="example-table">
+        <caption>sales</caption>
+        <tr>
+            {% for col in sales_desc %}
+                <th>{{ col[0] }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sales_data %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% if error_message %}
+        <p class="error-message">エラー: {{ error_message }}</p>
+    {% endif %}
+    {% if message %}
+        <p class="message">結果: {{ message }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <div class="form-group">
+            <p>SELECT * FROM sales WHERE</p>
+        <input type="text" name="condition_1" placeholder="条件">
+        <label>;</label>
+
+        <div class="btn-container">
+            <button type="submit" name="submit_button" value="result_btn" class="btn">結果を見る</button>
+        </div>
+    </form>
+
+    {% if query %}
+        <h2>実行したクエリ</h2>
+        <div class="code-block">{{ query }}</div>
+    {% endif %}
+
+    {% if query_result %}
+        <h2>クエリ結果</h2>
+        <table class="example-table">
+            <tr>
+                {% for col in query_result["columns"] %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in query_result["data"] %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+</div>
+
+<div class="nav-buttons">
+    <a href="/basic/select/multiple/example" class="prev">◀ 前へ</a>
+    <a href="/quiz/select_multiple_conditions" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

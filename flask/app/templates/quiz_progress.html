@@ -39,8 +39,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if quiz.id in quiz_files %}
-                            <a href="/{{ quiz_files[quiz.id] }}" class="btn btn-primary">挑戦する</a>
+                        {% if quiz.quiz_name in quiz_files %}
+                            <a href="/{{ quiz_files[quiz.quiz_name] }}" class="btn btn-primary">挑戦する</a>
                         {% else %}
                             <span class="text-danger">ファイルが見つかりません</span>
                         {% endif %}

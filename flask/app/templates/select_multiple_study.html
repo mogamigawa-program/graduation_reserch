@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}SELECT文とは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
+{% block content %}
+
+<div class="nav-buttons">
+    <a href="/index/select?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/select/multiple/example" class="next">次へ ▶</a>
+</div>
+
+<div class="learning-container">
+    <h1>SELECT文（複数条件）の学習</h1>
+
+    <section>
+        <h2>1. このページで学ぶこと</h2>
+        <p>
+            <strong>SELECT文</strong>は、テーブルから必要なデータを取り出すための命令です。<br>
+            このページでは、<strong>複数の条件を組み合わせてデータを取り出す方法</strong>を学びます。
+        </p>
+        <p>
+            条件を組み合わせる場合、<code>AND</code>（かつ）や <code>OR</code>（または）を使用します。
+        </p>
+    </section>
+
+    <section>
+        <h2>2. 基本の書き方（複数条件）</h2>
+        <div class="code-block">
+<code>SELECT 列名 FROM テーブル名 WHERE 条件1 AND 条件2;<br><br>
+SELECT 列名 FROM テーブル名 WHERE 条件1 OR 条件2;</code>
+        </div>
+        <ul>
+            <li><code>AND</code>：すべての条件を満たす行を抽出</li>
+            <li><code>OR</code>：いずれかの条件を満たす行を抽出</li>
+        </ul>
+        <div class="alert-info">
+            <strong>※</strong> 複数条件を組み合わせる場合は、意図が曖昧にならないように括弧 <code>()</code> を使うこともできます。
+        </div>
+    </section>
+
+    <section>
+
+</div>
+
+
+<div class="nav-buttons">
+    <a href="/index/select?flag=min" class="prev">◀ 前へ</a>
+    <a href="/basic/select/multiple/example" class="next">次へ ▶</a>
+</div>
+
+{% endblock %}

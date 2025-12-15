@@ -53,7 +53,26 @@ INSERT INTO `user_databases` VALUES
 (52,'5_db'),
 (53,'6_db'),
 (54,'7_db'),
-(55,'4_db');
+(55,'4_db'),
+(56,'i_db'),
+(57,'11_db'),
+(58,'a_db'),
+(59,'f_db'),
+(60,'s_db'),
+(61,'q_db'),
+(62,'g_db'),
+(63,'k_db'),
+(64,'y_db'),
+(65,'ff_db'),
+(66,'aaa_db'),
+(67,'eee_db'),
+(68,'fff_db'),
+(69,'eeee_db'),
+(70,'qqq_db'),
+(71,'ss_db'),
+(72,'ggg_db'),
+(73,'tt_db'),
+(74,'pp_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -71,7 +90,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,7 +107,26 @@ INSERT INTO `users` VALUES
 (52,'5','$2b$12$N2CgClq7hTisbsU00lUd6uipiozZSjPJaoP/SoBZJiFNQg0zzJn6e',0),
 (53,'6','$2b$12$uicqJM.mMJY6lLo8MyijdO7N8sDMQtVdAIIPVyw758jFSimwjKZlG',0),
 (54,'7','$2b$12$0I2YU2cvWQnhNbUL.6U9U.iZYxC5zbON67MPTpi2HazQJQu06kCde',0),
-(55,'4','$2b$12$Kmqz9yM3wP8wrqXpXLUsreADUxS3XWzfrvB1VFUzh5FxM3GFHUqf.',0);
+(55,'4','$2b$12$Kmqz9yM3wP8wrqXpXLUsreADUxS3XWzfrvB1VFUzh5FxM3GFHUqf.',0),
+(56,'i','$2b$12$koNkn4rTZnfN5JtsnP4UKuWmCWq5O6Vy09wLLRYO.3bVMsQUDDw0K',0),
+(57,'11','$2b$12$FrfDVXQ2Hhg2JCMfPicYB.ZlKkixiIRr66MkucqsVmC07LHS01lBq',0),
+(58,'a','$2b$12$6qvbY1/d2j8aWCBtYjrwTun.BD8ekIp0NBeT4uFPPBhWbZz/J4.dm',0),
+(59,'f','$2b$12$nIe6l5UVJh8lt.DR7HfKLuf4b3vYwnXrIAwf1CY4lMk0ZXVugbuyO',0),
+(60,'s','$2b$12$3zwPPYRXv4aKFrH6VA5cKe6PL7pUh13s6zGshWx12dKWNLELjF6Q6',0),
+(61,'q','$2b$12$naWN/avKhCis6eF/UIG0dOicDkbovXi8lROL/SiByUfvy0U6KtrHy',0),
+(62,'g','$2b$12$SqRT51P7drfkW5gcTJ6YvuF6NR1nzTBq8FyZa8uAAy4k86.SB0OGu',0),
+(63,'k','$2b$12$Sm6yV0SaQq7ty4yzI1STruXk9jga8lQdsD1CFyVTdZgqbEJZEclwS',0),
+(64,'y','$2b$12$/F37VXj8Vlto.SkKnKJQ1ueDvroxNxlz6IMX19NHiIA5kk9qk0VuS',0),
+(65,'ff','$2b$12$gbCagIQSF0v42cdIg41vde1tvZRccQYmjRNqRFbPkzhXjcL3zNDyC',0),
+(66,'aaa','$2b$12$7N/UCFQ900JSgYODQ9MJIe5ZXpqvOMOV2Ndi/04RL22S6TKwpu3NO',0),
+(67,'eee','$2b$12$k3tQ2IJ/qoMQscLnskSadOtAvipHOFQJVImW0xRxQvA4n0olO1t/u',0),
+(68,'fff','$2b$12$z6WocY358h7ajEKZ614sjOrNQbvk7uuNsApqhwKeHTfi/F00zzB/y',0),
+(69,'eeee','$2b$12$PmeG0lmSSU7jFzerFNAFe.sfmDlnFYfTEFxdigdDtX3vELVWsw29W',0),
+(70,'qqq','$2b$12$9tuRv05J.G.LKPDlkhv/5u4P0ryDAHrNDzbm1kZFKZ4VufHih111.',0),
+(71,'ss','$2b$12$Ak.5YAQWLLmBPvmp36jIEeWX2wlpaOm3PMynFvjrk3w/kIyp79MT6',0),
+(72,'ggg','$2b$12$cAeXut1YTGYdTyJKdT2dbOwTdtb8qBmSr90kDWX5.gi4PKWlS2oZ6',0),
+(73,'tt','$2b$12$B6WtRRDCUdry.CGxwmbM0Otr4QT3YC0Nv.1pwh9dmVM2aqB0VPryu',0),
+(74,'pp','$2b$12$6imugAEikghp3g3MeRr.eutsdbTT5Y6nfuR6OkSPRHAUjZcOj7os6',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -99,6 +137,63 @@ UNLOCK TABLES;
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dataset` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 
 USE `dataset`;
+
+--
+-- Table structure for table `accounts`
+--
+
+DROP TABLE IF EXISTS `accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `accounts` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `balance` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounts`
+--
+
+LOCK TABLES `accounts` WRITE;
+/*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES
+(1,'A',10000),
+(2,'B',8000),
+(3,'C',12000);
+/*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `accounts_plus`
+--
+
+DROP TABLE IF EXISTS `accounts_plus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `accounts_plus` (
+  `id` int(11) NOT NULL,
+  `name` varchar(20) DEFAULT NULL,
+  `balance` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accounts_plus`
+--
+
+LOCK TABLES `accounts_plus` WRITE;
+/*!40000 ALTER TABLE `accounts_plus` DISABLE KEYS */;
+INSERT INTO `accounts_plus` VALUES
+(1,'Suzuki',10000),
+(2,'Tanaka',15000),
+(3,'Sato',8000),
+(4,'Ito',20000);
+/*!40000 ALTER TABLE `accounts_plus` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `all_users`
@@ -149,7 +244,7 @@ CREATE TABLE `choices` (
   `is_correct` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `idx_question_id` (`question_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=316 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=508 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -350,7 +445,199 @@ INSERT INTO `choices` VALUES
 (312,48,'DELETE FROM tableA WHERE id IN (SELECT id FROM tableB WHERE status = \'inactive\');',0),
 (313,48,'DELETE a FROM tableA AS a JOIN tableB AS b ON a.id = b.id WHERE a.status = \'inactive\';',1),
 (314,48,'DELETE FROM tableA AS a, tableB AS b WHERE a.id = b.id AND a.status = \'inactive\';',0),
-(315,48,'DELETE b FROM tableA AS a JOIN tableB AS b ON a.id = b.id WHERE a.status = \'inactive\';',0);
+(315,48,'DELETE b FROM tableA AS a JOIN tableB AS b ON a.id = b.id WHERE a.status = \'inactive\';',0),
+(316,49,'1つのSQL文のみを指す言葉である',0),
+(317,49,'複数の操作をまとめて実行し、全体を一つの処理単位として扱う仕組み',1),
+(318,49,'SQL文のエラーを自動修正する仕組み',0),
+(319,49,'データベース全体をバックアップする仕組み',0),
+(320,50,'原子性（Atomicity）',0),
+(321,50,'一貫性（Consistency）',0),
+(322,50,'独立性（Isolation）',0),
+(323,50,'効率性（Efficiency）',1),
+(324,51,'START TRANSACTION;',1),
+(325,51,'BEGIN UPDATE;',0),
+(326,51,'OPEN TRANSACTION;',0),
+(327,51,'BEGIN SESSION;',0),
+(328,52,'データを確定して保存する命令',0),
+(329,52,'トランザクションを終了し、接続を切断する命令',0),
+(330,52,'トランザクション中の変更をすべて取り消す命令',1),
+(331,52,'実行計画を再構築する命令',0),
+(332,53,'INSERTとUPDATEをまとめて実行し、最後にCOMMITする',0),
+(333,53,'SELECT文のみを1回だけ実行しCOMMITする',1),
+(334,53,'ROLLBACKで処理を取り消すことができる',0),
+(335,53,'一連の操作を安全に実行するために使う',0),
+(336,54,'すべての処理が成功するか失敗するかを保証する性質',0),
+(337,54,'障害発生時にデータを保持する性質',0),
+(338,54,'トランザクションが互いに干渉しないように独立して実行される性質',1),
+(339,54,'データの整合性を保ち続けるための規則',0),
+(340,55,'他トランザクションの未確定の変更が見えてしまう',1),
+(341,55,'データが永続的に保存されなくなる',0),
+(342,55,'データベース全体が停止する',0),
+(343,55,'自動的にコミットされてしまう',0),
+(344,56,'Isolationは守られていない',0),
+(345,56,'Atomicityが守られている',0),
+(346,56,'Durabilityが守られている',0),
+(347,56,'Isolationは守られている',1),
+(348,57,'障害時にデータを保持すること',0),
+(349,57,'他トランザクションに途中状態を見せないこと',1),
+(350,57,'更新を永続的に保存すること',0),
+(351,57,'データベースの速度を最適化すること',0),
+(352,58,'テーブル定義が壊れる',0),
+(353,58,'整合性制約がすべて無効になる',0),
+(354,58,'別トランザクションが未確定の変更を読めてしまう',1),
+(355,58,'更新内容が永続的に保存されない',0),
+(356,59,'音楽や動画を自動生成する仕組み',0),
+(357,59,'大量のデータを整理して保存・管理する仕組み',1),
+(358,59,'プログラムの処理速度を上げる仕組み',0),
+(359,59,'ネットワーク設定を行う仕組み',0),
+(360,60,'プログラムがなくてもゲームが作れる',0),
+(361,60,'画面デザインを簡単にするため',0),
+(362,60,'データを効率よく検索・更新できるようにするため',1),
+(363,60,'インターネットに自動で接続するため',0),
+(364,61,'表（テーブル）同士の関連（リレーション）を使うこと',1),
+(365,61,'人間関係を管理するデータベース',0),
+(366,61,'ネットワーク接続の状態を管理する仕組み',0),
+(367,61,'サーバー同士の通信関係',0),
+(368,62,'画像ファイルの保存領域',0),
+(369,62,'データベースのログ履歴',0),
+(370,62,'サーバーの設定項目の一覧',0),
+(371,62,'列（カラム）と行（レコード）で構成されるデータの集まり',1),
+(372,63,'データの追加・削除履歴',0),
+(373,63,'データ量の上限',0),
+(374,63,'データの項目（名前・年齢など）',1),
+(375,63,'テーブル同士の関連先',0),
+(376,64,'1件分のデータ（例：1人のユーザー情報）',1),
+(377,64,'データベースの種類',0),
+(378,64,'テーブルの設定情報',0),
+(379,64,'SQL文の実行履歴',0),
+(380,65,'高精度の画像解析',0),
+(381,65,'Webページのデザイン作成',0),
+(382,65,'自動的にプログラムを作成すること',0),
+(383,65,'表同士を結びつけてデータを管理すること',1),
+(384,66,'テーブル数を増やすため',0),
+(385,66,'データの重複を避け、効率よく管理するため',1),
+(386,66,'データを暗号化するため',0),
+(387,66,'テーブル名を短くするため',0),
+(388,67,'共通のカラム（例：user_id）で関連付ける',1),
+(389,67,'全データを1つのテーブルにまとめる',0),
+(390,67,'テーブル名を同じにする',0),
+(391,67,'ファイル名を同じにする',0),
+(392,68,'データベースはオンライン操作ができない',0),
+(393,68,'Excelは複数人で同時編集できる',0),
+(394,68,'ExcelはSQLが使える',0),
+(395,68,'データベースは大量データの検索・更新に特化している',1),
+(396,69,'データを自動で並べ替えるための項目',0),
+(397,69,'データの種類を決める項目',0),
+(398,69,'削除された行を記録する項目',0),
+(399,69,'データを区別するための特別な項目',1),
+(400,70,'値が重複せず、NULLにできない',1),
+(401,70,'値は重複してよいが、NULLにはできない',0),
+(402,70,'NULLは許されるが、重複できない',0),
+(403,70,'常に文字列でなければならない',0),
+(404,71,'テーブルの行数を調整するための番号',0),
+(405,71,'常に自動で連番になる番号',0),
+(406,71,'別のテーブルの主キーとつなげるための番号',1),
+(407,71,'テーブル名を識別するための番号',0),
+(408,72,'値が重複してもよいが、NULLは不可',0),
+(409,72,'同じ値は入れられないが、NULLは許される',1),
+(410,72,'必ず主キーと同じ列になる',0),
+(411,72,'必ず整数値でなければならない',0),
+(412,73,'データの項目名（name, age など）',1),
+(413,73,'1件分のデータ（行）',0),
+(414,73,'データベース名',0),
+(415,73,'テーブルの作成日',0),
+(416,74,'SQL文の実行履歴を保存する場所',0),
+(417,74,'アプリの設定値を管理する場所',0),
+(418,74,'データ型をまとめた一覧表',0),
+(419,74,'行と列でデータを管理する箱（表）',1),
+(420,75,'データを検索するための文',0),
+(421,75,'新しいテーブルを作成するための文',1),
+(422,75,'データを削除するための文',0),
+(423,75,'既存のテーブル名を変更する文',0),
+(424,76,'TABLE CREATE ( カラム );',0),
+(425,76,'CREATE テーブル名 ( データ型 カラム名 );',0),
+(426,76,'CREATE TABLE ( カラム名, データ型 );',0),
+(427,76,'CREATE TABLE テーブル名 ( カラム名 データ型, ... );',1),
+(428,77,'CREATE TABLE users ( id INT PRIMARY KEY, name VARCHAR(50), age INT );',1),
+(429,77,'CREATE users TABLE ( id INT PRIMARY KEY, name VARCHAR(50), age INT );',0),
+(430,77,'CREATE TABLE users: id INT PRIMARY, name VARCHAR(50), age INT;',0),
+(431,77,'TABLE CREATE users ( id INT PK, name TEXT(50), age NUMBER );',0),
+(432,78,'文字列しか入れられない',0),
+(433,78,'NULL を入れてもよい',0),
+(434,78,'重複できず、NULL にできない',1),
+(435,78,'常に自動で連番になる',0),
+(436,79,'50種類のデータを扱える',0),
+(437,79,'最大50文字までの文字列',1),
+(438,79,'上限なく文字を入れられる',0),
+(439,79,'常に50文字の文字列が必要',0),
+(440,80,'テーブル名を識別する設定',0),
+(441,80,'行数を決める設定',0),
+(442,80,'SQL文を分類するための設定',0),
+(443,80,'どんな種類の値を入れるか決める設定',1),
+(444,81,'カラム名とデータ型の組み合わせ',1),
+(445,81,'SQL のコメント文',0),
+(446,81,'テーブル名の一覧',0),
+(447,81,'INSERT するデータの内容',0),
+(448,82,'age > 20',0),
+(449,82,'age = 20',1),
+(450,82,'age >= 20',0),
+(451,82,'age < 20',0),
+(452,83,'price = 1000',0),
+(453,83,'price <= 1000',0),
+(454,83,'price < 1000',0),
+(455,83,'price > 1000',1),
+(456,84,'name = \'Taro\'',1),
+(457,84,'name == \'Taro\'',0),
+(458,84,'name LIKE Taro',0),
+(459,84,'name = Taro',0),
+(460,85,'stock > 10',0),
+(461,85,'stock = 10',0),
+(462,85,'stock >= 10',1),
+(463,85,'stock < 10',0),
+(464,86,'score <= 60',0),
+(465,86,'score < 60',1),
+(466,86,'score = 60',0),
+(467,86,'score > 60',0),
+(468,87,'age >= 20 OR gender = \'男性\'',0),
+(469,87,'age > 20 AND gender = 男性',0),
+(470,87,'age >= 20 AND gender = \'男性\'',1),
+(471,87,'age = 20 AND gender = \'男性\'',0),
+(472,88,'price < 1000 OR stock = 0',1),
+(473,88,'price < 1000 AND stock = 0',0),
+(474,88,'price <= 1000 OR stock > 0',0),
+(475,88,'price > 1000 OR stock = 0',0),
+(476,89,'department = \'Sales\' OR years >= 5',0),
+(477,89,'department = Sales AND years >= 5',0),
+(478,89,'department = \'Sales\' AND years > 5',0),
+(479,89,'department = \'Sales\' AND years >= 5',1),
+(480,90,'category = \'Book\' AND category = \'Game\'',0),
+(481,90,'category = \'Book\' OR category = \'Game\'',1),
+(482,90,'category IN Book, Game',0),
+(483,90,'category = Book OR Game',0),
+(484,91,'age >= 18 OR status = \'active\'',0),
+(485,91,'age > 18 AND status = active',0),
+(486,91,'age >= 18 AND status = \'active\'',1),
+(487,91,'age = 18 AND status = \'active\'',0),
+(488,92,'SET stock = 10 - stock',0),
+(489,92,'SET stock = stock - 10',1),
+(490,92,'SET stock == stock - 10',0),
+(491,92,'SET stock := stock - 10',0),
+(492,93,'UPDATE products SET stock = stock - 10;',0),
+(493,93,'UPDATE products SET stock = 10 - stock WHERE product_id = 1;',0),
+(494,93,'UPDATE products SET stock = stock - 10 WHERE product_id == 1;',0),
+(495,93,'UPDATE products SET stock = stock - 10 WHERE product_id = 1;',1),
+(496,94,'UPDATE products SET price = price * 1.1;',1),
+(497,94,'UPDATE products SET price = price + 1.1;',0),
+(498,94,'UPDATE products SET price = price * 10;',0),
+(499,94,'UPDATE products SET price = 1.1;',0),
+(500,95,'UPDATE products SET stock = stock + 5 WHERE stock <= 10;',0),
+(501,95,'UPDATE products SET stock = 5 + stock WHERE stock = 10;',0),
+(502,95,'UPDATE products SET stock = stock + 5 WHERE stock < 10;',1),
+(503,95,'UPDATE products SET stock = stock + 10 WHERE stock < 5;',0),
+(504,96,'WHERE句を付けないUPDATEは、最初の1行だけ更新される',0),
+(505,96,'WHERE句を付けないUPDATEは、すべての行が更新される',1),
+(506,96,'UPDATEで計算を使うことはできない',0),
+(507,96,'PRIMARY KEYがないテーブルではUPDATEできない',0);
 /*!40000 ALTER TABLE `choices` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1005,7 +1292,7 @@ CREATE TABLE `questions` (
   `question_text` text NOT NULL,
   `explanation` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1062,7 +1349,55 @@ INSERT INTO `questions` VALUES
 (45,'DELETE_SHARED-MULTIPLE','DELETE JOIN構文で削除対象を指定する正しい方法はどれ？','DELETE句の直後に削除対象テーブルの別名を指定します。JOINで結合しても、削除されるのは指定したテーブルのみです。'),
 (46,'DELETE_SHARED-MULTIPLE','DELETE JOIN構文のON句はどのような役割を持つ？','ON句では、削除対象テーブルと結合テーブルの共通カラムを指定して、対応する行を特定します。'),
 (47,'DELETE_SHARED-MULTIPLE','別名を使ったDELETE JOIN構文の正しい例はどれ？','DELETE句の後には削除対象テーブルの別名を、JOIN句では結合条件を指定します。'),
-(48,'DELETE_SHARED-MULTIPLE','共通idかつstatusが\"inactive\"の行を削除する正しいSQLはどれ？（別名使用）','JOINで共通部分を結合し、WHERE句で追加条件を指定します。');
+(48,'DELETE_SHARED-MULTIPLE','共通idかつstatusが\"inactive\"の行を削除する正しいSQLはどれ？（別名使用）','JOINで共通部分を結合し、WHERE句で追加条件を指定します。'),
+(49,'TRANSACTION_BASIC_OPERATIONS','トランザクションの説明として正しいものはどれ？','トランザクションとは、一連の処理を1つの単位として扱い、すべて成功またはすべて失敗のどちらかにする仕組みです。'),
+(50,'TRANSACTION_BASIC_OPERATIONS','トランザクションの「ACID特性」に含まれないものはどれ？','ACID特性は、原子性(Atomicity)、一貫性(Consistency)、独立性(Isolation)、永続性(Durability)の4つです。'),
+(51,'TRANSACTION_BASIC_OPERATIONS','トランザクションを開始するSQL文はどれ？','トランザクションを開始するには「START TRANSACTION;」または「BEGIN;」を使います。'),
+(52,'TRANSACTION_BASIC_OPERATIONS','次のうち、ROLLBACKの説明として正しいものはどれ？','ROLLBACKはトランザクション中の変更を取り消し、開始前の状態に戻す命令です。'),
+(53,'TRANSACTION_BASIC_OPERATIONS','次のうち、トランザクションの使い方として誤っているのはどれ？','トランザクションは、複数の関連操作をまとめて実行するために使います。SELECTだけの処理で使う必要はありません。'),
+(54,'TRANSACTION_ISOLATION','Isolation（分離性）の最も正しい説明はどれ？','Isolationは、トランザクション同士が干渉せず独立して実行される性質です。'),
+(55,'TRANSACTION_ISOLATION','Isolationが守られていない場合に起こるもっとも基本的な問題はどれ？','Isolationが不足すると、未確定の変更が他のトランザクションから見えてしまいます。'),
+(56,'TRANSACTION_ISOLATION','次の状況はIsolationが守られているか？\n「T1がCOMMIT前の変更を、T2が読むことができない。」','COMMIT前の変更を他トランザクションが読めないのはIsolationが保たれている状態です。'),
+(57,'TRANSACTION_ISOLATION','Isolationがもっとも重視している目的はどれ？','Isolationは、他のトランザクションに途中経過を見せないための仕組みです。'),
+(58,'TRANSACTION_ISOLATION','Isolationが正しく機能していない場合の挙動として正しいものはどれ？','Isolation不足では、他トランザクションが未確定の変更を読めてしまう状態が起こります。'),
+(59,'DATABASE_OVERVIEW','データベースとは何を管理する仕組み？','データベースは大量のデータを整理し、検索や更新を効率よく行えるようにする仕組みです。'),
+(60,'DATABASE_OVERVIEW','データベースを使う主な理由として正しいものはどれ？','データベースはデータを効率よく検索・更新するための仕組みとして使われます。'),
+(61,'DATABASE_OVERVIEW','関係データベースの「関係」とは何を意味する？','関係（リレーション）は、テーブル同士の関連付けを意味します。'),
+(62,'DATABASE_OVERVIEW','テーブル（表）とはデータベース内で何を表す？','テーブルはカラム（列）とレコード（行）で構成されるデータの集まりです。'),
+(63,'DATABASE_OVERVIEW','カラム（列）は何を表している？','カラムはデータの項目（属性）を意味します。'),
+(64,'DATABASE_OVERVIEW','レコード（行）は何を表している？','レコードは1件分のデータ（例えば1人のユーザー情報）を表します。'),
+(65,'DATABASE_OVERVIEW','関係データベースが得意とすることはどれ？','関係データベースは表同士の関連付けを扱うのが得意です。'),
+(66,'DATABASE_OVERVIEW','関係データベースで複数のテーブルを関連付ける主な理由は？','テーブルを関連付けることで、データの重複を避け、効率よく管理できます。'),
+(67,'DATABASE_OVERVIEW','「ユーザー情報」と「注文情報」の2つのテーブルがある場合、関係データベースではどのように結びつける？','共通のカラム（例：user_id）で関連付けることで、ユーザーと注文を結びつけて管理できます。'),
+(68,'DATABASE_OVERVIEW','データベースとExcelの大きな違いはどれ？','データベースは大量データの検索・更新に特化しており、Excelとは用途が異なります。'),
+(69,'KEY_AND_DEFINITION','キー（Key）の役割として正しいのはどれ？','キーは、データを区別するための特別な項目です。'),
+(70,'KEY_AND_DEFINITION','主キー（Primary Key）の特徴として正しいのはどれ？','主キーは重複せず、NULLにはできません。'),
+(71,'KEY_AND_DEFINITION','外部キー（Foreign Key）の役割として正しいのはどれ？','外部キーは、別のテーブルの主キーを参照して関連づけます。'),
+(72,'KEY_AND_DEFINITION','一意キー（Unique）の特徴として正しいのはどれ？','一意キーは値の重複を禁止しますが、NULLは許可されることが多いです。'),
+(73,'KEY_AND_DEFINITION','カラム（列）は何を意味する？','カラムはデータの項目名を表します。'),
+(74,'KEY_AND_DEFINITION','テーブルとは何を指す？','テーブルは、行と列でデータを管理する箱（表）です。'),
+(75,'CREATE_TABLE','CREATE TABLE 文は何をするための SQL 文？','CREATE TABLE は新しいテーブルを作成するための SQL 文です。'),
+(76,'CREATE_TABLE','CREATE TABLE の基本構文として正しいのはどれ？','CREATE TABLE テーブル名 ( カラム名 データ型, ... ); の形式で定義します。'),
+(77,'CREATE_TABLE','次のうち、users テーブルを正しく作成する SQL はどれ？','PRIMARY KEY を付けると重複不可・NULL不可の列になります。'),
+(78,'CREATE_TABLE','PRIMARY KEY をつけたカラムに当てはまる特徴はどれ？','PRIMARY KEY は重複不可・NULL 不可の制約です。'),
+(79,'CREATE_TABLE','VARCHAR(50) が表す意味として正しいのはどれ？','VARCHAR(50) は最大 50 文字までの文字列を入れられるデータ型です。'),
+(80,'CREATE_TABLE','カラムに設定する「データ型」として正しいのはどれ？','データ型はそのカラムに入れられる値の種類を指定する設定です。'),
+(81,'CREATE_TABLE','CREATE TABLE の括弧 (…) の中に書くべき内容はどれ？','括弧の中にはカラム名とデータ型の組み合わせを並べます。'),
+(82,'select_single_condition','年齢が20歳のユーザーを取得したい。正しい条件はどれ？','等しい値を指定する場合は = を使います。'),
+(83,'select_single_condition','価格が1000円より高い商品を取得したい。正しい条件はどれ？','> は「より大きい」を意味します。'),
+(84,'select_single_condition','名前が「Taro」のデータを取得したい。正しい条件はどれ？','文字列はシングルクォートで囲みます。'),
+(85,'select_single_condition','在庫数が10以上の商品を取得したい。正しい条件はどれ？','以上を表すには >= を使います。'),
+(86,'select_single_condition','テストの点数が60点未満の学生を取得したい。正しい条件はどれ？','未満を表すには < を使います。'),
+(87,'select_multiple_conditions','年齢が20歳以上かつ性別が「男性」のユーザーを取得したい。正しい条件はどれ？','両方の条件を満たす場合は AND を使います。'),
+(88,'select_multiple_conditions','価格が1000円未満、または在庫が0の商品を取得したい。正しい条件はどれ？','どちらかを満たせばよい場合は OR を使います。'),
+(89,'select_multiple_conditions','部署が「Sales」で、勤続年数が5年以上の社員を取得したい。正しい条件はどれ？','AND は複数条件を同時に満たす場合に使います。'),
+(90,'select_multiple_conditions','カテゴリが「Book」または「Game」の商品を取得したい。正しい条件はどれ？','同じカラムに複数の候補がある場合も OR を使います。'),
+(91,'select_multiple_conditions','年齢が18歳以上で、会員状態が「active」のユーザーを取得したい。正しい条件はどれ？','複数条件を同時に満たす場合は AND を使います。'),
+(92,'update_calculation','UPDATE文で「カラムの現在の値」を使って計算し、更新できることを表す正しいSET句はどれ？','UPDATEでは「stock = stock - 10」のように、同じカラムを右辺に書いて計算できます。'),
+(93,'update_calculation','product_id=1 の在庫を10減らすSQLとして正しいものはどれ？','特定の商品だけ更新するには WHERE product_id = 1 のように条件を付けます。'),
+(94,'update_calculation','すべての商品の価格を10%上げるSQLとして正しいものはどれ？','WHERE句を付けないUPDATEは、テーブルのすべての行が更新対象になります。10%増は 1.1倍です。'),
+(95,'update_calculation','在庫が10未満の商品だけ在庫を5増やすSQLとして正しいものはどれ？','条件付きの更新は WHERE を使います。「10未満」は stock < 10 です。'),
+(96,'update_calculation','次のうち、ページの注意事項として正しいものはどれ？','WHERE句を付けないと全行が更新されます。また計算結果がマイナスになりうる場合は条件指定が重要です。');
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1077,9 +1412,10 @@ CREATE TABLE `quiz_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `quiz_name` varchar(255) NOT NULL,
   `total_questions` int(11) NOT NULL,
+  `display_order` int(11) NOT NULL DEFAULT 999,
   PRIMARY KEY (`id`),
   UNIQUE KEY `quiz_name` (`quiz_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1089,29 +1425,36 @@ CREATE TABLE `quiz_list` (
 LOCK TABLES `quiz_list` WRITE;
 /*!40000 ALTER TABLE `quiz_list` DISABLE KEYS */;
 INSERT INTO `quiz_list` VALUES
-(1,'AVG',5),
-(2,'COUNT',5),
-(3,'CROSS JOIN',8),
-(4,'GROUP BY',10),
-(5,'HAVING',10),
-(6,'INNER JOIN',8),
-(7,'JOIN SAMMARY',10),
-(8,'LEFT OUTER JOIN',8),
-(9,'MAX',5),
-(10,'MIN',5),
-(11,'ORDER BY',10),
-(12,'RIGHT OUTER JOIN',8),
-(13,'SUM',5),
-(14,'UPDATE',6),
-(15,'INSERT',6),
-(16,'DELETE SINGLE',5),
-(17,'DELETE MULTIPLE',5),
-(18,'INSERT SELECT',6),
-(19,'UPDATE SINGLE COLUMN',5),
-(20,'UPDATE MULTIPLE COLUMNS',5),
-(21,'DELETE ALL RECORDS',5),
-(22,'UPDATE JOIN',5),
-(23,'DELETE SHARED MULTIPLE',5);
+(1,'AVG',5,22),
+(2,'COUNT',5,20),
+(3,'CROSS JOIN',8,6),
+(4,'GROUP BY',10,26),
+(5,'HAVING',10,27),
+(6,'INNER JOIN',8,7),
+(7,'JOIN SAMMARY',10,10),
+(8,'LEFT OUTER JOIN',8,8),
+(9,'MAX',5,24),
+(10,'MIN',5,23),
+(11,'ORDER BY',10,25),
+(12,'RIGHT OUTER JOIN',8,9),
+(13,'SUM',5,21),
+(15,'INSERT',6,11),
+(16,'DELETE SINGLE',5,16),
+(17,'DELETE MULTIPLE',5,17),
+(18,'INSERT SELECT',6,12),
+(19,'UPDATE SINGLE COLUMN',5,13),
+(20,'UPDATE MULTIPLE COLUMNS',5,14),
+(21,'DELETE ALL RECORDS',5,18),
+(22,'UPDATE JOIN',5,15),
+(23,'DELETE SHARED MULTIPLE',5,19),
+(24,'TRANSACTION BASIC OPERATIONS',5,28),
+(25,'TRANSACTION ISOLATION',5,29),
+(26,'DATABASE OVERVIEW',10,1),
+(27,'KEY AND DEFINITION',6,2),
+(28,'CREATE TABLE',7,3),
+(29,'SELECT SINGLE CONDITION',5,4),
+(30,'SELECT MULTIPLE CONDITIONS',5,5),
+(31,'UPDATE CALCULATION',5,999);
 /*!40000 ALTER TABLE `quiz_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1369,6 +1712,31 @@ INSERT INTO `user` VALUES
 UNLOCK TABLES;
 
 --
+-- Table structure for table `user_created_tables`
+--
+
+DROP TABLE IF EXISTS `user_created_tables`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_created_tables` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(255) NOT NULL,
+  `create_sql` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_created_tables`
+--
+
+LOCK TABLES `user_created_tables` WRITE;
+/*!40000 ALTER TABLE `user_created_tables` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_created_tables` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 
@@ -1412,4 +1780,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-11-07  2:48:27
+-- Dump completed on 2025-12-15 21:35:56
