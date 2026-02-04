@@ -2,6 +2,69 @@
 {% block title %}INSERT文の実行例{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+
+<style>
+/* =========================
+   色付け（変更点の強調）
+========================= */
+/* ✅ 変更があった表：セル(th/td)の背景を塗る（learning.cssに勝つ） */
+.example-table.table-changed th,
+.example-table.table-changed td{
+  background-color: #038ff3 !important;  /* 青 */
+}
+
+/* ✅ 見出し行だけ少し濃く */
+.example-table.table-changed thead th{
+  background-color: #b5d4eb !important;
+}
+
+/* ✅ 追加された行（黄色）は青より優先して見せる */
+.example-table.table-changed tr.hl-insert td{
+  background-color: #f1c603 !important;  /* 黄 */
+  font-weight: 700;
+}
+
+.table-changed caption{ font-weight: 700; }
+
+/* 追加行：薄い黄色 */
+.hl-insert { background: #f1c603; font-weight: 700; }
+
+/* 重要セル：薄い緑 */
+.hl-key { background: #03f022; font-weight: 700; }
+
+/* NG/OK（エラー表用） */
+.bad { background: #e60808; font-weight: 700; }
+.good { background: #03f022; font-weight: 700; }
+
+.note { font-size: 0.95rem; color: #e60808; }
+
+/* =========================
+   ターミナル風（英語エラー表示用）
+========================= */
+.terminal-box{
+  background:#0b0f14;
+  color:#e8eef6;
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;
+  padding:12px 14px;
+  margin:10px 0 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 0.95rem;
+  overflow-x:auto;
+}
+.terminal-box .prompt{ color:#7ee787; }   /* mysql> の色 */
+.terminal-box .err{ color:#ff7b72; }      /* ERROR の色 */
+.terminal-caption{
+  margin-top: 8px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.small-note{
+  font-size: 0.9rem;
+  color:#666;
+  margin-top:-6px;
+}
+</style>
 {% endblock %}
 {% block content %}
 
@@ -14,90 +77,312 @@
     <h1>INSERT文の実行例</h1>
 
     <section>
-        <h2>基本的な実行例</h2>
-        <p>以下のような <code>students</code> テーブルがあるとします：</p>
+        <h2>このページでやること</h2>
+        <ul>
+            <li><strong>1件挿入</strong>して、テーブル表示で<strong>行が増える</strong>ことを確認する</li>
+            <li><strong>複数列挿入</strong>して、<strong>どの列に入ったか</strong>を確認する</li>
+            <li>典型的なエラーについて「<strong>何を直せば通るか</strong>」をセットで理解する</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>前提：サンプルテーブル</h2>
+        <p>以下のような <code>students</code> テーブルがあるとします。</p>
 
         <div class="code-block">
 <code>CREATE TABLE students (
     id INT PRIMARY KEY,
-    name VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     age INT
 );</code>
         </div>
 
-        <p>このテーブルに新しい学生を追加するには、次のようなSQLを使います。</p>
+        <p class="note">
+            <span class="hl-key">id（PRIMARY KEY）</span> は重複不可。<span class="hl-key">name（NOT NULL）</span> は必須です。
+        </p>
+
+        <table class="example-table">
+            <caption>students テーブルの構造</caption>
+            <thead>
+                <tr>
+                    <th>列名</th>
+                    <th>型</th>
+                    <th>制約</th>
+                    <th>入る値の例</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td><code>INT</code></td>
+                    <td class="hl-key"><code>PRIMARY KEY</code>（重複不可）</td>
+                    <td>1, 2, 3...</td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td><code>VARCHAR(100)</code></td>
+                    <td class="hl-key"><code>NOT NULL</code>（必須）</td>
+                    <td>'佐藤太郎'</td>
+                </tr>
+                <tr>
+                    <td><code>age</code></td>
+                    <td><code>INT</code></td>
+                    <td>（なし）</td>
+                    <td>20</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>実行例①：1件挿入 → 行が増えることを確認</h2>
 
         <div class="code-block">
 <code>INSERT INTO students (id, name, age)
 VALUES (1, '佐藤太郎', 20);</code>
         </div>
 
-        <p><strong>実行結果：</strong> 「idが1、名前が佐藤太郎、年齢が20歳」のデータが追加されます。</p>
+        <p>実行後、<code>SELECT</code> で確認します。</p>
+        <div class="code-block">
+<code>SELECT * FROM students;</code>
+        </div>
+
+        <p class="note">
+            <strong>青</strong>：変更があった表　／　<strong>黄</strong>：追加された行
+        </p>
+
+        <table class="example-table">
+            <caption>実行前 → 実行後の変化</caption>
+            <thead>
+                <tr>
+                    <th style="width:50%;">実行前（空）</th>
+                    <th style="width:50%;">実行後（1行追加）</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <table class="example-table" style="margin:0;">
+                            <thead>
+                                <tr><th>id</th><th>name</th><th>age</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3">（データなし）</td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="example-table table-changed" style="margin:0;">
+                            <thead>
+                                <tr><th>id</th><th>name</th><th>age</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hl-insert"><td>1</td><td>佐藤太郎</td><td>20</td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>確認ポイント：</strong> <code>id=1</code> の行が増えているか</p>
     </section>
 
     <section>
-        <h2>複数行を追加する例</h2>
+        <h2>実行例②：複数列挿入 → どの列に入ったかを確認</h2>
+
+        <div class="code-block">
+<code>INSERT INTO students (name, age, id)
+VALUES ('鈴木花子', 19, 2);</code>
+        </div>
+
+        <table class="example-table">
+            <caption>列と値の対応（列名を指定しているので安心）</caption>
+            <thead>
+                <tr>
+                    <th>指定した列</th>
+                    <th>入れる値</th>
+                    <th>入る場所（結果）</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>name</code></td>
+                    <td class="good">'鈴木花子'</td>
+                    <td>name 列に入る</td>
+                </tr>
+                <tr>
+                    <td><code>age</code></td>
+                    <td class="good">19</td>
+                    <td>age 列に入る</td>
+                </tr>
+                <tr>
+                    <td><code>id</code></td>
+                    <td class="good">2</td>
+                    <td>id 列に入る</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="code-block">
+<code>SELECT id, name, age FROM students;</code>
+        </div>
+
+        <p class="note"><strong>青</strong>：変更があった表　／　<strong>黄</strong>：追加された行</p>
+
+        <table class="example-table table-changed">
+            <caption>テーブル表示（2行になった）</caption>
+            <thead>
+                <tr><th>id</th><th>name</th><th>age</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>佐藤太郎</td><td>20</td></tr>
+                <tr class="hl-insert"><td>2</td><td>鈴木花子</td><td>19</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>実行例③：複数行をまとめて追加</h2>
         <div class="code-block">
 <code>INSERT INTO students (id, name, age)
 VALUES
-(2, '鈴木花子', 19),
-(3, '高橋一郎', 21);</code>
+(3, '高橋一郎', 21),
+(4, '田中花子', 20);</code>
         </div>
 
-        <p>このように、<strong>複数のレコード</strong>を一度に追加することもできます。</p>
+        <p class="note"><strong>青</strong>：変更があった表　／　<strong>黄</strong>：追加された行</p>
+
+        <table class="example-table table-changed">
+            <caption>追加後のテーブル（合計4行）</caption>
+            <thead>
+                <tr><th>id</th><th>name</th><th>age</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>佐藤太郎</td><td>20</td></tr>
+                <tr><td>2</td><td>鈴木花子</td><td>19</td></tr>
+                <tr class="hl-insert"><td>3</td><td>高橋一郎</td><td>21</td></tr>
+                <tr class="hl-insert"><td>4</td><td>田中花子</td><td>20</td></tr>
+            </tbody>
+        </table>
     </section>
 
     <hr>
 
     <section>
-        <h2>よくあるミスやエラー集</h2>
+        <h2>よくあるエラー例（何を直せば通るか）</h2>
+        <p>まずは「列数」／「値」／「制約」のどれが原因かを切り分けます。</p>
 
-        <h3>① PRIMARY KEYの重複</h3>
-        <div class="code-block">
-<code>-- エラーになる例（id=1はすでに存在する）
-INSERT INTO students (id, name, age)
-VALUES (1, '山田次郎', 22);</code>
-        </div>
-        <p><strong>エラーメッセージ例：</strong> <code>ERROR: duplicate key value violates unique constraint "students_pkey"</code></p>
-        <p><strong>対策：</strong> 主キー（id）の重複を避け、自動採番を使う方法も検討しましょう。</p>
+        <table class="example-table">
+            <caption>典型エラーの原因と直し方</caption>
+            <thead>
+                <tr>
+                    <th>エラーの種類</th>
+                    <th>原因（どれが原因？）</th>
+                    <th>何を直せば通る？</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>列数と値数が一致しない</td>
+                    <td class="bad"><strong>列数</strong></td>
+                    <td>列の数と値の数を一致させる</td>
+                </tr>
+                <tr>
+                    <td>クオート忘れ（文字列）</td>
+                    <td class="bad"><strong>値</strong></td>
+                    <td>文字列を <code>' '</code> で囲む</td>
+                </tr>
+                <tr>
+                    <td>主キー重複（UNIQUE/PRIMARY KEY）</td>
+                    <td class="bad"><strong>制約</strong></td>
+                    <td>重複しない値に変更する</td>
+                </tr>
+                <tr>
+                    <td>NOT NULL違反</td>
+                    <td class="bad"><strong>制約</strong></td>
+                    <td>NOT NULL の列に値を入れる</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <h3>② データ型の不一致</h3>
+        <h3>① 列数と値数が一致しない（列数が原因）</h3>
         <div class="code-block">
-<code>-- エラーになる例（ageに文字列を入れてしまっている）
-INSERT INTO students (id, name, age)
-VALUES (4, '田中花子', '二十');</code>
-        </div>
-        <p><strong>エラーメッセージ例：</strong> <code>ERROR: invalid input syntax for type integer: "二十"</code></p>
-        <p><strong>対策：</strong> 数値型カラムには半角の数値を使用する。</p>
-
-        <h3>③ 値の数と列の数が合わない</h3>
-        <div class="code-block">
-<code>-- エラーになる例（列が3つあるのに、値が2つしかない）
+<code>-- ❌ 列は3つなのに、値が2つしかない
 INSERT INTO students (id, name, age)
 VALUES (5, '山本一郎');</code>
         </div>
-        <p><strong>エラーメッセージ例：</strong> <code>ERROR: INSERT has more target columns than expressions</code></p>
-        <p><strong>対策：</strong> 列の数と、値の数が一致しているか確認しましょう。</p>
-
-        <h3>④ シングルクォートの閉じ忘れ</h3>
+        <p><strong>直し方：</strong> 値を3つにする（または列を2つにする）</p>
         <div class="code-block">
-<code>-- エラーになる例（文字列が閉じられていない）
+<code>-- ✅ 修正例
 INSERT INTO students (id, name, age)
-VALUES (6, '佐々木陽子, 20);</code>
+VALUES (5, '山本一郎', 18);</code>
         </div>
-        <p><strong>エラーメッセージ例：</strong> <code>ERROR: unterminated quoted string</code></p>
-        <p><strong>対策：</strong> 文字列は <code>'</code>（シングルクォート）で正しく囲みましょう。</p>
-    </section>
 
-    <hr>
+        <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+        <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO students (id, name, age) VALUES (5, '山本一郎');
+<span class="err">ERROR 1136 (21S01): Column count doesn't match value count at row 1</span></code></pre>
+        </div>
 
-    <section>
-        <h2>まとめ</h2>
-        <ul>
-            <li>INSERT文はテーブルにデータを追加するための基本的なSQL文です。</li>
-            <li>列と値の数・型・順番に注意して書きましょう。</li>
-            <li>よくあるエラーを知っておくことで、トラブルを防げます。</li>
-        </ul>
+        <h3>② クオート忘れ（値が原因）</h3>
+        <div class="code-block">
+<code>-- ❌ 文字列なのにクオートがない（name は文字列）
+INSERT INTO students (id, name, age)
+VALUES (6, 佐々木陽子, 20);</code>
+        </div>
+        <p><strong>直し方：</strong> 文字列を <code>' '</code> で囲む</p>
+        <div class="code-block">
+<code>-- ✅ 修正例
+INSERT INTO students (id, name, age)
+VALUES (6, '佐々木陽子', 20);</code>
+        </div>
+
+        <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+        <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO students (id, name, age) VALUES (6, 佐々木陽子, 20);
+<span class="err">ERROR 1054 (42S22): Unknown column '佐々木陽子' in 'field list'</span></code></pre>
+        </div>
+
+        <h3>③ 主キー重複（UNIQUE/PRIMARY KEY違反：制約が原因）</h3>
+        <div class="code-block">
+<code>-- ❌ id=1 はすでに存在する想定
+INSERT INTO students (id, name, age)
+VALUES (1, '山田次郎', 22);</code>
+        </div>
+        <p><strong>直し方：</strong> 重複しない id に変える</p>
+        <div class="code-block">
+<code>-- ✅ 修正例
+INSERT INTO students (id, name, age)
+VALUES (7, '山田次郎', 22);</code>
+        </div>
+
+        <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+        <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO students (id, name, age) VALUES (1, '山田次郎', 22);
+<span class="err">ERROR 1062 (23000): Duplicate entry '1' for key 'PRIMARY'</span></code></pre>
+        </div>
+
+        <h3>④ NOT NULL違反（制約が原因）</h3>
+        <div class="code-block">
+<code>-- ❌ name は NOT NULL なのに指定していない
+INSERT INTO students (id, age)
+VALUES (8, 20);</code>
+        </div>
+        <p><strong>直し方：</strong> NOT NULL の列（ここでは name）に値を入れる</p>
+        <div class="code-block">
+<code>-- ✅ 修正例
+INSERT INTO students (id, name, age)
+VALUES (8, '中村修', 20);</code>
+        </div>
+
+        <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+        <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO students (id, age) VALUES (8, 20);
+<span class="err">ERROR 1364 (HY000): Field 'name' doesn't have a default value</span></code></pre>
+        </div>
+        <p class="small-note">※環境（SQLモード）によっては NOT NULL 関連の文言が少し変わることがあります。</p>
+
     </section>
 </div>
 

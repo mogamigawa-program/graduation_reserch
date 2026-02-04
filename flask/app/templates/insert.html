@@ -1,7 +1,115 @@
 {% extends "base.html" %}
 {% block title %}INSERT文を使ってみよう{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+
+<style>
+/* =========================
+   INSERT 練習フォーム：SQLっぽく見せる
+========================= */
+.sql-editor-box{
+  background:#1e1e1e;
+  color:#dcdcdc;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;
+  padding:16px 18px;
+  margin: 12px 0 14px;
+  box-sizing:border-box;
+  overflow-x:auto;
+}
+.sql-editor-inner{ min-width: max-content; }
+
+/* SQL行 */
+.sql-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  line-height: 1.9;
+  white-space: nowrap;
+  flex-wrap: wrap;              /* 画面半分でも崩れにくい */
+}
+.sql-indent{ padding-left: 18px; }
+
+/* キーワード・記号 */
+.sql-kw{ color:#4fc1ff; font-weight:800; }
+.sql-id{ color:#dcdcdc; font-weight:700; }
+.sql-symbol{ color:#dcdcdc; opacity:0.9; }
+.sql-comma{ color:#dcdcdc; font-weight:800; }
+
+/* 入力 */
+.sql-input{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 0.95rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: #2a2a2a;
+  color:#eaeaea;
+  box-sizing:border-box;
+  min-width: 140px;
+}
+.sql-input::placeholder{ color: rgba(234,234,234,0.55); }
+
+/* ✅ 入力中は白背景＋黒文字（読みやすさ最優先） */
+.sql-editor-box input:focus{
+  outline:none;
+  background:#ffffff !important;
+  border-color:#cfcfcf !important;
+  color:#000000 !important;
+  caret-color:#000000 !important;
+  -webkit-text-fill-color:#000000 !important;
+}
+
+/* 列名/値：狭い画面で自然に折り返す */
+.sql-grid{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+}
+.sql-pill{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* 列と値の入力幅 */
+.sql-col-input{ width: 150px; }
+.sql-val-input{ width: 170px; }
+
+/* ボタン配置 */
+.btn-container{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* テーブル間の余白 */
+.section-gap{ margin-top: 22px; }
+
+/* 説明用バッジ */
+.hint-badge{
+  display:inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eef7ff;
+  border: 1px solid #d5ecff;
+  color:#0b4a77;
+  font-size:0.85rem;
+  font-weight:700;
+}
+
+/* エラー・成功（learning.cssがあるならそっち優先でもOK） */
+.error-message{ color:#d21c1c; font-weight:700; }
+.message{ color:#0b7a2a; font-weight:700; }
+
+/* ===== 半分ウィンドウ対策 ===== */
+@media (max-width: 900px){
+  .sql-col-input{ width: 140px; }
+  .sql-val-input{ width: 160px; }
+  .sql-editor-box{ padding: 14px 14px; }
+}
+</style>
 {% endblock %}
 {% block content %}
 
@@ -28,8 +136,11 @@
 INSERT INTO test (name, num) VALUES ('John', 1);</code>
     </div>
 
-    <h2>練習問題</h2>
-    <p>以下の <code>{{ table_name }}</code> テーブルにデータを挿入してみましょう。</p>
+    <h2 class="section-gap">練習問題</h2>
+    <p>
+        以下の <code>{{ table_name }}</code> テーブルにデータを挿入してみましょう。<br>
+        <span class="hint-badge">コツ</span> 文字列は <code>' '</code> で囲む／列数と値数を一致させる／NOT NULLに注意
+    </p>
 
     <table class="example-table">
         <caption>現在の{{ table_name }}の中身</caption>
@@ -51,7 +162,7 @@ INSERT INTO test (name, num) VALUES ('John', 1);</code>
         </tbody>
     </table>
 
-    <h2>{{ table_name }}の定義</h2>
+    <h2 class="section-gap">{{ table_name }}の定義</h2>
     <table class="example-table">
         <thead>
             <tr>
@@ -84,31 +195,59 @@ INSERT INTO test (name, num) VALUES ('John', 1);</code>
         <p class="message">更新: {{ message }}</p>
     {% endif %}
 
+    <!-- =========================
+         SQLっぽい入力フォーム
+    ========================= -->
     <form action="{{ url_for('insert_practice') }}" method="post" id="insert-form">
-        <p>INSERT INTO {{ table_name }}</p>
-        <label>(</label>
-        {% for row in desc %}
-            <input type="text" name="columns[]" placeholder="カラム名">
-            {% if not loop.last %}, {% endif %}
-        {% endfor %}
-        <label>)</label>
+      <div class="sql-editor-box" aria-label="sql editor">
+        <div class="sql-editor-inner">
 
-        <p>VALUES</p>
-        <div id="values-container">
-            <div class="value-input">
-                <label>(</label>
-                {% for row in desc %}
-                    <input type="text" name="values[]" placeholder="値">
-                    {% if not loop.last %}, {% endif %}
-                {% endfor %}
-                <label>);</label>
+          <!-- INSERT INTO 行 -->
+          <div class="sql-row">
+            <span class="sql-kw">INSERT INTO</span>
+            <span class="sql-id">{{ table_name }}</span>
+            <span class="sql-symbol">(</span>
+          </div>
+
+          <!-- columns -->
+          <div class="sql-row sql-indent">
+            <div class="sql-grid">
+              {% for row in desc %}
+                <span class="sql-pill">
+                  <input type="text" name="columns[]" class="sql-input sql-col-input" placeholder="カラム名">
+                  {% if not loop.last %}<span class="sql-comma">,</span>{% endif %}
+                </span>
+              {% endfor %}
             </div>
-        </div>
+            <span class="sql-symbol">)</span>
+          </div>
 
-        <div class="btn-container">
-            <button type="submit" name="submit_button" value="result_btn" class="btn">結果を表示する</button>
-            <button type="submit" name="submit_button" value="table_init_btn" class="btn">テーブルを初期化する</button>
+          <!-- VALUES 行 -->
+          <div class="sql-row" style="margin-top:8px;">
+            <span class="sql-kw">VALUES</span>
+            <span class="sql-symbol">(</span>
+          </div>
+
+          <!-- values -->
+          <div class="sql-row sql-indent">
+            <div class="sql-grid">
+              {% for row in desc %}
+                <span class="sql-pill">
+                  <input type="text" name="values[]" class="sql-input sql-val-input" placeholder="値">
+                  {% if not loop.last %}<span class="sql-comma">,</span>{% endif %}
+                </span>
+              {% endfor %}
+            </div>
+            <span class="sql-symbol">)</span><span class="sql-symbol">;</span>
+          </div>
+
         </div>
+      </div>
+
+      <div class="btn-container">
+          <button type="submit" name="submit_button" value="result_btn" class="btn">結果を表示する</button>
+          <button type="submit" name="submit_button" value="table_init_btn" class="btn">テーブルを初期化する</button>
+      </div>
     </form>
 </div>
 

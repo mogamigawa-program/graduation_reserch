@@ -15,43 +15,121 @@
 
     <section>
         <p>
-            <strong>INSERT文</strong>は、データベースのテーブルに新しいデータ（レコード）を追加するときに使うSQL文です。<br>
+            <strong>INSERT文</strong>は、テーブルに新しいデータ（レコード）を追加するときに使うSQL文です。<br>
             たとえば、新しいユーザー情報や商品データなどを登録したいときに使います。
         </p>
     </section>
 
     <section>
-        <h2>基本的な書き方</h2>
+        <h2>基本形（いちばん大事）</h2>
+        <p>
+            INSERT は「<strong>どの列に</strong>」「<strong>どんな値を</strong>」入れるかを指定します。<br>
+            基本は、列名（columns）を指定する形で書くのがおすすめです。
+        </p>
+
         <div class="code-block">
 <code>INSERT INTO テーブル名 (列1, 列2, ...) VALUES (値1, 値2, ...);</code>
         </div>
 
-        <p>
-            この構文では、追加したい列と、それに対応する値を指定します。たとえば、「users」テーブルに名前と年齢を追加するには次のように書きます：
-        </p>
-
+        <p>例：<code>users</code> テーブルに <code>name</code> と <code>age</code> を追加</p>
         <div class="code-block">
 <code>INSERT INTO users (name, age) VALUES ('田中太郎', 25);</code>
         </div>
     </section>
 
     <section>
-        <h2>すべての列に値を入れる場合</h2>
+        <h2>文字列のクオートと日付の書き方</h2>
         <p>
-            すべての列に順番通りに値を入れる場合は、列名の部分を省略することもできます。
+            値の書き方は「型」によって変わります。DBごとの細かい違いはありますが、まずは次のルールで覚えると安全です。
+        </p>
+
+        <ul>
+            <li><strong>文字列</strong>：<code>' '</code>（シングルクォート）で囲む</li>
+            <li><strong>数値</strong>：クォートは付けない</li>
+            <li><strong>日付</strong>：基本は <code>'YYYY-MM-DD'</code> の形で書く（シングルクォート付き）</li>
+        </ul>
+
+        <div class="code-block">
+<code>-- 文字列（' 'で囲む）
+INSERT INTO users (name) VALUES ('佐藤花子');
+
+-- 数値（囲まない）
+INSERT INTO users (age) VALUES (30);
+
+-- 日付（'YYYY-MM-DD' の形で囲む）
+INSERT INTO users (birth_date) VALUES ('2000-04-01');</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>よくあるエラーの考え方</h2>
+        <p>
+            INSERT がうまくいかないときは、だいたい次の3つのどれかです。<br>
+            エラーメッセージを見たら、まずこの3点を疑うと原因に辿り着きやすいです。
+        </p>
+
+        <h3>① 列数と値数は一致しているか</h3>
+        <p>
+            <code>(列1, 列2, ...)</code> と <code>VALUES (値1, 値2, ...)</code> は、<strong>個数が一致</strong>している必要があります。
+        </p>
+        <div class="code-block">
+<code>-- ❌ 列は2つなのに値が1つ
+INSERT INTO users (name, age) VALUES ('田中太郎');</code>
+        </div>
+        <div class="code-block">
+<code>-- ✅ 個数を合わせる
+INSERT INTO users (name, age) VALUES ('田中太郎', 25);</code>
+        </div>
+
+        <h3>② 型の整合性は合っているか</h3>
+        <p>
+            列のデータ型（INT, DATE など）に対して、入れる値が不自然だとエラーになったり、意図しない変換が起きたりします。<br>
+            例：INT列に文字列、DATE列に不正な日付 など。
+        </p>
+        <div class="code-block">
+<code>-- ❌ INT列に文字列（age が INT の想定）
+INSERT INTO users (age) VALUES ('twenty');</code>
+        </div>
+        <div class="code-block">
+<code>-- ✅ INT列には数値
+INSERT INTO users (age) VALUES (20);</code>
+        </div>
+
+        <h3>③ 制約違反していないか（NOT NULL / PRIMARY KEY / UNIQUE など）</h3>
+        <p>
+            テーブルには「入れてはいけない値」を防ぐための制約が付いていることがあります。<br>
+            代表的なのは次の2つです。
+        </p>
+        <ul>
+            <li><code>NOT NULL</code>：値が必須（NULL禁止）</li>
+            <li><code>PRIMARY KEY</code> / <code>UNIQUE</code>：重複禁止</li>
+        </ul>
+
+        <div class="code-block">
+<code>-- ❌ NOT NULL の列に値を入れていない（name が NOT NULL の想定）
+INSERT INTO users (age) VALUES (25);
+
+-- ❌ PRIMARY KEY/UNIQUE の重複（id が一意の想定）
+INSERT INTO users (id, name, age) VALUES (1, '山田太郎', 20);
+INSERT INTO users (id, name, age) VALUES (1, '佐藤花子', 30);</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>すべての列に値を入れる場合（列名省略）</h2>
+        <p>
+            すべての列に順番通りに値を入れる場合は、列名を省略できます。
+            ただし、<strong>列の順番を間違えるとエラーや事故が起きやすい</strong>ので、基本は列名を書くのがおすすめです。
         </p>
         <div class="code-block">
 <code>INSERT INTO users VALUES (1, '田中太郎', 25);</code>
         </div>
-        <p>
-            ただしこの方法は、列の順番や数を間違えるとエラーになるため、できるだけ列名を書くのがおすすめです。
-        </p>
     </section>
 
     <section>
-        <h2>複数行のデータを一度に追加する</h2>
+        <h2>複数行をまとめて追加する</h2>
         <p>
-            複数のレコードを一度に追加することもできます。
+            複数のレコードを一度に追加できます（VALUES をカンマでつなぐ）。
         </p>
         <div class="code-block">
 <code>INSERT INTO users (name, age) VALUES
@@ -62,20 +140,12 @@
     </section>
 
     <section>
-        <h2>注意点</h2>
-        <ul>
-            <li><code>NOT NULL</code> 制約がある列には必ず値を入れる必要があります。</li>
-            <li>文字列は <code>'（シングルクォート）</code> で囲みます。</li>
-            <li>テーブルの構造や制約（<code>PRIMARY KEY</code>, <code>UNIQUE</code> など）に適した値を使いましょう。</li>
-        </ul>
-    </section>
-
-    <section>
         <h2>まとめ</h2>
-        <p>
-            INSERT文を使えば、テーブルに新しいデータを簡単に追加できます。<br>
-            まずは基本の形をしっかり覚えて、慣れてきたら応用的な使い方も試してみましょう。
-        </p>
+        <ul>
+            <li>基本形は <code>INSERT INTO ... (columns) VALUES (...)</code></li>
+            <li>文字列と日付は基本 <code>' '</code> で囲む（例：<code>'2026-02-03'</code>）</li>
+            <li>エラー時は「<strong>列数=値数</strong>」「<strong>型</strong>」「<strong>制約</strong>」の3点をチェック</li>
+        </ul>
     </section>
 </div>
 

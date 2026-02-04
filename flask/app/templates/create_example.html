@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}CREATE TABLE の例{% endblock %}
+{% block title %}CREATE TABLE の実行例{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
 {% endblock %}
@@ -12,45 +12,245 @@
 </div>
 
 <div class="learning-container">
-    <h1>CREATE TABLE の具体例</h1>
+    <h1>CREATE TABLE の実行例</h1>
 
     <section>
-        <h2>例①：ユーザーテーブルの作成</h2>
+        <h2>このページでやること</h2>
+        <p>
+            CREATE TABLE は「テーブルを作る」だけで終わりではなく、<strong>作成後に構造（列名・型）が想定通りか確認</strong>するのが大切です。<br>
+            ここでは、列が2〜4本の小さなテーブルを作り、<strong>DESCRIBE</strong> で構造を確認する流れを紹介します。
+        </p>
 
-        <div class="code-block">
-<code>CREATE TABLE users (
-    id INT PRIMARY KEY,
-    name VARCHAR(50),
-    age INT
-);</code>
+        <div class="tips-box">
+            <div class="tips-title">流れ（基本）</div>
+            <p>① CREATE TABLE を実行 → ② DESCRIBE / SHOW COLUMNS で構造を確認 → ③ もしエラーなら「エラー文 → 原因 → 直す場所」で修正</p>
         </div>
-
-        <p>もっとも基本的なテーブルの例です。</p>
     </section>
 
     <section>
-        <h2>例②：商品テーブルの作成</h2>
+        <h2>実行例①：2〜3列の小さなテーブルを作る</h2>
+
+        <p>まずは列が少ないテーブルから作って、書き方に慣れます。</p>
 
         <div class="code-block">
-<code>CREATE TABLE items (
+<code>CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    enrolled_date DATE
+);</code>
+        </div>
+
+        <p>作成できたら、構造が想定通りか確認します。</p>
+
+        <div class="code-block">
+<code>DESCRIBE students;</code>
+        </div>
+
+        <p>（確認結果イメージ）</p>
+        <table class="learning-table">
+            <tr>
+                <th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th>
+            </tr>
+            <tr>
+                <td>student_id</td><td>int</td><td>NO</td><td>PRI</td><td>(NULL)</td><td></td>
+            </tr>
+            <tr>
+                <td>name</td><td>varchar(50)</td><td>NO</td><td></td><td>(NULL)</td><td></td>
+            </tr>
+            <tr>
+                <td>enrolled_date</td><td>date</td><td>YES</td><td></td><td>(NULL)</td><td></td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>実行例②：4列の小さなテーブルを作る（DEFAULT つき）</h2>
+
+        <div class="code-block">
+<code>CREATE TABLE books (
+    book_id INT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    price INT DEFAULT 0,
+    published_at DATE
+);</code>
+        </div>
+
+        <div class="code-block">
+<code>DESCRIBE books;</code>
+        </div>
+
+        <p>
+            <strong>Type</strong>（型）や <strong>Default</strong>（初期値）が想定通りになっているかを確認します。
+        </p>
+    </section>
+
+    <section>
+        <h2>実行例③：3〜4列の小さなテーブルを作る（外部キーの導入）</h2>
+
+        <p>最後に、別テーブルを参照する外部キーを使った例です（列数は少なめのまま）。</p>
+
+        <div class="code-block">
+<code>CREATE TABLE borrowings (
+    borrowing_id INT PRIMARY KEY,
+    student_id INT,
+    book_id INT,
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (book_id) REFERENCES books(book_id)
+);</code>
+        </div>
+
+        <div class="code-block">
+<code>DESCRIBE borrowings;</code>
+        </div>
+
+        <p>
+            外部キーの詳細まで見たい場合は、次のように確認できます。
+        </p>
+        <div class="code-block">
+<code>SHOW CREATE TABLE borrowings;</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>典型的なエラー例（エラー文 → 原因 → 直す場所）</h2>
+
+        <div class="alert-warning">
+            <strong>ポイント：</strong> エラー文は環境やバージョンで多少変わりますが、<strong>原因と直す場所</strong>はほぼ共通です。
+        </div>
+
+        <!-- (1) カンマ不足 -->
+        <h3 class="section-title">① カンマ不足</h3>
+
+        <div class="code-block">
+<code>-- ❌ カンマが不足している
+CREATE TABLE users (
+    id INT PRIMARY KEY
+    name VARCHAR(50)
+);</code>
+        </div>
+
+        <div class="result-box">
+            <p><strong>エラー文（例）</strong>：ERROR 1064 ... near 'name VARCHAR(50) ...'</p>
+            <p><strong>原因</strong>：列定義はカンマ区切り。<code>id</code> と <code>name</code> の間に区切りがない。</p>
+            <p><strong>どこを直すか</strong>：<code>id INT PRIMARY KEY</code> の行末に <strong>カンマ</strong> を付ける。</p>
+        </div>
+
+        <div class="code-block">
+<code>-- ✅ 修正
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(50)
+);</code>
+        </div>
+
+        <!-- (2) 余分なカンマ -->
+        <h3 class="section-title">② 余分なカンマ</h3>
+
+        <div class="code-block">
+<code>-- ❌ 最後に余分なカンマ
+CREATE TABLE items (
     id INT PRIMARY KEY,
     name VARCHAR(100),
-    price INT
 );</code>
         </div>
-    </section>
 
-    <section>
-        <h2>例③：外部キーを使ったテーブル</h2>
-
-        <p>少しだけ応用ですが、関係データベースっぽくなります。</p>
+        <div class="result-box">
+            <p><strong>エラー文（例）</strong>：ERROR 1064 ... near ');'</p>
+            <p><strong>原因</strong>：最後の列定義の後にカンマが残っている。</p>
+            <p><strong>どこを直すか</strong>：閉じカッコの直前の <strong>カンマを削除</strong>。</p>
+        </div>
 
         <div class="code-block">
-<code>CREATE TABLE orders (
+<code>-- ✅ 修正
+CREATE TABLE items (
     id INT PRIMARY KEY,
-    user_id INT,
-    item VARCHAR(50),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    name VARCHAR(100)
+);</code>
+        </div>
+
+        <!-- (3) 型名の誤記 -->
+        <h3 class="section-title">③ 型名の誤記（スペルミス）</h3>
+
+        <div class="code-block">
+<code>-- ❌ VARCHAR のスペルミス
+CREATE TABLE people (
+    id INT PRIMARY KEY,
+    name VARCHR(50)
+);</code>
+        </div>
+
+        <div class="result-box">
+            <p><strong>エラー文（例）</strong>：Unknown data type 'VARCHR'（または類似のエラー）</p>
+            <p><strong>原因</strong>：型名が存在しない（スペルミス）。</p>
+            <p><strong>どこを直すか</strong>：<code>VARCHR</code> を <code>VARCHAR</code> に直す。</p>
+        </div>
+
+        <div class="code-block">
+<code>-- ✅ 修正
+CREATE TABLE people (
+    id INT PRIMARY KEY,
+    name VARCHAR(50)
+);</code>
+        </div>
+
+        <!-- (4) 同名テーブル作成 -->
+        <h3 class="section-title">④ 同名テーブル作成（重複）</h3>
+
+        <div class="code-block">
+<code>-- ❌ すでに students が存在するのに再作成
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);</code>
+        </div>
+
+        <div class="result-box">
+            <p><strong>エラー文（例）</strong>：ERROR 1050 ... Table 'students' already exists</p>
+            <p><strong>原因</strong>：同じ名前のテーブルがすでにある。</p>
+            <p><strong>どこを直すか</strong>：①別名にする／②不要なら DROP TABLE／③安全にするなら IF NOT EXISTS を付ける。</p>
+        </div>
+
+        <div class="code-block">
+<code>-- ✅ 修正案（安全に作る）
+CREATE TABLE IF NOT EXISTS students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50)
+);</code>
+        </div>
+
+        <!-- (5) 予約語・不正な識別子 -->
+        <h3 class="section-title">⑤ 予約語・不正な識別子</h3>
+
+        <div class="code-block">
+<code>-- ❌ 予約語っぽい名前や、記号を含む名前
+CREATE TABLE order (
+    id INT
+);
+
+CREATE TABLE user-data (
+    id INT
+);</code>
+        </div>
+
+        <div class="result-box">
+            <p><strong>エラー文（例）</strong>：ERROR 1064 ... near 'order ...'（または near 'user-data ...'）</p>
+            <p><strong>原因</strong>：予約語として解釈される／ハイフンなどで識別子として解釈できない。</p>
+            <p><strong>どこを直すか</strong>：基本は <strong>名前を変更</strong>。どうしても使うなら <strong>バッククォート（`）</strong>で囲む。</p>
+        </div>
+
+        <div class="code-block">
+<code>-- ✅ 修正（名前を変えるのが無難）
+CREATE TABLE orders (
+    id INT
+);
+
+CREATE TABLE user_data (
+    id INT
+);
+
+-- ✅ どうしてもその名前を使うなら（推奨はしない）
+CREATE TABLE `order` (
+    id INT
 );</code>
         </div>
     </section>

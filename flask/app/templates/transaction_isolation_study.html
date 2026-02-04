@@ -10,13 +10,37 @@
     margin: 25px 0;
     border-radius: 8px;
 }
-.isolation-img {
+.isolation-box {
     background: #fff;
     border: 1px solid #ccc;
     padding: 15px;
     border-radius: 6px;
-    margin-bottom: 20px;
+    margin: 18px 0;
 }
+.isolation-box h2 {
+    margin-top: 0;
+}
+.mini-label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    margin-right: 6px;
+    border: 1px solid rgba(0,0,0,0.15);
+    background: #f5f5f5;
+}
+.flow {
+    background: #fafafa;
+    border: 1px dashed #bbb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+.flow .t1 { color: #0056b3; font-weight: 700; }
+.flow .t2 { color: #7a3e00; font-weight: 700; }
 </style>
 {% endblock %}
 {% block content %}
@@ -31,46 +55,70 @@
 
     <section>
         <p>
-            <strong>Isolation（独立性）</strong>とは、  
-            「同時に複数のユーザーがデータベースにアクセスしても、  
-            お互いの処理が干渉しないようにする」ための仕組みです。
+            <strong>Isolation（独立性）</strong>とは、簡単にいうと<br>
+            <strong>「他のトランザクションの途中結果が見えない／影響を受けにくい」</strong>という性質です。
         </p>
-    </section>
-
-    <section class="isolation-img">
-        <h2>❌ Isolation が弱い場合（問題例）</h2>
-        <p>同時に2人が同じ口座を更新すると、下のような問題が発生することがあります。</p>
-        <ul>
-            <li><strong>Lost Update（更新の消失）</strong>  
-                → Aさんの更新が、Bさんの更新に上書きされて消える
-            </li>
-            <li><strong>Dirty Read</strong>  
-                → Bさんが、Aさんの「まだコミットされていない値」を読んでしまう
-            </li>
-        </ul>
-    </section>
-
-    <section class="isolation-img">
-        <h2>⭕ Isolation が強い場合</h2>
         <p>
-            データベースは、同じデータを更新するトランザクションを  
-            「順番に安全に実行」してくれます。
+            つまり、同時に複数の人がデータベースを操作していても、<br>
+            <strong>未確定（未COMMIT）の途中状態</strong>を勝手に読んだり、処理が混ざって壊れたりしないようにします。
         </p>
-        <p>これにより……</p>
+    </section>
+
+    <section class="isolation-box">
+        <h2><span class="mini-label">❌</span>独立性が弱いと起こる問題（途中値参照による不整合）</h2>
+        <p>
+            独立性が弱いと、他人の<strong>「まだ確定していない変更」</strong>を見てしまい、
+            その値を前提に処理してしまうことがあります。これが不整合の原因になります。
+        </p>
+
+        <div class="flow">
+            <div><span class="t1">[T1]</span> BEGIN;</div>
+            <div><span class="t1">[T1]</span> UPDATE accounts SET balance = balance - 1000 WHERE name='A';</div>
+            <div>　　（まだ <strong>COMMITしていない</strong>＝途中状態）</div>
+            <div><span class="t2">[T2]</span> SELECT/参照で A の残高を読んでしまう（途中値）</div>
+            <div><span class="t2">[T2]</span> 「残高が減ってる前提」で別の処理を進めてしまう</div>
+            <div><span class="t1">[T1]</span> ROLLBACK;（結局、T1の変更はなかったことに）</div>
+            <div>→ <strong>T2は “存在しないはずの値” を前提に処理してしまい不整合</strong></div>
+        </div>
+
         <ul>
-            <li>更新が消えない</li>
-            <li>矛盾した状態を読み取らない</li>
-            <li>整合性が保たれる</li>
+            <li><strong>Dirty Read（ダーティリード）</strong>：未COMMITの値を読んでしまう</li>
+            <li><strong>Lost Update（更新の消失）</strong>：更新が上書きされて消える（同時更新で起きやすい）</li>
         </ul>
+    </section>
+
+    <section class="isolation-box">
+        <h2><span class="mini-label">⭕</span>独立性があると何が嬉しい？</h2>
+        <p>
+            独立性があると、<strong>未確定の変更は他の処理から見えない</strong>（または見えにくい）ため、
+            <strong>途中状態を前提にした誤った処理</strong>が起こりにくくなります。
+        </p>
+        <ul>
+            <li>未COMMITの値を読まない（途中値参照を防ぐ）</li>
+            <li>同じデータへの同時更新がぶつかりにくい（壊れにくい）</li>
+            <li>結果として整合性が保たれる</li>
+        </ul>
+    </section>
+
+    <section class="isolation-box">
+        <h2><span class="mini-label">🔒</span>どうやって担保される？（深入りしすぎない範囲）</h2>
+        <p>
+            データベースは独立性を保つために、主に次のような仕組みを使います。
+            （細かい「分離レベル」の種類はここでは深入りしません）
+        </p>
+        <ul>
+            <li><strong>ロック</strong>：同じ行や同じデータを同時に更新しようとしたとき、順番待ちにして衝突を防ぐ</li>
+            <li><strong>スナップショット/バージョン管理（MVCC）</strong>：未確定の変更を他から見えにくくする</li>
+        </ul>
+        <div class="alert-info">
+            <strong>覚えるポイント：</strong> 「途中状態を見せない」「同時更新をぶつけない」ための仕組みがある
+        </div>
     </section>
 
     <div class="tips-box">
         <strong>💡 Tips：</strong><br>
-        UPDATE や DELETE は 1文だけでも、  
-        実は MySQL 内部で自動的に  
-        <strong>1つのトランザクションとして実行</strong>されています。  
-        明示的にトランザクションを使うのは、  
-        「複数の処理を安全にまとめたい時」です。
+        UPDATE / INSERT / DELETE は環境によっては1文でも自動的に確定（自動コミット）されることがあります。<br>
+        だからこそ、<strong>複数の処理をまとめて安全に扱いたいとき</strong>に明示的なトランザクションが重要になります。
     </div>
 
 </div>

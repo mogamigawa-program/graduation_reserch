@@ -14,64 +14,77 @@
     <h1>トランザクションとは？</h1>
 
     <section>
-        <h2>トランザクションの概要</h2>
+        <h2>トランザクション＝複数操作をまとめて扱う単位</h2>
         <p>
-            トランザクションとは、<strong>一連の処理をまとめて実行・管理する仕組み</strong>です。<br>
-            途中でエラーが発生した場合に、<strong>途中までの変更を取り消す（ROLLBACK）</strong>ことができます。
+            トランザクションとは、<strong>複数のSQL操作を「ひとまとまり」として扱う仕組み</strong>です。<br>
+            まとめて実行し、最後に<strong>確定（COMMIT）</strong>するか、<strong>取消（ROLLBACK）</strong>するかを選べます。
         </p>
-    </section>
 
-    <section>
-        <h2>基本構文</h2>
-        <div class="code-block">
-<code>START TRANSACTION;
--- SQL文を実行
-COMMIT;      -- 変更を確定
-ROLLBACK;    -- 変更を取り消す</code>
+        <div class="alert-info">
+            <strong>イメージ：</strong> 「一連の作業をまとめて行い、最後に“確定する”か“なかったことにする”か決める」
         </div>
     </section>
 
     <section>
-        <h2>4つの重要な性質（ACID）</h2>
-        <ul>
-            <li><strong>原子性（Atomicity）</strong>：すべての操作が成功するか、すべて取り消される</li>
-            <li><strong>一貫性（Consistency）</strong>：トランザクション前後でデータの整合性が保たれる</li>
-            <li><strong>独立性（Isolation）</strong>：他の処理の影響を受けずに実行される</li>
-            <li><strong>永続性（Durability）</strong>：確定した変更は失われない</li>
-        </ul>
+        <h2>基本操作（BEGIN / COMMIT / ROLLBACK）</h2>
+        <p>
+            トランザクションは、<strong>BEGIN（開始）</strong>で始め、最後に
+            <strong>COMMIT（確定）</strong>または<strong>ROLLBACK（取消）</strong>で終わります。
+        </p>
+
+        <div class="code-block">
+<code>BEGIN;  -- トランザクション開始（START TRANSACTIONでもOK）
+
+-- ここに複数のSQLを書く（例：UPDATE / INSERT / DELETE）
+
+COMMIT;    -- 変更を確定（ここで初めて反映が確定する）
+ROLLBACK;  -- 変更を取り消す（BEGIN以降の変更をなかったことにする）</code>
+        </div>
     </section>
 
-    <div class="alert-info">
-        <strong>ポイント：</strong> 複数のSQLをまとめて扱うことで、安全にデータ操作ができます。
+    <section>
+        <h2>考え方：確定前は「途中状態」</h2>
+        <p>
+            BEGIN 〜 COMMIT の間は、変更が行われていても<strong>まだ確定していない途中状態</strong>です。<br>
+            この状態では、<strong>ROLLBACKすれば取り消せる</strong>のが大きなポイントです。
+        </p>
+
+        <div class="alert-warning">
+            <strong>ポイント：</strong> COMMITするまでは「やっぱやめた」ができる（ROLLBACKで取り消し可能）
+        </div>
+    </section>
+
+    <section>
+        <h2>考え方：確定後は元に戻せない（通常）</h2>
+        <p>
+            <strong>COMMIT を実行すると変更が確定</strong>し、基本的には<strong>元に戻せません</strong>。<br>
+            （元に戻すには、逆の操作を自分で実行する必要があります）
+        </p>
+
+        <div class="alert-warning">
+            <strong>注意：</strong> COMMIT後はROLLBACKでは戻せない（通常）
+        </div>
+    </section>
+
+    <div class="tips-box">
+        <div class="tips-title">💡 Tips：1文でもトランザクションって知ってた？</div>
+        <p>
+            <strong>UPDATE / INSERT / DELETE</strong> は、BEGINを書かなくても、
+            DBが内部で<strong>自動的に1つのトランザクションとして処理</strong>することがあります（自動コミット設定の場合）。
+        </p>
+
+        <div class="tips-code">
+<code>-- これを1文だけ実行すると…
+UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
+
+--（自動コミットなら）内部的には「実行して確定」まで進むイメージ</code>
+        </div>
+
+        <p>
+            明示的に BEGIN してトランザクションを使うのは、<strong>複数の処理をまとめて安全に扱いたいとき</strong>です。
+        </p>
     </div>
 </div>
-
-<div class="tips-box">
-    <div class="tips-title">💡 Tips：1文でもトランザクションって知ってた？</div>
-    <p>
-        <strong>UPDATE / INSERT / DELETE</strong> は、
-        <strong>START TRANSACTION</strong> を書かなくても、MySQL が内部で自動的に
-        <strong>1つのトランザクションとして実行</strong>します。
-    </p>
-  
-    <div class="tips-code">
-  <code>
-  -- これを1文だけ実行すると…
-  UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
-  
-  -- 実は内部でこう処理されています
-  START TRANSACTION;
-  UPDATE ...;
-  COMMIT;
-  </code>
-    </div>
-  
-    <p>
-        つまり「1文だけの UPDATE」も実はしっかりトランザクション処理！<br>
-        明示的にトランザクションを始める必要があるのは、<strong>複数の処理をまとめたいとき</strong>だけです。
-    </p>
-  </div>
-  
 
 <div class="nav-buttons">
     <a href="/index/トランザクションにおける基本操作?flag=min" class="prev">◀ 前へ</a>

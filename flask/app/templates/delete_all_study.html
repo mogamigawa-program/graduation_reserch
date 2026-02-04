@@ -14,39 +14,105 @@
     <h1>DELETE文（全レコード削除）</h1>
 
     <section>
-        <h2>全レコード削除とは？</h2>
+        <h2>このページで学ぶこと</h2>
+        <ul>
+            <li><code>DELETE FROM テーブル名;</code> は <strong>全件削除</strong>（全レコードが対象）になる</li>
+            <li>実務上の注意（実行前確認・初期化/バックアップ・トランザクション活用）</li>
+            <li>「空テーブル」になった状態の見方（件数・表示）</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>1. 全レコード削除とは？</h2>
         <p>
-            DELETE文で <code>WHERE</code> 句を省略すると、<strong>テーブル内のすべてのデータ</strong>が削除されます。<br>
-            テーブル自体は残りますが、中身が空になります。
+            DELETE文は通常、<code>WHERE</code> 句で削除対象を絞り込みます。<br>
+            一方で、<code>WHERE</code> 句を省略して <code>DELETE FROM テーブル名;</code> を実行すると、
+            <strong>テーブル内の全レコードが削除対象</strong>になります。
+        </p>
+        <p>
+            なお、この操作では <strong>テーブル構造（列・制約など）は残ったまま</strong>であり、
+            中身（行）だけが空になります。
         </p>
     </section>
 
     <section>
-        <h2>基本構文</h2>
+        <h2>2. 基本構文</h2>
         <div class="code-block">
 <code>DELETE FROM テーブル名;</code>
         </div>
         <p>
-            WHEREを付けないことで、削除対象を限定せずにすべての行を削除します。
+            <code>WHERE</code> を書かないことで、削除対象を限定せずにすべての行を削除します。
         </p>
     </section>
 
     <section>
-        <h2>例</h2>
-        <p>例えば、<code>students</code>テーブルの全データを削除したい場合：</p>
-        <div class="code-block"><code>DELETE FROM students;</code></div>
-        <p>これにより、全ての学生データが削除され、テーブルは空の状態になります。</p>
+        <h2>3. 実行前確認（実務上の基本）</h2>
+        <p>
+            全件削除は影響が大きいため、実務では<strong>実行前に対象を確認する手順</strong>を必須とすることが多いです。
+            例えば、削除対象が本当に全件でよいかを次のように確認します。
+        </p>
+
+        <div class="code-block">
+<code>-- 件数で確認
+SELECT COUNT(*) FROM students;
+
+-- 中身を目視で確認（件数が多い場合はLIMITなどを用いる）
+SELECT * FROM students;</code>
+        </div>
     </section>
 
-    <div class="alert-warning">
-        <strong>⚠ 注意：</strong> この操作は<strong>取り消しができません</strong>。<br>
-        実行前にバックアップを取るか、トランザクションを使って安全に実験しましょう。
-    </div>
+    <section>
+        <h2>4. 初期化・バックアップ・トランザクション</h2>
+        <p>
+            全件削除は取り返しが難しいため、以下のような安全策が重要になります。
+        </p>
+
+        <ul>
+            <li><strong>初期化の導線</strong>：学習環境では「初期状態に戻す」機能を用意し、反復実行を可能にする</li>
+            <li><strong>バックアップ</strong>：実務では事前にバックアップを取得し、復旧可能な状態を確保する</li>
+            <li><strong>トランザクション</strong>：可能であればトランザクション内で実行し、誤りがあればロールバックする</li>
+        </ul>
+
+        <div class="code-block">
+<code>-- 例：トランザクションで安全に実行（DBによって書き方は多少異なる）
+START TRANSACTION;
+
+DELETE FROM students;
+
+-- 問題なければ確定
+COMMIT;
+
+-- 誤りに気づいた場合は取り消し
+-- ROLLBACK;</code>
+        </div>
+
+        <div class="alert-warning">
+            <strong>⚠ 注意：</strong> 全件削除は影響範囲が大きいため、実行前確認と復旧手段（初期化・バックアップ・トランザクション）を前提として扱います。
+        </div>
+    </section>
 
     <section>
-        <h2>似た操作との違い</h2>
+        <h2>5. 「空テーブル」になった状態の見方</h2>
+        <p>
+            全件削除後は、テーブルの行数が0になります。<br>
+            そのため、<code>COUNT</code> と <code>SELECT</code> の表示を用いると「空になった」ことを確認できます。
+        </p>
+
+        <div class="code-block">
+<code>SELECT COUNT(*) FROM students;  -- 0 になる
+
+SELECT * FROM students;         -- 0行（表示されるデータがない）</code>
+        </div>
+
+        <p class="mini">
+            表示上は「行が何も出ない」状態になりますが、テーブル自体（列・制約）は残っています。
+        </p>
+    </section>
+
+    <section>
+        <h2>補足：似た操作との違い</h2>
         <ul>
-            <li><code>DELETE FROM テーブル名;</code> … 中身だけ削除（テーブル構造は残る）</li>
+            <li><code>DELETE FROM テーブル名;</code> … 中身（行）だけ削除（テーブル構造は残る）</li>
             <li><code>TRUNCATE TABLE テーブル名;</code> … 高速に全削除（条件指定不可）</li>
             <li><code>DROP TABLE テーブル名;</code> … テーブルそのものを削除</li>
         </ul>

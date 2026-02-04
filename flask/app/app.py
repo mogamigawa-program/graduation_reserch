@@ -1448,6 +1448,7 @@ def delete(type):
 #CREATE文の演習ページ
 @app.route('/create_table', methods=['GET', 'POST'])
 def create_table():
+    error_message = ""
     if request.method == "POST":
         try:
             table_name = request.form.get('table_name')
@@ -1485,18 +1486,16 @@ def create_table():
         except Exception as e:
             # エラーが発生した場合の処理
             print(f"Error fetching tables: {e}")
-            error_message = "テーブル作成を失敗しました。"
-            return render_template('error.html', error_message=error_message)
+            error_message = str(e)
         
     try:
         tables = get_tables()
     except Exception as e:
         # エラーが発生した場合の処理
         print(f"Error fetching tables: {e}")
-        error_message = "テーブルが取得できませんでした。"
-        return render_template('error.html', error_message=error_message)
+        error_message = str(e)
             
-    return render_template('create_table.html', tables=tables)
+    return render_template('create_table.html', tables=tables, error_message=error_message)
 
 #insert tableの前段階でテーブルを選ばせる
 @app.route('/insert_table_choose', methods=['GET', 'POST'])

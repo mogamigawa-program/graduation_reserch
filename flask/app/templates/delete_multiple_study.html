@@ -14,40 +14,109 @@
     <h1>DELETE文（複数条件）</h1>
 
     <section>
+        <h2>このページで学ぶこと</h2>
+        <ul>
+            <li><code>WHERE 条件A AND 条件B</code> / <code>WHERE 条件A OR 条件B</code> の基本形</li>
+            <li><code>AND</code>/<code>OR</code> によって削除対象がどう変わるか（論理と結果の対応）</li>
+            <li>必要に応じて括弧 <code>( )</code> の役割（優先順位）に触れる</li>
+        </ul>
+    </section>
+
+    <section>
         <h2>複数条件での削除とは？</h2>
         <p>
-            複数の条件を組み合わせて、より細かく削除対象を絞り込むことができます。<br>
-            条件の組み合わせには <code>AND</code>（かつ）や <code>OR</code>（または）を使用します。
+            単数条件では <code>WHERE</code> に条件を1つ書いて削除対象を決めました。<br>
+            複数条件では、条件を2つ以上組み合わせて、<strong>削除対象をより細かく絞り込む</strong>ことができます。
+        </p>
+        <p>
+            条件の組み合わせには主に <code>AND</code>（かつ）と <code>OR</code>（または）を使います。
         </p>
     </section>
 
     <section>
         <h2>基本構文</h2>
         <div class="code-block">
-<code>DELETE FROM テーブル名 WHERE 条件1 AND 条件2;
+<code>-- AND（両方の条件を満たす行だけ削除）
+DELETE FROM テーブル名
+WHERE 条件A AND 条件B;
 
-DELETE FROM テーブル名 WHERE 条件1 OR 条件2;</code>
+-- OR（どちらかの条件を満たす行を削除）
+DELETE FROM テーブル名
+WHERE 条件A OR 条件B;</code>
         </div>
-        <ul>
-            <li><code>AND</code>：すべての条件を満たす行が削除されます</li>
-            <li><code>OR</code>：いずれかの条件を満たす行が削除されます</li>
-        </ul>
+    </section>
+
+    <section>
+        <h2>AND と OR の違い（結果のイメージ）</h2>
+        <p>
+            同じ2つの条件でも、<code>AND</code> と <code>OR</code> で対象の範囲が大きく変わります。
+        </p>
+
+        <table class="example-table">
+            <caption>AND / OR の考え方</caption>
+            <thead>
+                <tr>
+                    <th>書き方</th>
+                    <th>意味</th>
+                    <th>対象のイメージ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>条件A AND 条件B</code></td>
+                    <td>両方を満たす</td>
+                    <td>対象は<strong>狭く</strong>なりやすい（絞り込みが強い）</td>
+                </tr>
+                <tr>
+                    <td><code>条件A OR 条件B</code></td>
+                    <td>どちらかを満たす</td>
+                    <td>対象は<strong>広く</strong>なりやすい（削除が増えやすい）</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="mini">
+            DELETEは「対象が広すぎる」と事故が起きやすいので、<strong>まずSELECTで対象確認</strong>してから削除するのが安全です。
+        </p>
     </section>
 
     <section>
         <h2>使用例</h2>
-        <p>たとえば、年齢が20歳以上かつ名前が"John"のデータを削除するには：</p>
+
+        <p><strong>例1：AND（両方満たす行だけ）</strong></p>
+        <p>年齢が20歳以上 <strong>かつ</strong> 名前が "John" の行を削除します。</p>
         <div class="code-block"><code>DELETE FROM users
 WHERE age &gt;= 20 AND name = 'John';</code></div>
 
-        <p>また、年齢が18歳未満または住所がNULLの人を削除したい場合：</p>
+        <p><strong>例2：OR（どちらか満たす行）</strong></p>
+        <p>年齢が18歳未満 <strong>または</strong> 住所がNULLの行を削除します。</p>
         <div class="code-block"><code>DELETE FROM users
 WHERE age &lt; 18 OR address IS NULL;</code></div>
     </section>
 
-    <div class="alert-warning">
-        <strong>注意：</strong> <code>AND</code> と <code>OR</code> を混在させる場合は、<strong>括弧()</strong>で意図を明確にしましょう。
-    </div>
+    <section>
+        <h2>括弧 ( ) の役割（優先順位）</h2>
+        <p>
+            <code>AND</code> と <code>OR</code> を混ぜて使うときは、<strong>括弧で意図を明確にする</strong>のが基本です。<br>
+            一般に、括弧がない場合は <code>AND</code> が先に評価されやすく、思った結果とズレることがあります。
+        </p>
+
+        <div class="code-block">
+<code>-- 例：どちらを先にまとめたいかで対象が変わる
+
+-- (A OR B) AND C を明確にしたい場合
+DELETE FROM users
+WHERE (age &lt; 18 OR address IS NULL) AND is_active = 0;
+
+-- A OR (B AND C) を明確にしたい場合
+DELETE FROM users
+WHERE age &lt; 18 OR (address IS NULL AND is_active = 0);</code>
+        </div>
+
+        <div class="alert-warning">
+            <strong>注意：</strong> <code>AND</code> と <code>OR</code> を混在させるときは、迷ったら必ず <strong>( )</strong> を付けましょう。
+        </div>
+    </section>
 </div>
 
 <div class="nav-buttons">

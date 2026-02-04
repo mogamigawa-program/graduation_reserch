@@ -2,6 +2,33 @@
 {% block title %}DELETE文（全レコード削除） 実行例{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/example.css') }}">
+
+<style>
+/* 視覚的に「空になった」を分かりやすくする */
+.table-changed{
+  outline: 2px solid rgba(3, 143, 243, 0.55);
+  border-radius: 8px;
+}
+.count-badge{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#e7f5ff;
+  border:1px solid #d0ebff;
+  font-weight:700;
+}
+.mini{ font-size:0.9rem; color:#666; }
+
+/* 注意例（テーブル名の見失い） */
+.attention-box{
+  background:#fff5f5;
+  border:1px solid #ffb3b3;
+  padding:12px 14px;
+  border-radius:10px;
+  margin-top:10px;
+}
+.attention-box code{ font-weight:700; }
+</style>
 {% endblock %}
 {% block content %}
 
@@ -14,10 +41,14 @@
     <h1>DELETE文（全レコード削除）の実行例</h1>
 
     <section>
-        <h2>例題</h2>
-        <p>次の <code>employees</code> テーブルの全レコードを削除してみましょう。</p>
+        <h2>実行例：全件削除後に「空テーブル（件数0）」になることを確認</h2>
+        <p>
+            ここでは <code>employees</code> テーブルを対象として、<code>WHERE</code> を付けないDELETEを実行します。<br>
+            実行後は、テーブル表示だけでなく <code>COUNT</code> により<strong>件数が0であること</strong>も確認します。
+        </p>
 
         <h3>実行前のテーブル</h3>
+        <p class="mini">行数：<span class="count-badge">3</span></p>
         <table class="db-table">
             <tr><th>id</th><th>name</th><th>department</th><th>salary</th></tr>
             <tr><td>1</td><td>田中太郎</td><td>営業</td><td>300000</td></tr>
@@ -28,28 +59,51 @@
         <h3>実行するSQL</h3>
         <div class="code-block"><code>DELETE FROM employees;</code></div>
 
-        <h3>実行後のテーブル</h3>
-        <table class="db-table">
+        <p class="mini"><strong>確認用SQL：</strong> 件数が0になったことを確認する</p>
+        <div class="code-block"><code>SELECT COUNT(*) FROM employees;</code></div>
+
+        <h3>実行後のテーブル（空になる）</h3>
+        <p class="mini">行数：<span class="count-badge">0</span></p>
+        <table class="db-table table-changed">
             <tr><th>id</th><th>name</th><th>department</th><th>salary</th></tr>
             <tr><td colspan="4" style="text-align:center;">（データなし）</td></tr>
         </table>
+
+        <p class="mini">
+            ※ テーブルの中身（行）は消えるが、テーブル構造（列・型など）は残る。
+        </p>
     </section>
 
+    <hr>
+
     <section>
-        <h2>よくあるミス・エラー</h2>
+        <h2>注意例：どのテーブルに対して実行しているか見失う危険性</h2>
+        <p>
+            全件削除は影響が大きく、実務では「対象テーブルの取り違え」が重大事故につながる。<br>
+            したがって、実行前に<strong>テーブル名の確認</strong>を手順として組み込むことが重要である。
+        </p>
+
+        <div class="attention-box">
+            <strong>例：</strong> 別テーブルを操作していた流れで、そのまま全件削除してしまうケース<br>
+            <div class="code-block" style="margin-top:8px;"><code>DELETE FROM employees;</code></div>
+            <p class="mini" style="margin:6px 0 0;">
+                実行前に「本当に <code>employees</code> でよいか」を確認する。
+            </p>
+        </div>
+
+        <p class="mini"><strong>確認のための例（実行前チェック）：</strong></p>
         <ul>
-            <li><strong>WHEREを付け忘れた：</strong> 本当は一部だけ削除したかったのに全削除される</li>
-            <li><strong>権限エラー：</strong> 削除権限（DELETE権限）がないユーザーではエラーが出る</li>
-            <li><strong>外部キー制約：</strong> 他のテーブルから参照されていると削除できない（例：外部キー制約エラー）</li>
-            <li><strong>トランザクション未使用：</strong> 間違って削除しても戻せないので、必要に応じて <code>ROLLBACK</code> を活用する</li>
+            <li>対象テーブル名を読み上げて確認する（例：<code>employees</code>）</li>
+            <li>事前に <code>SELECT * FROM employees;</code> を実行し、対象データが想定通りかを確認する</li>
+            <li>可能であればトランザクション内で実行し、誤りがあれば <code>ROLLBACK</code> できるようにする</li>
         </ul>
     </section>
 
     <section>
         <h2>ポイント</h2>
         <p>
-            条件を省略したDELETEは「テーブルの内容をリセットする操作」として使えますが、<br>
-            一般的には開発・検証環境での利用が推奨されます。
+            条件を省略したDELETEは「テーブル内容のリセット」に相当する操作であり、学習・検証環境では有用である。<br>
+            一方で実務運用では、実行前確認や復旧手段（バックアップ、トランザクション）を前提として慎重に扱う必要がある。
         </p>
     </section>
 </div>

@@ -13,26 +13,40 @@
 <div class="learning-container">
     <h1>トランザクションの実行例</h1>
 
-    <!-- 成功例 -->
+    <p>
+        ここでは <strong>COMMIT した場合</strong>と <strong>ROLLBACK した場合</strong>を比較して、
+        <strong>最終的なテーブル状態がどう変わるか</strong>を確認します。<br>
+        見るべきポイントは、<strong>「いつ確定したか（COMMITしたか）」</strong>です。
+    </p>
+
+    <div class="alert-info">
+        <strong>比較の核：</strong> 同じ UPDATE を行っても、最後が COMMIT か ROLLBACK かで結果が変わる
+    </div>
+
+    <!-- ======================================
+         パターンA：COMMIT（変更が残る）
+    ======================================= -->
     <section>
-        <h2 class="section-title">成功する例（COMMIT）</h2>
-        <p>下記は、AさんからBさんへ1000円送金する例です。</p>
+        <h2 class="section-title">パターンA：BEGIN → 更新 → COMMIT（変更が残る）</h2>
+        <p>
+            AさんからBさんへ1000円送金する例です。<br>
+            最後に <strong>COMMIT</strong> するので、変更は <strong>確定して残ります</strong>。
+        </p>
 
         <div class="code-block">
 <code>
-START TRANSACTION;
-UPDATE accounts 
-    SET balance = balance - 1000 
+BEGIN;
+UPDATE accounts
+    SET balance = balance - 1000
     WHERE name = 'A';
-UPDATE accounts 
-    SET balance = balance + 1000 
+UPDATE accounts
+    SET balance = balance + 1000
     WHERE name = 'B';
 COMMIT;
 </code>
         </div>
 
         <div class="example-flex">
-
             <!-- Before -->
             <div>
                 <h3>実行前</h3>
@@ -45,39 +59,42 @@ COMMIT;
 
             <!-- After -->
             <div>
-                <h3>COMMIT後</h3>
+                <h3>COMMIT後（確定）</h3>
                 <table class="example-table">
                     <tr><th>name</th><th>balance</th></tr>
                     <tr><td>A</td><td style="background:#ffe8a6;">9000</td></tr>
                     <tr><td>B</td><td style="background:#ffe8a6;">9000</td></tr>
                 </table>
             </div>
-
         </div>
 
-        <p><strong>結果：</strong> Aの残高が減り、Bの残高が増えます。（正常に完了）</p>
+        <p><strong>結果：</strong> COMMIT により確定したため、変更がそのまま残ります。</p>
     </section>
 
-    <!-- 失敗例 -->
+    <!-- ======================================
+         パターンB：ROLLBACK（変更が戻る）
+    ======================================= -->
     <section>
-        <h2 class="section-title">失敗する例（ROLLBACK）</h2>
-        <p>存在しないユーザーに送金しようとした場合、途中でエラーが発生します。</p>
+        <h2 class="section-title">パターンB：BEGIN → 更新 → ROLLBACK（変更が戻る）</h2>
+        <p>
+            同じ更新を行っても、最後に <strong>ROLLBACK</strong> すると、BEGIN 以降の変更は
+            <strong>すべて取り消されて元に戻ります</strong>。
+        </p>
 
         <div class="code-block">
 <code>
-START TRANSACTION;
-UPDATE accounts 
-    SET balance = balance - 1000 
+BEGIN;
+UPDATE accounts
+    SET balance = balance - 1000
     WHERE name = 'A';
-UPDATE accounts 
-    SET balance = balance + 1000 
-    WHERE name = 'Z'; -- 存在しないユーザー
-COMMIT;
+UPDATE accounts
+    SET balance = balance + 1000
+    WHERE name = 'B';
+ROLLBACK;
 </code>
         </div>
 
         <div class="example-flex">
-
             <!-- Before -->
             <div>
                 <h3>実行前</h3>
@@ -88,24 +105,74 @@ COMMIT;
                 </table>
             </div>
 
-            <!-- After (ROLLBACK) -->
+            <!-- After -->
             <div>
-                <h3>ROLLBACK後</h3>
+                <h3>ROLLBACK後（取消）</h3>
                 <table class="example-table">
                     <tr><th>name</th><th>balance</th></tr>
                     <tr><td>A</td><td>10000</td></tr>
                     <tr><td>B</td><td>8000</td></tr>
                 </table>
             </div>
-
         </div>
 
-        <p><strong>結果：</strong> 途中でエラーが発生し、全ての処理が取り消されます。</p>
+        <p><strong>結果：</strong> ROLLBACK により確定しなかったため、変更は残りません。</p>
     </section>
 
     <div class="alert-warning">
-        <strong>ポイント：</strong> どちらの UPDATE も成功した場合のみ確定（COMMIT）されます。
+        <strong>注目ポイント：</strong> この2つの違いは「UPDATEの内容」ではなく、<strong>最後にいつ確定（COMMIT）したか</strong>です。
     </div>
+
+    <!-- ======================================
+         エラー例 / 注意例
+    ======================================= -->
+    <section>
+        <h2 class="section-title">エラー例・注意例：「いつ確定したか」で結果がズレる</h2>
+
+        <h3>注意例①：BEGINなしでROLLBACKしても戻らない（状況依存）</h3>
+        <p>
+            トランザクションを開始していない状態で UPDATE を実行すると、
+            環境設定（自動コミット）によっては <strong>すぐに確定</strong>してしまいます。<br>
+            その場合、あとから ROLLBACK しても <strong>元に戻りません</strong>。
+        </p>
+
+        <div class="code-block">
+<code>
+-- BEGINを書かずにUPDATE（自動コミットだと、ここで確定することがある）
+UPDATE accounts
+    SET balance = balance - 1000
+    WHERE name = 'A';
+
+-- 後からROLLBACKしても…
+ROLLBACK;  -- 期待どおり戻らないことがある
+</code>
+        </div>
+
+        <div class="alert-warning">
+            <strong>ポイント：</strong> 「いつ確定したか」を見失うと、ROLLBACKできると思っていたのに戻らない、が起きます。
+        </div>
+
+        <h3>注意例②：確定タイミングを誤ると期待と結果がズレる</h3>
+        <p>
+            例えば、途中で COMMIT してしまうと、その前までの変更は確定してしまいます。<br>
+            そのあとに ROLLBACK しても、<strong>確定済みの変更は戻せません</strong>。
+        </p>
+
+        <div class="code-block">
+<code>
+BEGIN;
+UPDATE accounts SET balance = balance - 1000 WHERE name = 'A';
+COMMIT;   -- ここで確定（この変更はもう戻らない）
+
+UPDATE accounts SET balance = balance + 1000 WHERE name = 'B';
+ROLLBACK; -- 取り消せるのは「BEGIN～ROLLBACKの範囲」だけ
+</code>
+        </div>
+
+        <div class="alert-info">
+            <strong>まとめ：</strong> ROLLBACKできるのは、<strong>最後に確定（COMMIT）していない範囲</strong>だけ。
+        </div>
+    </section>
 </div>
 
 <div class="nav-buttons">

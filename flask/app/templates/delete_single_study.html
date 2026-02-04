@@ -14,28 +14,122 @@
     <h1>DELETE文（単数条件）の学習</h1>
 
     <section>
-        <h2>1. このページで学ぶこと</h2>
-        <p>
-            <strong>DELETE文</strong>は、データベースの中から不要なデータを削除するための命令（SQL文）です。<br>
-            このページでは、「<strong>1つの条件</strong>だけでデータを削除する方法」を学びます。
-        </p>
+        <h2>このページで学ぶこと</h2>
+        <ul>
+            <li><code>DELETE FROM ... WHERE 条件;</code> の基本形</li>
+            <li>比較演算子（<code>=</code>, <code>&lt;</code>, <code>&gt;</code> など）と条件式の書き方</li>
+            <li>削除前に <code>SELECT</code> で対象を確認する手順（安全な思考）</li>
+        </ul>
     </section>
 
     <section>
-        <h2>2. 基本の書き方</h2>
-        <p>以下が、DELETE文の基本的な形です。</p>
+        <h2>1. DELETE文の基本形</h2>
+        <p>
+            <strong>DELETE文</strong>は、テーブルから不要な行（レコード）を削除するSQLです。<br>
+            単数条件では、<strong>WHEREに1つの条件</strong>を書いて削除対象を絞ります。
+        </p>
+
         <div class="code-block">
-<code>DELETE FROM テーブル名<br>WHERE 条件;</code>
+<code>DELETE FROM テーブル名
+WHERE 条件;</code>
         </div>
-        <ul>
-            <li><code>DELETE FROM</code>：どのテーブルから削除するかを指定します</li>
-            <li><code>WHERE 条件</code>：どの行を削除するかを条件で指定します（例：IDが1のデータ）</li>
-        </ul>
 
         <div class="alert-warning">
-            <strong>⚠ 注意：</strong> <code>WHERE</code> を書かないと、テーブルのすべてのデータが削除されてしまいます！<br>
-            必ず <code>WHERE</code> をつけるようにしましょう。
+            <strong>⚠ 注意：</strong> <code>WHERE</code> を書かないと、テーブルの全データが削除されます。<br>
+            学習中でも、必ず <code>WHERE</code> を付けるクセをつけましょう。
         </div>
+    </section>
+
+    <section>
+        <h2>2. 条件式と比較演算子</h2>
+        <p>
+            <code>WHERE</code> では「どの行を削除するか」を条件で指定します。<br>
+            よく使う比較演算子は次の通りです。
+        </p>
+
+        <table class="example-table">
+            <caption>よく使う比較演算子</caption>
+            <thead>
+                <tr>
+                    <th>演算子</th>
+                    <th>意味</th>
+                    <th>条件の例</th>
+                    <th>読み方（例）</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>=</code></td>
+                    <td>等しい</td>
+                    <td><code>id = 3</code></td>
+                    <td>idが3の行</td>
+                </tr>
+                <tr>
+                    <td><code>&lt;&gt;</code></td>
+                    <td>等しくない</td>
+                    <td><code>age &lt;&gt; 20</code></td>
+                    <td>年齢が20ではない行</td>
+                </tr>
+                <tr>
+                    <td><code>&lt;</code></td>
+                    <td>より小さい</td>
+                    <td><code>age &lt; 18</code></td>
+                    <td>年齢が18未満の行</td>
+                </tr>
+                <tr>
+                    <td><code>&lt;=</code></td>
+                    <td>以下</td>
+                    <td><code>age &lt;= 10</code></td>
+                    <td>年齢が10以下の行</td>
+                </tr>
+                <tr>
+                    <td><code>&gt;</code></td>
+                    <td>より大きい</td>
+                    <td><code>price &gt; 1000</code></td>
+                    <td>価格が1000より大きい行</td>
+                </tr>
+                <tr>
+                    <td><code>&gt;=</code></td>
+                    <td>以上</td>
+                    <td><code>score &gt;= 80</code></td>
+                    <td>点数が80以上の行</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            条件式は基本的に <strong>「カラム名 演算子 値」</strong> の形です。<br>
+            文字列の場合は <code>' '</code>（シングルクォート）で囲む点にも注意しましょう。
+        </p>
+
+        <div class="code-block">
+<code>-- 数値の例
+DELETE FROM employees WHERE id = 3;
+
+-- 文字列の例（文字列は ' ' で囲む）
+DELETE FROM employees WHERE name = 'Tanaka';</code>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. 安全な手順：DELETE前にSELECTで確認</h2>
+        <p>
+            DELETEは取り消しが難しい操作です。<br>
+            そこで、安全に作業するために <strong>「同じ条件でまずSELECT」</strong> を実行し、削除対象を確認してからDELETEします。
+        </p>
+
+        <div class="code-block">
+<code>-- ① まず削除対象を確認する（安全）
+SELECT * FROM employees WHERE id = 3;
+
+-- ② 削除対象が合っていれば削除する
+DELETE FROM employees WHERE id = 3;</code>
+        </div>
+
+        <p class="mini">
+            <strong>考え方：</strong>「SELECTで出た行＝削除される行」<br>
+            これを毎回確認するクセを付けると、事故（消しすぎ）を防げます。
+        </p>
     </section>
 </div>
 

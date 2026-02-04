@@ -2,6 +2,65 @@
 {% block title %}DELETE文の実行例(複数条件){% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+
+<style>
+/* =========================
+   変化の可視化（複数条件）
+========================= */
+.table-changed th,
+.table-changed td{
+  background-color:#e7f5ff !important;   /* 変更があった表：薄い青 */
+}
+.table-changed thead th{
+  background-color:#d0ebff !important;
+}
+
+/* 削除対象（before側） */
+.hl-deleted-row td{
+  background-color:#ffe3e3 !important;   /* 薄い赤 */
+  font-weight:700;
+}
+
+/* 対象0件 */
+.no-hit{
+  background:#f1f3f5;
+  font-weight:700;
+}
+
+.mini{ font-size:0.9rem; color:#666; }
+
+/* 比較用2カラム */
+.compare-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+}
+@media (max-width: 900px){
+  .compare-grid{ grid-template-columns: 1fr; }
+}
+.compare-card{
+  border:1px solid rgba(0,0,0,0.08);
+  border-radius:12px;
+  padding:12px 12px 6px;
+  background:#fff;
+}
+.compare-card h3{
+  margin:0 0 8px;
+  font-size:1.05rem;
+}
+.bad-case{
+  border:1px solid #ffb3b3;
+  background:#fff5f5;
+  padding:12px 14px;
+  border-radius:12px;
+}
+.good-case{
+  border:1px solid #b2f2bb;
+  background:#ebfbee;
+  padding:12px 14px;
+  border-radius:12px;
+}
+</style>
 {% endblock %}
 {% block content %}
 
@@ -14,59 +73,211 @@
     <h1>DELETE文の実行例（複数条件）</h1>
 
     <section>
-        <h2>実行例①：ANDを使った条件</h2>
-        <p>以下のSQLは、名前が「John」で、かつ年齢が30以上のユーザーを削除します。</p>
-        <div class="code-block">
-<code>DELETE FROM users
-WHERE name = 'John' AND age &gt;= 30;</code>
-        </div>
+        <h2>このページでやること</h2>
+        <ul>
+            <li>同じデータに対して <strong>AND / OR を入れ替え</strong>、削除結果の差を比較する</li>
+            <li><strong>ORで想定より多く消える</strong>典型パターンを見て、削除前確認（SELECT）の重要性を理解する</li>
+        </ul>
     </section>
 
     <section>
-        <h2>実行例②：ORを使った条件</h2>
-        <p>以下のSQLは、住所がNULLか、または年齢が20未満のユーザーを削除します。</p>
-        <div class="code-block">
-<code>DELETE FROM users
-WHERE address IS NULL OR age &lt; 20;</code>
-        </div>
-    </section>
+        <h2>前提：usersテーブル（同じデータで比較）</h2>
+        <p>以下のデータを使って、ANDとORで結果がどう変わるか見ます。</p>
 
-    <section>
-        <h2>実行例③：ANDとORを組み合わせる</h2>
-        <p>以下のSQLは、名前が「Alice」で年齢が40以上、またはステータスがNULLのユーザーを削除します。</p>
-        <div class="code-block">
-<code>DELETE FROM users
-WHERE (name = 'Alice' AND age &gt;= 40) OR status IS NULL;</code>
-        </div>
-        <p class="alert-warning mt-2">
-            ※ 括弧を使って条件の優先順位を明確にすることが重要です。
+        <table class="example-table">
+            <caption>users（削除前の状態）</caption>
+            <thead>
+                <tr>
+                    <th>id</th><th>name</th><th>age</th><th>status</th><th>address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>John</td><td>29</td><td>active</td><td>Tokyo</td></tr>
+                <tr><td>2</td><td>John</td><td>30</td><td>active</td><td>Osaka</td></tr>
+                <tr><td>3</td><td>John</td><td>45</td><td>inactive</td><td>Tokyo</td></tr>
+                <tr><td>4</td><td>Alice</td><td>31</td><td>active</td><td>Tokyo</td></tr>
+                <tr><td>5</td><td>Bob</td><td>19</td><td>active</td><td>(NULL)</td></tr>
+                <tr><td>6</td><td>Mary</td><td>17</td><td>inactive</td><td>Osaka</td></tr>
+            </tbody>
+        </table>
+
+        <p class="mini">
+            ※ここでは <code>(NULL)</code> を「住所がNULL」として表記しています。
         </p>
     </section>
 
+    <hr>
+
     <section>
-        <h2>よくあるエラー・注意点</h2>
-        <ul>
-            <li>
-                <strong>AND / OR の優先順位を誤る</strong><br>
-                <code>DELETE FROM users WHERE name = 'Taro' OR age &gt; 60 AND status = 'inactive';</code><br>
-                → 条件の優先順位に注意（<code>AND</code>が先に評価される）。<br>
-                対処法：明示的に<code>()</code>で囲う。
-            </li>
-            <li>
-                <strong>文字列をクォートで囲んでいない</strong><br>
-                <code>DELETE FROM users WHERE name = Taro;</code><br>
-                → 正しくは <code>name = 'Taro'</code>。文字列は必ずシングルクォートで囲む。
-            </li>
-            <li>
-                <strong>NULL値との比較で = を使ってしまう</strong><br>
-                <code>DELETE FROM users WHERE address = NULL;</code><br>
-                → NULLとの比較は<code>IS NULL</code>または<code>IS NOT NULL</code>を使う。
-            </li>
-            <li>
-                <strong>WHEREを付け忘れて全データを削除</strong><br>
-                → 複雑な条件を使うときほど、<code>WHERE</code>の記述漏れに注意。
-            </li>
-        </ul>
+        <h2>実行例：同じ条件で AND / OR を入れ替えて比較</h2>
+        <p>
+            条件A：<code>name = 'John'</code><br>
+            条件B：<code>age &gt;= 30</code><br>
+            この2つを <code>AND</code> と <code>OR</code> で入れ替えると、対象が大きく変わります。
+        </p>
+
+        <div class="compare-grid">
+            <!-- AND側 -->
+            <div class="compare-card">
+                <h3>① AND：両方満たす行だけ削除（対象が狭い）</h3>
+                <div class="code-block">
+<code>-- まず削除対象を確認（安全）
+SELECT * FROM users
+WHERE name = 'John' AND age &gt;= 30;
+
+-- 削除
+DELETE FROM users
+WHERE name = 'John' AND age &gt;= 30;</code>
+                </div>
+
+                <table class="example-table">
+                    <caption>削除前 → 削除後（AND）</caption>
+                    <thead>
+                        <tr>
+                            <th style="width:50%;">削除前（削除対象を赤）</th>
+                            <th style="width:50%;">削除後</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table class="example-table" style="margin:0;">
+                                    <thead>
+                                        <tr><th>id</th><th>name</th><th>age</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>1</td><td>John</td><td>29</td></tr>
+                                        <tr class="hl-deleted-row"><td>2</td><td>John</td><td>30</td></tr>
+                                        <tr class="hl-deleted-row"><td>3</td><td>John</td><td>45</td></tr>
+                                        <tr><td>4</td><td>Alice</td><td>31</td></tr>
+                                        <tr><td>5</td><td>Bob</td><td>19</td></tr>
+                                        <tr><td>6</td><td>Mary</td><td>17</td></tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="example-table table-changed" style="margin:0;">
+                                    <thead>
+                                        <tr><th>id</th><th>name</th><th>age</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>1</td><td>John</td><td>29</td></tr>
+                                        <tr><td>4</td><td>Alice</td><td>31</td></tr>
+                                        <tr><td>5</td><td>Bob</td><td>19</td></tr>
+                                        <tr><td>6</td><td>Mary</td><td>17</td></tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="mini"><strong>結果：</strong> John かつ 30以上（id=2,3）の2行だけ削除</p>
+            </div>
+
+            <!-- OR側 -->
+            <div class="compare-card">
+                <h3>② OR：どちらか満たす行を削除（対象が広い）</h3>
+                <div class="code-block">
+<code>-- まず削除対象を確認（安全）
+SELECT * FROM users
+WHERE name = 'John' OR age &gt;= 30;
+
+-- 削除
+DELETE FROM users
+WHERE name = 'John' OR age &gt;= 30;</code>
+                </div>
+
+                <table class="example-table">
+                    <caption>削除前 → 削除後（OR）</caption>
+                    <thead>
+                        <tr>
+                            <th style="width:50%;">削除前（削除対象を赤）</th>
+                            <th style="width:50%;">削除後</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table class="example-table" style="margin:0;">
+                                    <thead>
+                                        <tr><th>id</th><th>name</th><th>age</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="hl-deleted-row"><td>1</td><td>John</td><td>29</td></tr>
+                                        <tr class="hl-deleted-row"><td>2</td><td>John</td><td>30</td></tr>
+                                        <tr class="hl-deleted-row"><td>3</td><td>John</td><td>45</td></tr>
+                                        <tr class="hl-deleted-row"><td>4</td><td>Alice</td><td>31</td></tr>
+                                        <tr><td>5</td><td>Bob</td><td>19</td></tr>
+                                        <tr><td>6</td><td>Mary</td><td>17</td></tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td>
+                                <table class="example-table table-changed" style="margin:0;">
+                                    <thead>
+                                        <tr><th>id</th><th>name</th><th>age</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>5</td><td>Bob</td><td>19</td></tr>
+                                        <tr><td>6</td><td>Mary</td><td>17</td></tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="mini"><strong>結果：</strong> John全員 + 30以上（Aliceも含む）が削除される</p>
+            </div>
+        </div>
+
+        <div class="alert-warning" style="margin-top:12px;">
+            <strong>ポイント：</strong>
+            <code>OR</code> にすると対象が一気に広がり、<strong>想定より多く消える</strong>ことがよくあります。<br>
+            だからこそ、DELETEの前に <code>SELECT</code> で「消える行」を必ず確認します。
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>注意例（実質エラー例）：ORで想定より多く消えるパターン</h2>
+
+        <div class="bad-case">
+            <strong>❌ よくある事故：</strong>「inactive の John だけ消したい」つもりが、Johnが全部消える
+            <div class="code-block" style="margin-top:8px;">
+<code>-- ❌ これだと「John」もしくは「inactive」のどちらかに当てはまれば削除される
+DELETE FROM users
+WHERE name = 'John' OR status = 'inactive';</code>
+            </div>
+
+            <p class="mini">
+                この条件だと、<strong>John（activeでも対象）</strong> と <strong>inactive（John以外でも対象）</strong> が全部消えます。<br>
+                「John かつ inactive」を狙うなら <code>AND</code> が必要です。
+            </p>
+
+            <div class="code-block">
+<code>-- ✅ 本当に消したい条件（John かつ inactive）
+DELETE FROM users
+WHERE name = 'John' AND status = 'inactive';</code>
+            </div>
+
+            <p class="mini"><strong>対策：</strong> まず同じ条件でSELECTして「消える行」を目視確認する</p>
+            <div class="code-block">
+<code>SELECT * FROM users
+WHERE name = 'John' OR status = 'inactive';</code>
+            </div>
+        </div>
+
+        <div class="good-case" style="margin-top:12px;">
+            <strong>✅ 安全な進め方：</strong> DELETE前の確認（SELECT）が習慣化できれば事故が減る
+            <ul class="mini" style="margin:8px 0 0;">
+                <li>① まず <code>SELECT</code> で対象確認</li>
+                <li>② 対象が意図通りなら <code>DELETE</code></li>
+                <li>③ 変更後のテーブルで差を確認</li>
+            </ul>
+        </div>
     </section>
 </div>
 

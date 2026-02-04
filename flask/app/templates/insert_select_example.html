@@ -1,5 +1,68 @@
 {% extends "base.html" %}
 {% block title %}INSERT + SELECT文 実行例と注意点{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+
+<style>
+/* =========================
+   視覚化（テーブル変化を強調）
+========================= */
+.table-changed th,
+.table-changed td{
+  background-color:#e7f5ff !important; /* 変更があった表：薄い青 */
+}
+.table-changed thead th{
+  background-color:#d0ebff !important;
+}
+.hl-insert-row td{
+  background-color:#fff3bf !important; /* 追加された行：薄い黄 */
+  font-weight:700;
+}
+.hl-hit td{
+  background-color:#d3f9d8 !important; /* SELECT候補：薄い緑 */
+  font-weight:700;
+}
+
+/* エラー表示 */
+.alert-error{
+  border:1px solid #ffb3b3;
+  background:#fff5f5;
+  padding:12px 14px;
+  border-radius:10px;
+  margin:12px 0;
+}
+.alert-warning{
+  border:1px solid #ffe08a;
+  background:#fff9db;
+  padding:12px 14px;
+  border-radius:10px;
+  margin:12px 0;
+}
+.small-note{ color:#555; font-size:0.95rem; }
+.mini{ font-size:0.9rem; color:#666; }
+
+/* =========================
+   ターミナル風（英語エラー表示）
+========================= */
+.terminal-caption{
+  margin:10px 0 6px;
+  font-weight:700;
+}
+.terminal-box{
+  background:#0b0f14;
+  color:#e8eef6;
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;
+  padding:12px 14px;
+  margin:8px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 0.95rem;
+  overflow-x:auto;
+}
+.terminal-box .prompt{ color:#7ee787; }
+.terminal-box .err{ color:#ff7b72; }
+</style>
+{% endblock %}
 {% block content %}
 
 <div class="nav-buttons">
@@ -11,56 +74,229 @@
     <h1>INSERT + SELECT文 実行例と注意点</h1>
 
     <section>
-        <h2>実行例：users → temp_users にコピー</h2>
+        <h2>実行例：まずSELECTだけ実行し「挿入される候補」を確認</h2>
+        <p>
+            まずは <code>SELECT</code> だけを実行して、<strong>どの行が挿入対象になるか</strong>確認します。<br>
+            ここでは「18歳未満のユーザー」を <code>temp_users</code> にコピーする例です。
+        </p>
+
+        <div class="code-block">
+<code>SELECT id, name
+FROM users
+WHERE age &lt; 18;</code>
+        </div>
+
+        <p class="small-note">（例）users テーブルの状態</p>
+        <table class="example-table">
+            <caption>users（コピー元）</caption>
+            <thead>
+                <tr><th>id</th><th>name</th><th>age</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>佐藤太郎</td><td>20</td></tr>
+                <tr class="hl-hit"><td>2</td><td>鈴木花子</td><td>17</td></tr>
+                <tr class="hl-hit"><td>3</td><td>高橋一郎</td><td>16</td></tr>
+                <tr><td>4</td><td>田中次郎</td><td>22</td></tr>
+            </tbody>
+        </table>
+
+        <table class="example-table">
+            <caption>SELECT結果（＝挿入候補）</caption>
+            <thead>
+                <tr><th>id</th><th>name</th></tr>
+            </thead>
+            <tbody>
+                <tr class="hl-hit"><td>2</td><td>鈴木花子</td></tr>
+                <tr class="hl-hit"><td>3</td><td>高橋一郎</td></tr>
+            </tbody>
+        </table>
+
+        <p class="mini">緑が「WHERE条件に一致して挿入候補になった行」です。</p>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>実行例：INSERT + SELECTを実行し，挿入先テーブルが増えるのを確認</h2>
+
         <div class="code-block">
 <code>INSERT INTO temp_users (id, name)
 SELECT id, name
 FROM users
 WHERE age &lt; 18;</code>
         </div>
-        <p>このSQLは、18歳未満のユーザーを <code>temp_users</code> にコピーします。</p>
+
+        <p class="small-note">（例）挿入前の temp_users</p>
+        <table class="example-table">
+            <caption>temp_users（挿入前）</caption>
+            <thead>
+                <tr><th>id</th><th>name</th></tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2">（データなし）</td></tr>
+            </tbody>
+        </table>
+
+        <p class="small-note">（例）挿入後の temp_users（青＝変化があった表 / 黄＝追加された行）</p>
+        <table class="example-table table-changed">
+            <caption>temp_users（挿入後）</caption>
+            <thead>
+                <tr><th>id</th><th>name</th></tr>
+            </thead>
+            <tbody>
+                <tr class="hl-insert-row"><td>2</td><td>鈴木花子</td></tr>
+                <tr class="hl-insert-row"><td>3</td><td>高橋一郎</td></tr>
+            </tbody>
+        </table>
+
+        <p class="mini">
+            <strong>ポイント：</strong><br>
+            <code>WHERE</code> に一致した行数だけ、挿入先の行数が増えます（0件〜複数件）。
+        </p>
     </section>
 
     <hr>
 
     <section>
-        <h2>よくあるエラーと原因</h2>
+        <h2>よくあるエラー（典型）</h2>
+        <p>
+            INSERT + SELECT が通らないときは、まず <strong>「対応付け（INSERTの列） ⇔（SELECTの列）」</strong> を確認します。<br>
+            その上で、<strong>列数</strong>／<strong>型</strong>／<strong>主キー重複</strong>を疑うのが基本です。
+        </p>
 
+        <!-- ========= 1) 列数不一致 ========= -->
         <div class="alert-error">
-            <strong>❌ 列数が一致していない</strong>
+            <strong>❌ 列数不一致（INSERT列数 ≠ SELECT列数）</strong>
             <div class="code-block">
 <code>INSERT INTO temp_users (id, name)
 SELECT id, name, age
 FROM users;</code>
             </div>
-            <p><code>temp_users</code>には2列しかないのに3列指定しています。</p>
+
+            <table class="example-table">
+                <caption>対応付けチェック</caption>
+                <thead>
+                    <tr>
+                        <th>挿入先（INSERT側）</th>
+                        <th>SELECT側</th>
+                        <th>判定</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>id</td><td>id</td><td>OK</td></tr>
+                    <tr><td>name</td><td>name</td><td>OK</td></tr>
+                    <tr><td>（なし）</td><td>age</td><td><strong>NG：余分</strong></td></tr>
+                </tbody>
+            </table>
+
+            <p><strong>直し方：</strong> SELECTの列を2つにする（またはINSERT側を3列に揃える）</p>
+
+            <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+            <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO temp_users (id, name) SELECT id, name, age FROM users;
+<span class="err">ERROR 1136 (21S01): Column count doesn't match value count at row 1</span></code></pre>
+            </div>
         </div>
 
+        <!-- ========= 2) 型不一致 ========= -->
         <div class="alert-warning">
-            <strong>⚠ データ型の不一致</strong>
+            <strong>⚠ 型不一致（SELECTの値が挿入先の型に合わない）</strong>
+            <p class="mini">例：挿入先の <code>created_at</code> が DATE なのに、SELECTで文字列（name）を持ってきている</p>
             <div class="code-block">
 <code>INSERT INTO target_table (id, created_at)
-SELECT id, name FROM source_table;</code>
+SELECT id, name
+FROM source_table;</code>
             </div>
-            <p><code>name</code>は文字列なのに、<code>created_at</code>は日付型 → エラーになります。</p>
+
+            <table class="example-table">
+                <caption>対応付けチェック</caption>
+                <thead>
+                    <tr>
+                        <th>挿入先（列 / 型）</th>
+                        <th>SELECT列 / 例</th>
+                        <th>判定</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id / INT</td>
+                        <td>id / 1</td>
+                        <td>OK</td>
+                    </tr>
+                    <tr>
+                        <td>created_at / DATE</td>
+                        <td>name / 'Taro'</td>
+                        <td><strong>NG：型が合わない</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>直し方：</strong> DATE列には日付列をSELECTする（または変換して入れる）</p>
+
+            <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+            <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO target_table (id, created_at) SELECT id, name FROM source_table;
+<span class="err">ERROR 1292 (22007): Incorrect date value: 'Taro' for column 'created_at' at row 1</span></code></pre>
+            </div>
         </div>
 
+        <!-- ========= 3) 主キー重複 ========= -->
         <div class="alert-error">
-            <strong>❌ 主キー重複によるエラー</strong>
+            <strong>❌ 主キー重複（移行先で衝突）</strong>
+            <p class="mini">
+                例：<code>users.id</code> が PRIMARY KEY のとき、すでに同じ <code>id</code> が存在すると失敗します。
+            </p>
             <div class="code-block">
 <code>INSERT INTO users (id, name)
-SELECT id, name FROM old_users;</code>
+SELECT id, name
+FROM old_users;</code>
             </div>
-            <p><code>users</code> テーブルにすでに同じ <code>id</code> があるとエラーになります。</p>
+
+            <table class="example-table">
+                <caption>移行先 users（すでに存在）</caption>
+                <thead><tr><th>id</th><th>name</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>佐藤太郎</td></tr>
+                    <tr class="hl-hit"><td>2</td><td>鈴木花子</td></tr>
+                </tbody>
+            </table>
+
+            <table class="example-table">
+                <caption>SELECT結果（old_users）</caption>
+                <thead><tr><th>id</th><th>name</th></tr></thead>
+                <tbody>
+                    <tr class="hl-hit"><td>2</td><td>鈴木花子（旧）</td></tr>
+                    <tr><td>3</td><td>高橋一郎（旧）</td></tr>
+                </tbody>
+            </table>
+
+            <p><strong>どこが衝突？</strong> id=2 が移行先にすでにある → <strong>PRIMARY KEY / UNIQUE違反</strong></p>
+            <p><strong>直し方：</strong> WHEREで除外する／重複しないIDにする／重複チェック（NOT EXISTSなど）を入れる</p>
+
+            <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+            <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> INSERT INTO users (id, name) SELECT id, name FROM old_users;
+<span class="err">ERROR 1062 (23000): Duplicate entry '2' for key 'PRIMARY'</span></code></pre>
+            </div>
+        </div>
+
+        <div class="mini">
+            <strong>覚えること：</strong>
+            <ul>
+                <li>まず <code>SELECT</code> 単体で「挿入候補」を確認</li>
+                <li>次に INSERT + SELECT を実行し「挿入先が増えた」ことを確認</li>
+                <li>エラー時は「対応付け（INSERT列 ↔ SELECT列）」を最初にチェック</li>
+            </ul>
         </div>
     </section>
 
     <section>
         <h2>対策</h2>
         <ul>
-            <li>列の数と順番を確認する</li>
+            <li>列の数と順番（対応付け）を確認する</li>
+            <li>まず <code>SELECT</code> だけ実行して、挿入される行を見てからINSERTする</li>
             <li>必要に応じて <code>WHERE</code> でデータを絞る</li>
-            <li><code>NOT EXISTS</code> などで重複チェックも可能</li>
+            <li>主キー重複が心配なときは重複チェック（<code>NOT EXISTS</code> など）を検討する</li>
         </ul>
     </section>
 </div>

@@ -46,33 +46,7 @@ CREATE TABLE `user_databases` (
 LOCK TABLES `user_databases` WRITE;
 /*!40000 ALTER TABLE `user_databases` DISABLE KEYS */;
 INSERT INTO `user_databases` VALUES
-(47,'admin_db'),
-(49,'test_db'),
-(50,'1_db'),
-(51,'2_db'),
-(52,'5_db'),
-(53,'6_db'),
-(54,'7_db'),
-(55,'4_db'),
-(56,'i_db'),
-(57,'11_db'),
-(58,'a_db'),
-(59,'f_db'),
-(60,'s_db'),
-(61,'q_db'),
-(62,'g_db'),
-(63,'k_db'),
-(64,'y_db'),
-(65,'ff_db'),
-(66,'aaa_db'),
-(67,'eee_db'),
-(68,'fff_db'),
-(69,'eeee_db'),
-(70,'qqq_db'),
-(71,'ss_db'),
-(72,'ggg_db'),
-(73,'tt_db'),
-(74,'pp_db');
+(75,'hiroki_admin_db');
 /*!40000 ALTER TABLE `user_databases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -90,7 +64,7 @@ CREATE TABLE `users` (
   `is_admin` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,33 +74,7 @@ CREATE TABLE `users` (
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` VALUES
-(47,'admin','$2b$12$aFUuUd/94xJevU6uNukLGe3Rvn/9mLCO47urOyrNmrhFRio.7BRgq',1),
-(49,'test','$2b$12$SvPZk/VFSQaWDQC9A5YYL.wohPp/9j1Nkjq84SvMKKvYxXN84ZgWS',0),
-(50,'1','$2b$12$fKH9cA0Cw7ygN.TGmxD5uO1ZopyyrQzSsnZVeSof7wocZSx9NKwRq',0),
-(51,'2','$2b$12$x9kcDFzrNmbL0HXYVtlYleBUwXUFzm0rx2P38o77RlF4yFrU5CK/O',0),
-(52,'5','$2b$12$N2CgClq7hTisbsU00lUd6uipiozZSjPJaoP/SoBZJiFNQg0zzJn6e',0),
-(53,'6','$2b$12$uicqJM.mMJY6lLo8MyijdO7N8sDMQtVdAIIPVyw758jFSimwjKZlG',0),
-(54,'7','$2b$12$0I2YU2cvWQnhNbUL.6U9U.iZYxC5zbON67MPTpi2HazQJQu06kCde',0),
-(55,'4','$2b$12$Kmqz9yM3wP8wrqXpXLUsreADUxS3XWzfrvB1VFUzh5FxM3GFHUqf.',0),
-(56,'i','$2b$12$koNkn4rTZnfN5JtsnP4UKuWmCWq5O6Vy09wLLRYO.3bVMsQUDDw0K',0),
-(57,'11','$2b$12$FrfDVXQ2Hhg2JCMfPicYB.ZlKkixiIRr66MkucqsVmC07LHS01lBq',0),
-(58,'a','$2b$12$6qvbY1/d2j8aWCBtYjrwTun.BD8ekIp0NBeT4uFPPBhWbZz/J4.dm',0),
-(59,'f','$2b$12$nIe6l5UVJh8lt.DR7HfKLuf4b3vYwnXrIAwf1CY4lMk0ZXVugbuyO',0),
-(60,'s','$2b$12$3zwPPYRXv4aKFrH6VA5cKe6PL7pUh13s6zGshWx12dKWNLELjF6Q6',0),
-(61,'q','$2b$12$naWN/avKhCis6eF/UIG0dOicDkbovXi8lROL/SiByUfvy0U6KtrHy',0),
-(62,'g','$2b$12$SqRT51P7drfkW5gcTJ6YvuF6NR1nzTBq8FyZa8uAAy4k86.SB0OGu',0),
-(63,'k','$2b$12$Sm6yV0SaQq7ty4yzI1STruXk9jga8lQdsD1CFyVTdZgqbEJZEclwS',0),
-(64,'y','$2b$12$/F37VXj8Vlto.SkKnKJQ1ueDvroxNxlz6IMX19NHiIA5kk9qk0VuS',0),
-(65,'ff','$2b$12$gbCagIQSF0v42cdIg41vde1tvZRccQYmjRNqRFbPkzhXjcL3zNDyC',0),
-(66,'aaa','$2b$12$7N/UCFQ900JSgYODQ9MJIe5ZXpqvOMOV2Ndi/04RL22S6TKwpu3NO',0),
-(67,'eee','$2b$12$k3tQ2IJ/qoMQscLnskSadOtAvipHOFQJVImW0xRxQvA4n0olO1t/u',0),
-(68,'fff','$2b$12$z6WocY358h7ajEKZ614sjOrNQbvk7uuNsApqhwKeHTfi/F00zzB/y',0),
-(69,'eeee','$2b$12$PmeG0lmSSU7jFzerFNAFe.sfmDlnFYfTEFxdigdDtX3vELVWsw29W',0),
-(70,'qqq','$2b$12$9tuRv05J.G.LKPDlkhv/5u4P0ryDAHrNDzbm1kZFKZ4VufHih111.',0),
-(71,'ss','$2b$12$Ak.5YAQWLLmBPvmp36jIEeWX2wlpaOm3PMynFvjrk3w/kIyp79MT6',0),
-(72,'ggg','$2b$12$cAeXut1YTGYdTyJKdT2dbOwTdtb8qBmSr90kDWX5.gi4PKWlS2oZ6',0),
-(73,'tt','$2b$12$B6WtRRDCUdry.CGxwmbM0Otr4QT3YC0Nv.1pwh9dmVM2aqB0VPryu',0),
-(74,'pp','$2b$12$6imugAEikghp3g3MeRr.eutsdbTT5Y6nfuR6OkSPRHAUjZcOj7os6',0);
+(75,'hiroki_admin','$2b$12$Q4kd3rbXL2azr3mUNQMAVOw2btiMwWxRiFrDJkbBQUeenaQExzLfq',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1780,4 +1728,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-12-15 21:35:56
+-- Dump completed on 2025-12-15 21:43:36

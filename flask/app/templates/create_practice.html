@@ -4,301 +4,388 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
 
 <style>
-/* ===== SQL Editor Window ===== */
-.sql-editor-box {
-    background: #1e1e1e;
-    color: #dcdcdc;
-    padding: 20px;
-    border-radius: 8px;
-    font-family: monospace;
-    margin-top: 20px;
-    white-space: pre-wrap;
-    overflow-x: hidden;
-    overflow-y: visible;
+/* =========================
+   SQL Code-like Editor UI
+========================= */
+.sql-editor-box{
+  background:#1e1e1e;
+  color:#dcdcdc;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px;
+  padding:16px 18px;
+  margin:18px 0 10px;
+  width:100%;
+  max-width:100%;
+  display:block;
+  box-sizing:border-box;
+  overflow-x:auto;
+  overflow-y:visible;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
-/* 入力フォーム（白背景） */
-.sql-input, 
-.sql-col, 
-.sql-type, 
-.sql-constraint {
-    font-family: monospace;
-    font-size: 1rem;
-    background: #ffffff;
-    color: #000000;
-    border: 1px solid #555;
-    padding: 3px 6px;
-    border-radius: 4px;
-    max-width: 100%;
-    box-sizing: border-box;
+/* 中身だけ横に伸びてOK（外枠は伸びない） */
+.sql-editor-inner{
+  min-width: max-content;
 }
 
-/* テーブル名入力欄 */
-.table-name-input {
-    width: 200px !important;
+/* 1行（基本はSQLっぽく） */
+.sql-editor-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  line-height:1.9;
+  white-space:nowrap;
 }
 
-/* 行のレイアウト（ここが最大の修正ポイント） */
-.sql-line {
-    display: flex;
-    flex-wrap: nowrap;   /* ← 折り返し禁止 */
-    gap: 8px;
-    margin-left: 20px;
-    width: 100%;
+/* 列定義のインデント */
+.sql-indent{
+  padding-left: 20px;
 }
 
-/* 入力欄の幅（絶対に縮まないようにする） */
-.sql-editor-box input.sql-col {
-    width: 260px !important;
-    min-width: 260px !important;
-    max-width: none !important;
-    flex: 0 0 260px !important;
+.sql-kw{ color:#4fc1ff; font-weight:700; }
+.sql-paren{ color:#dcdcdc; opacity:0.95; }
+.sql-symbol{ color:#dcdcdc; opacity:0.85; }
+.sql-comma{ color:#dcdcdc; font-weight:700; margin-left:2px; }
+
+/* 入力系（通常時） */
+.sql-input,
+.sql-col,
+.sql-type,
+.sql-constraint{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.98rem;
+  color:#eaeaea;
+  background:#2a2a2a;
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:8px;
+  padding:6px 10px;
+  box-sizing:border-box;
 }
 
-.sql-editor-box input.sql-constraint {
-    width: 350px !important;
-    min-width: 350px !important;
-    max-width: none !important;
-    flex: 0 0 350px !important;
+.sql-input::placeholder,
+.sql-col::placeholder,
+.sql-constraint::placeholder{
+  color: rgba(234,234,234,0.55);
 }
 
-.sql-editor-box select.sql-type {
-    width: 160px !important;
-    min-width: 160px !important;
-    max-width: none !important;
-    flex: 0 0 160px !important;
+/* ✅ フォーカス中は「白背景 + 黒文字」に統一（テーブル名も同じ） */
+.sql-editor-box input:focus,
+.sql-editor-box select:focus{
+  outline:none;
+  box-shadow:none !important;
+
+  background:#ffffff !important;
+  border-color:#cfcfcf !important;
+
+  color:#000000 !important;
+  caret-color:#000000 !important;
+  -webkit-text-fill-color:#000000 !important;
+  opacity:1 !important;
 }
 
-/* カンマ */
-.comma {
-    font-weight: bold;
-    color: #dcdcdc;
+/* 念のため：テーブル名だけ別スタイルに負ける環境対策 */
+.sql-editor-box .table-name-input:focus{
+  background:#ffffff !important;
+  color:#000000 !important;
+  -webkit-text-fill-color:#000000 !important;
 }
 
-/* カラム削除ボタン */
-.delete-col-btn {
-    background: #cc3333;
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.delete-col-btn:hover {
-    background: #aa0000;
+.table-name-input{
+  width: 240px;
 }
 
-/* ===== Add Button ===== */
-.add-btn {
-    margin-top: 10px;
-    background: #007bff;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-}
-.add-btn:hover {
-    background: #0056b3;
+/* 列1行 */
+.sql-line{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  white-space:nowrap;
 }
 
-/* ===== History & Table list ===== */
+/* 各パーツの基本幅（広い時の見た目） */
+.sql-editor-box .sql-col{
+  width: 220px;
+  min-width: 220px;
+  flex: 0 0 220px; /* shrinkさせない */
+}
+
+.sql-editor-box .sql-type{
+  width: 170px;
+  min-width: 170px;
+  flex: 0 0 170px; /* shrinkさせない */
+}
+
+/* 制約は伸びる担当 */
+.sql-editor-box .sql-constraint{
+  flex: 1 1 320px;
+  min-width: 260px;
+}
+
+/* カンマと×は末尾グループ */
+.sql-tail{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex: 0 0 auto;
+}
+
+/* 削除ボタン */
+.icon-btn{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:#2a2a2a;
+  color:#ffb4b4;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.icon-btn:hover{
+  background:#3a2a2a;
+  border-color: rgba(255,180,180,0.35);
+}
+
+/* 下の操作ボタン */
+.editor-actions{
+  margin: 10px 0 0;
+  display:flex;
+  justify-content: center;
+  gap:10px;
+  flex-wrap: wrap;
+}
+.editor-actions .btn{
+  min-width: 240px;
+}
+
+/* メッセージ */
+.success { color: green; font-weight: bold; text-align: center; }
+.error   { color: red;   font-weight: bold; text-align: center; }
+
+/* 作成済み一覧・履歴 */
 .table-list-box, .history-box {
-    background: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    margin-top: 25px;
-    max-width: 900px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.history-item{
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+  font-family: monospace;
+}
+.history-item:last-child{ border-bottom:none; }
+
+/* ===== 崩れないレイアウト（PCの半分幅対応） ===== */
+
+/* 行は折り返し可能にする（広い時は結果的に折り返さない） */
+.sql-line{
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+/* テーブル名行も狭いときに折り返せるように */
+.sql-editor-row{
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+/* ✅ 半分ウィンドウ想定 */
+@media (max-width: 900px){
+  /* テーブル名は横幅に合わせて伸びる */
+  .table-name-input{
+    width: auto;
+    flex: 1 1 260px;
+    min-width: 220px;
+  }
+
+  /* カラム名と型は2列っぽく並び、制約は次の段でフル幅にする */
+  .sql-editor-box .sql-col{
+    width: auto;
+    flex: 1 1 180px;
+    min-width: 160px;
+  }
+  .sql-editor-box .sql-type{
+    width: auto;
+    flex: 1 1 140px;
+    min-width: 140px;
+  }
+
+  .sql-editor-box .sql-constraint{
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  /* 末尾（カンマ、×）は右寄せで次段に来ても自然 */
+  .sql-tail{
     margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
 }
 
-.history-item {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
-    font-family: monospace;
-}
-.history-item:last-child {
-    border-bottom: none;
-}
-
-.success {
-    color: green;
-    font-weight: bold;
-    text-align: center;
-}
-
-.error {
-    color: red;
-    font-weight: bold;
-    text-align: center;
-}
-
-/* ボタン配置 */
-.center-btn {
-    text-align: center;
-    margin-top: 10px;
-}
-
-/* 2行になる作成ボタン */
-.create-btn {
-    padding: 12px 25px;
-    width: 180px;
-    font-size: 1.1rem;
-    white-space: normal !important;
-    line-height: 1.3;
+/* 親がflexでも縮められるように保険 */
+.learning-container,
+.sql-editor-box{
+  min-width: 0;
 }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<h1>テーブル作成（CREATE TABLE）</h1>
-
 <div class="nav-buttons">
-    <a href="/part_of_database/create/example" class="prev">◀ 前へ</a>
-    <a href="/quiz/create_table" class="next">クイズへ ▶</a>
+  <a href="/part_of_database/create/example" class="prev">◀ 前へ</a>
+  <a href="/quiz/create_table" class="next">クイズへ ▶</a>
 </div>
 
-{% if message %}
-<p class="success">{{ message }}</p>
-{% endif %}
+<div class="learning-container">
+  <h1>テーブル作成（CREATE TABLE）</h1>
 
-{% if error_message %}
-<p class="error">{{ error_message }}</p>
-{% endif %}
+  <p>
+    <strong>CREATE TABLE</strong> は、テーブル名と列定義（列名・型・制約）を指定してテーブルを作成します。<br>
+    列定義は <strong>カンマ区切り</strong>です（最後の行にはカンマを付けません）。
+  </p>
 
-<!-- ==========================================
-     SQL 文埋め込み型入力 UI
-=========================================== -->
-<form method="POST">
+  {% if message %}
+    <p class="success">{{ message }}</p>
+  {% endif %}
+  {% if error_message %}
+    <p class="error">{{ error_message }}</p>
+  {% endif %}
 
-<div class="sql-editor-box">
-<pre class="sql-display">
-CREATE TABLE <input type="text" name="table_name" class="sql-input table-name-input" placeholder="テーブル名" required> (
-<div id="column-area">
-    <div class="sql-line">
-        <input type="text" name="columns[]" class="sql-col" placeholder="カラム名" required>
-        <select name="data_types[]" class="sql-type">
-            <option value="INT">INT</option>
-            <option value="VARCHAR(50)">VARCHAR(50)</option>
-            <option value="DATE">DATE</option>
-            <option value="BOOLEAN">BOOLEAN</option>
-        </select>
-        <input type="text" name="constraints[]" class="sql-constraint" placeholder="制約 (例: PRIMARY KEY)">
-        <span class="comma">,</span>
-        <button type="button" class="delete-col-btn" onclick="deleteColumn(this)">×</button>
+  <h2>練習してみよう</h2>
+  <p>SQL文を“書く感覚”で、テーブルを作ってみよう（列は2〜4本くらいが目安）。</p>
+
+  <form method="POST" id="create-form">
+    <div class="sql-editor-box" aria-label="SQL editor">
+      <div class="sql-editor-inner">
+        <!-- 1行目 -->
+        <div class="sql-editor-row">
+          <span class="sql-kw">CREATE TABLE</span>
+          <input type="text" name="table_name" class="sql-input table-name-input" placeholder="テーブル名" required>
+          <span class="sql-paren">(</span>
+        </div>
+
+        <!-- 列定義 -->
+        <div id="column-area" class="sql-indent">
+          <div class="sql-line">
+            <input type="text" name="columns[]" class="sql-col" placeholder="カラム名" required>
+            <select name="data_types[]" class="sql-type">
+              <option value="INT">INT</option>
+              <option value="VARCHAR(50)">VARCHAR(50)</option>
+              <option value="DATE">DATE</option>
+              <option value="BOOLEAN">BOOLEAN</option>
+            </select>
+            <input type="text" name="constraints[]" class="sql-constraint" placeholder="制約（例: PRIMARY KEY / NOT NULL）">
+
+            <!-- comma と × を末尾グループ化 -->
+            <span class="sql-tail">
+              <span class="sql-comma comma">,</span>
+              <button type="button" class="icon-btn" onclick="deleteColumn(this)" aria-label="delete column">×</button>
+            </span>
+          </div>
+        </div>
+
+        <!-- 終端 -->
+        <div class="sql-editor-row">
+          <span class="sql-paren">)</span><span class="sql-symbol">;</span>
+        </div>
+      </div>
     </div>
-</div>
-);
-</pre>
-</div>
 
-<button type="button" class="add-btn" onclick="addColumn()">＋ カラム追加</button>
+    <div class="editor-actions">
+      <button type="button" class="btn" onclick="addColumn()">＋ カラム追加</button>
+      <button type="submit" class="btn">テーブルを作成する</button>
+      <button type="reset" class="btn">入力をリセット</button>
+    </div>
+  </form>
 
-<br>
-<div class="center-btn">
-    <button type="submit" class="btn create-btn">
-        テーブルを<br>作成する
-    </button>
-</div>
-
-</form>
-
-<!-- ==========================================
-     作成済みテーブル一覧
-=========================================== -->
-<div class="table-list-box">
+  <!-- ==========================================
+       作成済みテーブル一覧
+  =========================================== -->
+  <div class="table-list-box">
     <h2>作成済みテーブル一覧</h2>
-
     {% if tables %}
-        <ul>
+      <ul>
         {% for t in tables %}
-            <li>{{ t[0] }}</li>
+          <li>{{ t[0] }}</li>
         {% endfor %}
-        </ul>
+      </ul>
     {% else %}
-        <p>まだテーブルがありません。</p>
+      <p>まだテーブルがありません。</p>
     {% endif %}
-</div>
+  </div>
 
-<!-- ==========================================
-     CREATE文の履歴（最新10件）
-=========================================== -->
-<div class="history-box">
+  <!-- ==========================================
+       CREATE文の履歴（最新10件）
+  =========================================== -->
+  <div class="history-box">
     <h2>CREATE文 履歴（最新10件）</h2>
 
     {% if history %}
-        {% for h in history %}
+      {% for h in history %}
         <div class="history-item">
-            <strong>{{ h[0] }}</strong><br>
-            {{ h[1] }}<br>
-            <span style="font-size:0.8rem; color:#888;">{{ h[2] }}</span>
+          <strong>{{ h[0] }}</strong><br>
+          {{ h[1] }}<br>
+          <span style="font-size:0.8rem; color:#888;">{{ h[2] }}</span>
         </div>
-        {% endfor %}
+      {% endfor %}
     {% else %}
-        <p>履歴がありません。</p>
+      <p>履歴がありません。</p>
     {% endif %}
+  </div>
+
 </div>
 
 <div class="nav-buttons">
-    <a href="/part_of_database/create/example" class="prev">◀ 前へ</a>
-    <a href="/quiz/create_table" class="next">クイズへ ▶</a>
+  <a href="/part_of_database/create/example" class="prev">◀ 前へ</a>
+  <a href="/quiz/create_table" class="next">クイズへ ▶</a>
 </div>
 
 <script>
-/* 最終行のカンマ調整 */
 function updateCommas() {
-    const lines = document.querySelectorAll("#column-area .sql-line");
-    lines.forEach((line, index) => {
-        const comma = line.querySelector(".comma");
-        if (index === lines.length - 1) {
-            comma.style.display = "none";
-        } else {
-            comma.style.display = "inline";
-        }
-    });
+  const lines = document.querySelectorAll("#column-area .sql-line");
+  lines.forEach((line, index) => {
+    const comma = line.querySelector(".comma");
+    if (!comma) return;
+    comma.style.display = (index === lines.length - 1) ? "none" : "inline";
+  });
 }
 
-/* カラム行追加 */
 function addColumn() {
-    const area = document.getElementById("column-area");
-    const line = document.createElement("div");
-    line.className = "sql-line";
+  const area = document.getElementById("column-area");
+  const line = document.createElement("div");
+  line.className = "sql-line";
 
-    line.innerHTML = `
-        <input type="text" name="columns[]" class="sql-col" placeholder="カラム名" required>
-        <select name="data_types[]" class="sql-type">
-            <option value="INT">INT</option>
-            <option value="VARCHAR(50)">VARCHAR(50)</option>
-            <option value="DATE">DATE</option>
-            <option value="BOOLEAN">BOOLEAN</option>
-        </select>
-        <input type="text" name="constraints[]" class="sql-constraint" placeholder="制約 (例: PRIMARY KEY)">
-        <span class="comma">,</span>
-        <button type="button" class="delete-col-btn" onclick="deleteColumn(this)">×</button>
-    `;
+  line.innerHTML = `
+    <input type="text" name="columns[]" class="sql-col" placeholder="カラム名" required>
+    <select name="data_types[]" class="sql-type">
+      <option value="INT">INT</option>
+      <option value="VARCHAR(50)">VARCHAR(50)</option>
+      <option value="DATE">DATE</option>
+      <option value="BOOLEAN">BOOLEAN</option>
+    </select>
+    <input type="text" name="constraints[]" class="sql-constraint" placeholder="制約（例: PRIMARY KEY / NOT NULL）">
+    <span class="sql-tail">
+      <span class="sql-comma comma">,</span>
+      <button type="button" class="icon-btn" onclick="deleteColumn(this)" aria-label="delete column">×</button>
+    </span>
+  `;
 
-    area.appendChild(line);
-    updateCommas();
+  area.appendChild(line);
+  updateCommas();
 }
 
-/* カラム削除 */
 function deleteColumn(btn) {
-    const area = document.getElementById("column-area");
-    const lines = area.querySelectorAll(".sql-line");
-
-    if (lines.length <= 1) return; /* ← 最後の1行は削除不可 */
-
-    btn.parentElement.remove();
-    updateCommas();
+  const area = document.getElementById("column-area");
+  const lines = area.querySelectorAll(".sql-line");
+  if (lines.length <= 1) return;
+  btn.closest(".sql-line").remove();
+  updateCommas();
 }
 
-/* 初期ロード時の調整 */
-document.addEventListener("DOMContentLoaded", () => {
-    updateCommas();
-});
+document.addEventListener("DOMContentLoaded", updateCommas);
 </script>
 
 {% endblock %}

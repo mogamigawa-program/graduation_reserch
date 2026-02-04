@@ -2,6 +2,54 @@
 {% block title %}DELETE文の実行例(単数条件){% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+
+<style>
+/* =========================
+   変更点の可視化（DELETE向け）
+========================= */
+.table-changed th,
+.table-changed td{
+  background-color:#e7f5ff !important;   /* 変更があった表：薄い青 */
+}
+.table-changed thead th{
+  background-color:#d0ebff !important;
+}
+
+/* 削除された行：薄い赤（before側で強調） */
+.hl-deleted-row td{
+  background-color:#ffe3e3 !important;
+  font-weight:700;
+}
+
+/* 0件ヒット：薄い灰 */
+.no-hit{
+  background:#f1f3f5;
+  font-weight:700;
+}
+
+/* =========================
+   ターミナル風（英語エラー）
+========================= */
+.terminal-caption{
+  margin:10px 0 6px;
+  font-weight:700;
+}
+.terminal-box{
+  background:#0b0f14;
+  color:#e8eef6;
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;
+  padding:12px 14px;
+  margin:8px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 0.95rem;
+  overflow-x:auto;
+}
+.terminal-box .prompt{ color:#7ee787; }
+.terminal-box .err{ color:#ff7b72; }
+
+.mini{ font-size:0.9rem; color:#666; }
+</style>
 {% endblock %}
 {% block content %}
 
@@ -14,10 +62,20 @@
     <h1>DELETE文（単数条件）実行例</h1>
 
     <section>
+        <h2>このページで見ること</h2>
+        <ul>
+            <li><strong>削除前テーブル → DELETE実行 → 削除後テーブル</strong>を並べて、差を確認する</li>
+            <li>典型エラー（列名誤記／クオート誤り／型不整合）を見て「何を直すか」を理解する</li>
+            <li><strong>対象が0件で終わる</strong>ケースも扱い、意図と結果のズレに気づけるようにする</li>
+        </ul>
+    </section>
+
+    <section>
         <h2>対象テーブル：products</h2>
-        <p>次のような <code>products</code> テーブルがあります。</p>
+        <p>次のような <code>products</code> テーブルがあるとします。</p>
 
         <table class="example-table">
+            <caption>products（削除前の状態）</caption>
             <thead>
                 <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
             </thead>
@@ -29,67 +87,222 @@
         </table>
     </section>
 
+    <hr>
+
     <section>
-        <h2>実行例①：価格が100円の商品を削除</h2>
-        <div class="code-block"><code>DELETE FROM products<br>WHERE price = 100;</code></div>
-        <p><strong>実行結果：</strong> 「ペン」と「消しゴム」が削除されます。</p>
+        <h2>実行例①：価格が100円の商品を削除（差を確認）</h2>
+
+        <p class="mini"><strong>手順：</strong> ①まずSELECTで対象確認 → ②DELETE実行 → ③テーブルがどう変わったか確認</p>
+
+        <div class="code-block">
+<code>-- ① まず削除対象を確認（安全）
+SELECT * FROM products
+WHERE price = 100;</code>
+        </div>
+
+        <div class="code-block">
+<code>-- ② DELETEを実行
+DELETE FROM products
+WHERE price = 100;</code>
+        </div>
+
         <table class="example-table">
+            <caption>削除前 → 削除後（赤＝消える行 / 青＝変更後の表）</caption>
+            <thead>
+                <tr>
+                    <th style="width:50%;">削除前（削除対象を赤で強調）</th>
+                    <th style="width:50%;">削除後（残った行）</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <table class="example-table" style="margin:0;">
+                            <thead>
+                                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hl-deleted-row"><td>1</td><td>ペン</td><td>100</td></tr>
+                                <tr><td>2</td><td>ノート</td><td>200</td></tr>
+                                <tr class="hl-deleted-row"><td>3</td><td>消しゴム</td><td>100</td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="example-table table-changed" style="margin:0;">
+                            <thead>
+                                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2</td><td>ノート</td><td>200</td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>確認ポイント：</strong> price=100 の行が消えているか（2行消える）</p>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>実行例②：product_idが2の商品のみを削除（差を確認）</h2>
+
+        <div class="code-block">
+<code>-- ① 対象確認
+SELECT * FROM products
+WHERE product_id = 2;</code>
+        </div>
+
+        <div class="code-block">
+<code>-- ② 削除
+DELETE FROM products
+WHERE product_id = 2;</code>
+        </div>
+
+        <table class="example-table">
+            <caption>削除前 → 削除後（赤＝消える行 / 青＝変更後の表）</caption>
+            <thead>
+                <tr>
+                    <th style="width:50%;">削除前（削除対象を赤で強調）</th>
+                    <th style="width:50%;">削除後（残った行）</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <table class="example-table" style="margin:0;">
+                            <thead>
+                                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>ペン</td><td>100</td></tr>
+                                <tr class="hl-deleted-row"><td>2</td><td>ノート</td><td>200</td></tr>
+                                <tr><td>3</td><td>消しゴム</td><td>100</td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="example-table table-changed" style="margin:0;">
+                            <thead>
+                                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>ペン</td><td>100</td></tr>
+                                <tr><td>3</td><td>消しゴム</td><td>100</td></tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>確認ポイント：</strong> product_id=2 の行だけが消えているか</p>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>対象が0件で終わる（意図と結果のズレ）</h2>
+        <p>
+            DELETEは実行できても、条件に合う行がなければ<strong>何も削除されません</strong>。<br>
+            だからこそ、削除前にSELECTで確認するのが重要です。
+        </p>
+
+        <div class="code-block">
+<code>-- ① まず確認（0件）
+SELECT * FROM products
+WHERE product_name = 'はさみ';</code>
+        </div>
+
+        <table class="example-table">
+            <caption>SELECT結果（0件）</caption>
             <thead>
                 <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
             </thead>
             <tbody>
-                <tr><td>2</td><td>ノート</td><td>200</td></tr>
+                <tr><td colspan="3" class="no-hit">（条件に一致する行がありません）</td></tr>
             </tbody>
         </table>
+
+        <div class="code-block">
+<code>-- ② DELETEしても削除される行は0件
+DELETE FROM products
+WHERE product_name = 'はさみ';</code>
+        </div>
+
+        <p><strong>学び：</strong>「実行できた」＝「削除された」とは限らない（0件のことがある）</p>
     </section>
 
-    <section>
-        <h2>実行例②：product_idが2の商品のみを削除</h2>
-        <div class="code-block"><code>DELETE FROM products<br>WHERE product_id = 2;</code></div>
-        <p><strong>実行結果：</strong>「ノート」が削除されます。</p>
-        <table class="example-table">
-            <thead>
-                <tr><th>product_id</th><th>product_name</th><th>price</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>1</td><td>ペン</td><td>100</td></tr>
-                <tr><td>3</td><td>消しゴム</td><td>100</td></tr>
-            </tbody>
-        </table>
-    </section>
+    <hr>
 
     <section>
-        <h2>よくあるエラーと注意点</h2>
+        <h2>よくあるエラー例（典型）</h2>
+        <p class="mini">※英語エラーは MySQL/MariaDB でターミナルに出がちな代表例です（環境により文言は少し変わります）。</p>
 
+        <!-- 1) 列名誤記 -->
         <div class="alert-error">
-            <strong>❌ WHERE を忘れる</strong>
-            <div class="code-block"><code>DELETE FROM products;</code></div>
-            <p>→ テーブル内の全行が削除されてしまいます！</p>
+            <strong>❌ 列名の誤記（Unknown column）</strong>
+            <div class="code-block"><code>DELETE FROM products
+WHERE id = 3;</code></div>
+            <p><strong>原因：</strong> products の列は <code>product_id</code> なのに <code>id</code> と書いている</p>
+            <p><strong>直し方：</strong> 正しい列名に直す（<code>product_id</code> を使う）</p>
+
+            <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+            <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> DELETE FROM products WHERE id = 3;
+<span class="err">ERROR 1054 (42S22): Unknown column 'id' in 'where clause'</span></code></pre>
+            </div>
         </div>
 
+        <!-- 2) クオート誤り -->
         <div class="alert-warning">
-            <strong>⚠ 条件に一致する行がない</strong>
-            <div class="code-block"><code>DELETE FROM products<br>WHERE product_name = 'はさみ';</code></div>
-            <p>→ 実行されても削除対象がないため、何も起きません。</p>
+            <strong>⚠ クオート誤り（文字列を ' ' で囲まない）</strong>
+            <div class="code-block"><code>DELETE FROM products
+WHERE product_name = はさみ;</code></div>
+            <p><strong>原因：</strong> 文字列なのにクオートが無い → DBは「列名」だと思ってしまう</p>
+            <p><strong>直し方：</strong> <code>'はさみ'</code> のようにシングルクォートで囲む</p>
+
+            <p class="terminal-caption">ターミナルでのエラーメッセージ例（英語 / MySQL）</p>
+            <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> DELETE FROM products WHERE product_name = はさみ;
+<span class="err">ERROR 1054 (42S22): Unknown column 'はさみ' in 'where clause'</span></code></pre>
+            </div>
         </div>
 
+        <!-- 3) 条件値の型不整合 -->
         <div class="alert-warning">
-            <strong>⚠ 文字列の指定ミス</strong>
-            <div class="code-block"><code>DELETE FROM products<br>WHERE product_name = はさみ;</code></div>
-            <p>→ エラーになります（文字列はシングルクォートで囲む必要あり）</p>
-        </div>
+            <strong>⚠ 条件値の型不整合（意図した一致にならない／0件になる）</strong>
+            <p class="mini">
+                DBによっては「エラー」ではなく「暗黙変換」されて、<strong>0件になって気づきにくい</strong>ことがあります。
+            </p>
 
-        <div class="alert-error">
-            <strong>❌ 主キーの指定ミス</strong>
-            <div class="code-block"><code>DELETE FROM products<br>WHERE id = 3;</code></div>
-            <p>→ カラム名を間違えると <code>Unknown column 'id'</code> のようなエラーが出ます。</p>
+            <div class="code-block"><code>-- price は数値(INT)なのに、文字列っぽい値を入れてしまう例
+DELETE FROM products
+WHERE price = 'abc';</code></div>
+
+            <p><strong>起こりうること：</strong> エラーにならず、結果が0件（または意図しない判定）になる場合がある</p>
+            <p><strong>直し方：</strong> 数値列には数値で条件を書く（<code>price = 100</code> など）</p>
+
+            <p class="terminal-caption">ターミナルでのメッセージ例（英語 / MySQL）</p>
+            <div class="terminal-box">
+<pre><code><span class="prompt">mysql&gt;</span> DELETE FROM products WHERE price = 'abc';
+<span class="err">Query OK, 0 rows affected (0.00 sec)</span></code></pre>
+            </div>
+
+            <p class="mini">
+                ※SQLモードによっては警告が出ることがあります（例：Truncated incorrect DECIMAL value）。
+            </p>
         </div>
     </section>
 
     <section>
-        <h2>補足：削除前の確認方法</h2>
+        <h2>補足：削除前の確認方法（安全な手順）</h2>
         <p>削除前に対象データを確認するには、<code>SELECT</code>文を使いましょう。</p>
-        <div class="code-block"><code>SELECT * FROM products<br>WHERE price = 100;</code></div>
+        <div class="code-block"><code>SELECT * FROM products
+WHERE price = 100;</code></div>
     </section>
 </div>
 

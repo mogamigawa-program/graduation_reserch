@@ -13,17 +13,17 @@
 <div class="learning-container">
   <h1>DELETE文（共通なタプルの削除） 実行例</h1>
 
-  <!-- 基本構文 -->
+  <!-- 実行例 -->
   <section>
-    <h2>例①：基本構文</h2>
-    <p>退職者テーブル <code>departed_employees</code> に存在する従業員を、<code>employees</code> から削除します。</p>
+    <h2>実行例：削除前確認 → DELETE JOIN実行 → 削除後確認</h2>
+    <p>
+      ここでは、退職者テーブル <code>departed_employees</code> に存在する従業員を、
+      <code>employees</code> から削除する例を示す。まず削除前に両テーブルを提示し、
+      <strong>共通するnameが存在すること</strong>を確認した上でDELETE JOINを実行し、
+      最後に <code>employees</code> から該当行が消えることを確認する。
+    </p>
 
-    <div class="example-box">
-<code>DELETE e
-FROM employees AS e
-INNER JOIN departed_employees AS d
-ON e.name = d.name;</code>
-    </div>
+    <h3>削除前：両テーブルの確認（共通nameの存在を確認）</h3>
 
     <table class="example-table">
       <caption>employees（削除前）</caption>
@@ -35,12 +35,25 @@ ON e.name = d.name;</code>
     </table>
 
     <table class="example-table">
-      <caption>departed_employees</caption>
+      <caption>departed_employees（退職者）</caption>
       <tr><th>id</th><th>name</th></tr>
       <tr><td>2</td><td>Lisa</td></tr>
       <tr><td>3</td><td>Mike</td></tr>
     </table>
 
+    <div class="alert-warning">
+      <strong>確認：</strong> 両テーブルに共通して存在する <code>name</code> は <code>Lisa</code>, <code>Mike</code> である。
+    </div>
+
+    <h3>実行するSQL（DELETE JOIN）</h3>
+    <div class="example-box">
+<code>DELETE e
+FROM employees AS e
+INNER JOIN departed_employees AS d
+ON e.name = d.name;</code>
+    </div>
+
+    <h3>削除後：employeesから該当行が消えることを確認</h3>
     <table class="example-table">
       <caption>employees（削除後）</caption>
       <tr><th>id</th><th>name</th><th>department</th></tr>
@@ -49,91 +62,77 @@ ON e.name = d.name;</code>
     </table>
 
     <div class="alert-warning">
-      <strong>ポイント：</strong> 両テーブルに存在する <code>Lisa</code> と <code>Mike</code> が削除されました。
+      <strong>結果：</strong> <code>departed_employees</code> に存在した <code>Lisa</code>, <code>Mike</code> が
+      <code>employees</code> から削除された。
     </div>
   </section>
 
-  <!-- 条件付き構文 -->
+  <hr>
+
+  <!-- エラー例（典型） -->
   <section>
-    <h2>例②：条件付き削除（WHERE句あり）</h2>
+    <h2>エラー例（典型）と修正の観点</h2>
     <p>
-      JOINで共通データを対象にしつつ、さらに<code>status='inactive'</code> の行だけを削除します。
+      DELETE JOINの誤りは、主に <strong>ON条件の列名</strong> または <strong>別名（AS）の不整合</strong> に起因する。
+      したがって、エラー発生時は「<code>ON</code>句で参照している列」と「宣言した別名を一貫して使用しているか」を優先的に確認する。
     </p>
 
-    <div class="example-box">
-<code>DELETE a
-FROM tableA AS a
-JOIN tableB AS b
-ON a.id = b.id
-WHERE a.status = 'inactive';</code>
-    </div>
-
-    <table class="example-table">
-      <caption>tableA（削除前）</caption>
-      <tr><th>id</th><th>name</th><th>status</th></tr>
-      <tr><td>1</td><td>John</td><td>active</td></tr>
-      <tr><td>2</td><td>Lisa</td><td>inactive</td></tr>
-      <tr><td>3</td><td>Mike</td><td>inactive</td></tr>
-      <tr><td>4</td><td>Emma</td><td>active</td></tr>
-    </table>
-
-    <table class="example-table">
-      <caption>tableB</caption>
-      <tr><th>id</th><th>category</th></tr>
-      <tr><td>2</td><td>X</td></tr>
-      <tr><td>3</td><td>Y</td></tr>
-    </table>
-
-    <table class="example-table">
-      <caption>tableA（削除後）</caption>
-      <tr><th>id</th><th>name</th><th>status</th></tr>
-      <tr><td>1</td><td>John</td><td>active</td></tr>
-      <tr><td>4</td><td>Emma</td><td>active</td></tr>
-    </table>
-
-    <div class="alert-warning">
-      <strong>結果：</strong> JOINで一致し、かつ <code>status='inactive'</code> の <code>Lisa</code> と <code>Mike</code> が削除されました。
-    </div>
-  </section>
-
-  <!-- よくあるエラー・ミス -->
-  <section>
-    <h2>よくあるミス・エラー例</h2>
-
-    <h3>❌ 1. エイリアスを省略して構文エラー</h3>
+    <h3>❌ 1. 結合条件の列名誤り（ON句の列を見直す）</h3>
     <div class="error-box">
-<code>DELETE FROM employees
-INNER JOIN departed_employees
-ON employees.name = departed_employees.name;</code>
+<code>DELETE e
+FROM employees AS e
+INNER JOIN departed_employees AS d
+ON e.fullname = d.name;</code>
     </div>
-    <p>→ MySQLでは <code>DELETE</code> 句の後に削除対象の別名またはテーブル名を明示する必要があります。</p>
+    <p>
+      <strong>想定されるエラー例：</strong> <code>Unknown column 'e.fullname' in 'on clause'</code><br>
+      <strong>修正方針：</strong> <code>employees</code> 側の列名を確認し、実在する列（例：<code>e.name</code>）に修正する。
+    </p>
 
-    <h3>❌ 2. ON句を省略して全削除</h3>
-    <div class="error-box">
-<code>DELETE e FROM employees AS e
-INNER JOIN departed_employees AS d;</code>
-    </div>
-    <p>→ ON条件がないため、すべての行がマッチして削除されてしまう危険な構文です。</p>
-
-    <h3>❌ 3. 他のDB（PostgreSQLなど）で同じ構文を使う</h3>
-    <div class="error-box">
-<code>DELETE e FROM employees AS e
+    <div class="correct-box">
+<code>-- ✅ 修正例（列名を正しくする）
+DELETE e
+FROM employees AS e
 INNER JOIN departed_employees AS d
 ON e.name = d.name;</code>
     </div>
-    <p>→ PostgreSQLではこの構文は無効です。代わりに次のように書きます。</p>
+
+    <h3>❌ 2. 別名の不整合（宣言した別名を使っていない）</h3>
+    <div class="error-box">
+<code>DELETE e
+FROM employees AS e
+INNER JOIN departed_employees AS d
+ON employees.name = d.name;</code>
+    </div>
+    <p>
+      <strong>問題点：</strong> <code>employees</code> に別名 <code>e</code> を付与しているにもかかわらず、
+      <code>ON</code>句で <code>employees.name</code> を参照している。<br>
+      <strong>修正方針：</strong> 以降の参照は別名（<code>e</code>, <code>d</code>）に統一する。
+    </p>
+
     <div class="correct-box">
-<code>DELETE FROM employees
-USING departed_employees
-WHERE employees.name = departed_employees.name;</code>
+<code>-- ✅ 修正例（別名に統一）
+DELETE e
+FROM employees AS e
+INNER JOIN departed_employees AS d
+ON e.name = d.name;</code>
     </div>
 
-    <h3>❌ 4. WHEREを省略してJOIN一致すべて削除</h3>
-    <p>→ 条件をつけないとJOINでマッチしたすべての行が削除されます。</p>
+    <h3>❌ 3. 別名のタイプミス（存在しない別名を参照）</h3>
+    <div class="error-box">
+<code>DELETE e
+FROM employees AS e
+INNER JOIN departed_employees AS d
+ON emp.name = d.name;</code>
+    </div>
+    <p>
+      <strong>想定されるエラー例：</strong> <code>Unknown column 'emp.name' in 'on clause'</code><br>
+      <strong>修正方針：</strong> 宣言済みの別名（ここでは <code>e</code>）を使用するよう修正する。
+    </p>
 
-    <div class="alert-error">
-      <strong>注意：</strong> DELETE JOINは強力な操作です。実行前に必ず
-      <code>SELECT</code> で削除対象を確認する習慣をつけましょう。
+    <div class="alert-warning">
+      <strong>確認ポイント：</strong> エラー発生時はまず <code>ON</code> 句に注目し、
+      「列名が存在するか」「別名が宣言と一致しているか」を確認する。
     </div>
   </section>
 
@@ -141,9 +140,9 @@ WHERE employees.name = departed_employees.name;</code>
   <section>
     <h2>まとめ</h2>
     <ul>
-      <li>MySQL / MariaDBでは <code>DELETE エイリアス FROM ...</code> 構文を使う</li>
-      <li><code>ON</code> と <code>WHERE</code> を正しく組み合わせる</li>
-      <li>PostgreSQLでは構文が異なる</li>
+      <li>削除前に両テーブルを提示し、共通データ（例：共通name）の存在を確認する。</li>
+      <li>DELETE JOIN実行後は、削除対象テーブル（例：<code>employees</code>）から該当行が消えたことを確認する。</li>
+      <li>エラー時は <strong>ON句の列名</strong> と <strong>別名（AS）の整合性</strong> を優先的に点検する。</li>
     </ul>
   </section>
 </div>

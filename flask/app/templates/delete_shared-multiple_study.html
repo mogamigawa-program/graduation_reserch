@@ -14,28 +14,82 @@
   <h1>DELETE文（共通なタプルの削除）</h1>
 
   <section>
+    <h2>このページで学ぶこと</h2>
+    <ul>
+      <li>DELETE JOINの基本形（<strong>どのテーブルが削除対象か</strong>を明確にする）</li>
+      <li><code>ON</code>（結合条件）と <code>WHERE</code>（追加の絞り込み）の役割を区別する</li>
+      <li>別名（<code>AS</code>）の意味（読みやすさ・誤り防止）を理解する</li>
+    </ul>
+  </section>
+
+  <section>
     <h2>共通なタプルの削除とは？</h2>
     <p>
-      2つのテーブル間で、<strong>共通するデータ</strong>を削除したいときに使用します。<br>
-      例えば、退職済み従業員を社員テーブルから削除するなど。
+      2つのテーブル間で、<strong>共通する行（タプル）</strong>に該当するデータを削除したい場合があります。<br>
+      例えば、退職者一覧（退職済みテーブル）に載っている従業員を、社員テーブルから削除する場面が該当します。
+    </p>
+    <p>
+      このようなときに、テーブル同士を結合（JOIN）して削除対象を特定し、削除する方法を <strong>DELETE JOIN</strong> と呼びます。
     </p>
   </section>
 
   <section>
-    <h2>基本構文</h2>
+    <h2>DELETE JOINの基本形（削除対象を明示する）</h2>
+    <p>
+      DELETE JOINでは、<strong>先頭のDELETE直後に書いたテーブル（別名）が削除対象</strong>になります。<br>
+      したがって「どのテーブルの行を消すのか」を読み間違えないことが重要です。
+    </p>
+
     <div class="code-block">
 <code>DELETE t1
 FROM テーブル1 AS t1
 INNER JOIN テーブル2 AS t2
 ON t1.共通カラム = t2.共通カラム;</code>
     </div>
+
+    <ul>
+      <li><code>DELETE t1</code>：<strong>削除されるのは t1（＝テーブル1）</strong></li>
+      <li><code>INNER JOIN</code>：両方に一致する行だけを対象にする</li>
+    </ul>
   </section>
 
   <section>
-    <h2>応用：条件付きDELETE JOIN</h2>
+    <h2>ON と WHERE の役割（結合条件と絞り込み条件）</h2>
     <p>
-      JOINによって共通行を削除するだけでなく、<code>WHERE</code>句を使えば条件を絞って削除できます。
+      DELETE JOINでは、条件が2種類登場します。<br>
+      <code>ON</code> は「どの行同士を対応付けるか（結合条件）」、<code>WHERE</code> は「その中からさらに削除対象を絞る条件」です。
     </p>
+
+    <table class="example-table">
+      <caption>ON と WHERE の役割</caption>
+      <thead>
+        <tr>
+          <th>句</th>
+          <th>役割</th>
+          <th>例</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ON</code></td>
+          <td>結合条件（どの行とどの行を対応付けるか）</td>
+          <td><code>a.id = b.id</code></td>
+        </tr>
+        <tr>
+          <td><code>WHERE</code></td>
+          <td>追加の絞り込み（対応付けた後、どれを削除するか）</td>
+          <td><code>a.status = 'inactive'</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>条件付きDELETE JOIN（WHEREでさらに絞る）</h2>
+    <p>
+      JOINで「共通行」を特定した上で、<code>WHERE</code> により削除対象を追加で限定できます。
+    </p>
+
     <div class="code-block">
 <code>DELETE a
 FROM tableA AS a
@@ -43,15 +97,30 @@ JOIN tableB AS b
 ON a.id = b.id
 WHERE a.status = 'inactive';</code>
     </div>
+
     <ul>
-      <li>共通idを持ち、かつ <code>status='inactive'</code> のデータのみ削除</li>
-      <li>JOIN条件と削除条件の両方を組み合わせられる</li>
+      <li><code>ON a.id = b.id</code>：共通idを持つ行同士を対応付ける</li>
+      <li><code>WHERE a.status = 'inactive'</code>：その中でも inactive の行のみを削除する</li>
+      <li>削除対象は <code>DELETE a</code> により <strong>tableA 側</strong></li>
     </ul>
+
+    <div class="alert-warning">
+      <strong>注意：</strong> <code>WHERE</code> 句を省略すると、JOIN条件に一致する行が<strong>すべて削除対象</strong>になります。
+    </div>
   </section>
 
-  <div class="alert-warning">
-    <strong>注意：</strong> WHERE句を省略すると、JOINに一致するすべての行が削除されます。
-  </div>
+  <section>
+    <h2>別名（AS）を付ける理由</h2>
+    <p>
+      複数テーブルを扱うDELETEでは、列名の重複や読み間違いが起きやすくなります。<br>
+      そこで、テーブルに別名（エイリアス）を付けることで、SQLが読みやすくなり、誤りも防ぎやすくなります。
+    </p>
+    <ul>
+      <li><strong>読みやすさ：</strong> <code>employees</code> より <code>e</code> のほうが記述が短くなる</li>
+      <li><strong>誤り防止：</strong> <code>id</code> のような共通列でも <code>e.id</code> / <code>d.id</code> と区別できる</li>
+      <li><strong>削除対象の明確化：</strong> <code>DELETE e</code> のように削除対象が明示できる</li>
+    </ul>
+  </section>
 </div>
 
 <div class="nav-buttons">

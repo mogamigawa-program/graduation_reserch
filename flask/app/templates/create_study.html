@@ -17,48 +17,145 @@
     <section>
         <h2>CREATE TABLE 文とは？</h2>
         <p>
-            <strong>テーブルを新しく作るための SQL 文</strong>です。  
-            中にどんなデータを入れるのか（名前、データ型、主キーなど）を定義します。
+            <strong>テーブルを新しく作るための SQL 文</strong>です。<br>
+            「どんな列（カラム）を作るか」「それぞれにどんな値を入れるか（データ型）」
+            「最低限どんなルール（制約）を付けるか」を決めます。
         </p>
     </section>
 
     <section>
-        <h2>基本構文</h2>
+        <h2>基本構文（超重要）</h2>
+        <p>
+            CREATE TABLE は、<strong>テーブル名</strong>を書いて、<strong>括弧の中に列定義</strong>を並べます。<br>
+            列定義は <strong>カンマ区切り</strong>です（最後の行にはカンマを付けません）。
+        </p>
 
         <div class="code-block">
 <code>CREATE TABLE テーブル名 (
-    カラム名 データ型,
-    カラム名 データ型,
+    列名 データ型 [制約],
+    列名 データ型 [制約],
     ...
 );</code>
+        </div>
+
+        <div class="tips-box">
+            <div class="tips-title">よくある注意</div>
+            <ul>
+                <li>列定義は <strong>カンマ区切り</strong>（不足/余分なカンマでエラーになりやすい）</li>
+                <li>括弧 <strong>( )</strong> と文末の <strong>;</strong> を忘れない</li>
+            </ul>
         </div>
     </section>
 
     <section>
-        <h2>例：users テーブルを作る</h2>
+        <h2>代表的なデータ型と「どの値を入れるか」</h2>
+        <p>
+            データ型は「その列に入れる値の種類」を決めます。<br>
+            まずは以下の 3 種類を押さえれば十分です。
+        </p>
+
+        <table class="learning-table">
+            <tr>
+                <th>種類</th>
+                <th>データ型（例）</th>
+                <th>入れる値のイメージ</th>
+                <th>例</th>
+            </tr>
+            <tr>
+                <td>整数</td>
+                <td><code>INT</code></td>
+                <td>年齢、個数、ID など（小数なし）</td>
+                <td>18 / 250 / 1</td>
+            </tr>
+            <tr>
+                <td>文字列</td>
+                <td><code>VARCHAR(50)</code></td>
+                <td>名前、メール、商品名など（文字）</td>
+                <td>"Sato" / "apple"</td>
+            </tr>
+            <tr>
+                <td>日付</td>
+                <td><code>DATE</code></td>
+                <td>生年月日、登録日、購入日など（日付）</td>
+                <td>2026-01-30</td>
+            </tr>
+        </table>
+
+        <div class="tips-box">
+            <div class="tips-title">VARCHAR(50) って何？</div>
+            <p>
+                <code>VARCHAR(50)</code> は「<strong>最大 50 文字まで入る文字列</strong>」です。<br>
+                名前なら 50、商品名なら 100 など、用途に合わせて長さを決めます。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>最低限の制約と役割（PRIMARY KEY / NOT NULL）</h2>
+        <p>
+            制約は「データを正しく保つためのルール」です。<br>
+            初学者はまず <strong>PRIMARY KEY</strong> と <strong>NOT NULL</strong> を覚えると実務でも困りにくいです。
+        </p>
+
+        <table class="learning-table">
+            <tr>
+                <th>制約</th>
+                <th>役割</th>
+                <th>何を防ぐ？</th>
+                <th>よく使う場所</th>
+            </tr>
+            <tr>
+                <td><code>PRIMARY KEY</code></td>
+                <td>行（レコード）を一意に識別する</td>
+                <td><strong>重複</strong>・<strong>NULL</strong> を防ぐ</td>
+                <td>ID（番号）</td>
+            </tr>
+            <tr>
+                <td><code>NOT NULL</code></td>
+                <td>必ず値を入れさせる</td>
+                <td><strong>欠損（NULL）</strong> を防ぐ</td>
+                <td>名前、登録日など</td>
+            </tr>
+        </table>
+
+        <div class="tips-box">
+            <div class="tips-title">PRIMARY KEY のイメージ</div>
+            <p>
+                <strong>同じ id が2つあると困る</strong>ので、PRIMARY KEY を付けて重複を禁止します。<br>
+                さらに PRIMARY KEY の列は <strong>NULL も禁止</strong>になります。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>例：users テーブルを作る（基本の形）</h2>
 
         <div class="code-block">
 <code>CREATE TABLE users (
     id INT PRIMARY KEY,
-    name VARCHAR(50),
+    name VARCHAR(50) NOT NULL,
     age INT
 );</code>
         </div>
 
+        <ul>
+            <li><code>id INT PRIMARY KEY</code>：ユーザーを識別する番号（重複・NULL を防止）</li>
+            <li><code>name VARCHAR(50) NOT NULL</code>：名前（文字列、必須入力＝欠損防止）</li>
+            <li><code>age INT</code>：年齢（整数、必要なら入れる）</li>
+        </ul>
+
         <p>
-            この SQL を実行すると、  
-            <strong>id・name・age の3つの項目を持つ users テーブル</strong>ができます。
+            この SQL を実行すると、<strong>id・name・age の3列を持つ users テーブル</strong>が作成されます。
         </p>
     </section>
 
     <section>
-        <h2>ポイント</h2>
+        <h2>まとめ</h2>
         <ul>
-            <li>PRIMARY KEY を付けると、そのカラムは重複不可・NULL不可になります</li>
-            <li>VARCHAR(50) は「最大50文字までの文字列」</li>
-            <li>INT は整数を入れるカラム</li>
+            <li>CREATE TABLE は「テーブル名 + (列定義...)」で、列定義は <strong>カンマ区切り</strong></li>
+            <li>まずは <strong>INT / VARCHAR / DATE</strong> の使い分けを押さえる</li>
+            <li><strong>PRIMARY KEY（重複防止）</strong> と <strong>NOT NULL（欠損防止）</strong> が最低限の制約</li>
         </ul>
-        <p>初心者はまずこのレベルだけ覚えれば十分です。</p>
     </section>
 </div>
 

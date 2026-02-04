@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block title %}INSERT + SELECT文とは{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning.css') }}">
+{% endblock %}
 {% block content %}
 
 <div class="nav-buttons">
@@ -12,29 +15,60 @@
 
     <section>
         <p>
-            <strong>INSERT + SELECT</strong>文は、別のテーブルからデータを取得して、別のテーブルに挿入するためのSQL構文です。<br>
-            主に「<strong>データのコピー</strong>」や「<strong>一部データの移動</strong>」に使われます。
+            <strong>INSERT + SELECT</strong> は、<strong>別テーブルのデータをSELECTで取り出し、その結果をまとめて別テーブルへ挿入する</strong>SQLです。<br>
+            「データのコピー」「条件に合う行だけ移す」「集計結果を別テーブルに保存する」などでよく使われます。
         </p>
     </section>
 
     <section>
-        <h2>基本構文</h2>
+        <h2>基本形</h2>
+        <p>
+            <strong>VALUES の代わりに SELECT を書く</strong>のがポイントです。
+        </p>
         <div class="code-block">
-<code>INSERT INTO 追加先テーブル (列1, 列2, ...)
-SELECT 列1, 列2, ...
+<code>INSERT INTO 挿入先テーブル (挿入先カラム1, 挿入先カラム2, ...)
+SELECT 取り出す列1, 取り出す列2, ...
 FROM 元テーブル
 WHERE 条件;</code>
         </div>
+    </section>
+
+    <section>
+        <h2>重要ルール：カラム数を一致させる</h2>
         <p>
-            <code>VALUES</code> の代わりに <code>SELECT</code> を使って、複数の行を一括で挿入できます。
+            INSERT + SELECT では、<strong>挿入先に指定したカラム数</strong>と、<strong>SELECTで返す列数</strong>が
+            <strong>必ず一致</strong>している必要があります。
+        </p>
+
+        <div class="code-block">
+<code>-- ✅ OK（3列 → 3列）
+INSERT INTO A (c1, c2, c3)
+SELECT x, y, z
+FROM B;</code>
+        </div>
+
+        <div class="code-block">
+<code>-- ❌ NG（3列 → 2列：列数が足りない）
+INSERT INTO A (c1, c2, c3)
+SELECT x, y
+FROM B;</code>
+        </div>
+
+        <p>
+            また、列数だけでなく、<strong>型（INTに文字列を入れないなど）</strong>も整合している必要があります。
         </p>
     </section>
 
     <section>
-        <h2>使用例</h2>
-        <p>以下のように、年齢が30以上のユーザーを <code>senior_users</code> テーブルに追加できます：</p>
+        <h2>WHEREで挿入件数が変わる</h2>
+        <p>
+            <code>WHERE</code> 条件を付けると、<strong>SELECTで取れる行数＝挿入される行数</strong>になります。<br>
+            つまり、条件次第で <strong>0件 / 1件 / 複数件</strong>と挿入件数が変わります。
+        </p>
+
         <div class="code-block">
-<code>INSERT INTO senior_users (id, name, age)
+<code>-- age >= 30 の人だけを挿入（条件に合う人数分だけ行が追加される）
+INSERT INTO senior_users (id, name, age)
 SELECT id, name, age
 FROM users
 WHERE age >= 30;</code>
@@ -42,11 +76,34 @@ WHERE age >= 30;</code>
     </section>
 
     <section>
-        <h2>注意点</h2>
+        <h2>制約違反が起きる可能性</h2>
+        <p>
+            INSERT + SELECT は複数行をまとめて挿入できる反面、<strong>挿入先テーブルの制約に違反するとエラーになる</strong>ことがあります。
+        </p>
+
         <ul>
-            <li>列数・型が一致している必要があります</li>
-            <li>挿入先テーブルに存在しない列を指定しないようにしましょう</li>
-            <li>必要に応じて <code>WHERE</code> で条件をつけましょう</li>
+            <li><strong>PRIMARY KEY / UNIQUE</strong>：同じ値が入ろうとすると重複エラー</li>
+            <li><strong>NOT NULL</strong>：NULLが入ろうとするとエラー</li>
+            <li><strong>外部キー（FOREIGN KEY）</strong>：参照先に存在しない値だとエラー</li>
+        </ul>
+
+        <div class="code-block">
+<code>-- 例：senior_users.id が PRIMARY KEY の場合
+-- users 側に id の重複がある/すでに入っているとエラーになる可能性がある</code>
+        </div>
+
+        <p>
+            うまくいかないときは、<strong>「列数」「型」「制約」</strong>のどれが原因かを切り分けるのがコツです。
+        </p>
+    </section>
+
+    <section>
+        <h2>まとめ</h2>
+        <ul>
+            <li><code>INSERT INTO A (...) SELECT ... FROM B ...</code> の形で、SELECT結果をまとめて挿入できる</li>
+            <li><strong>挿入先カラム数</strong>と<strong>SELECTの列数</strong>は必ず一致させる</li>
+            <li><code>WHERE</code> によって挿入件数が変わる（0件〜複数件）</li>
+            <li>制約（PRIMARY KEY / NOT NULL など）違反でエラーになることがある</li>
         </ul>
     </section>
 </div>
