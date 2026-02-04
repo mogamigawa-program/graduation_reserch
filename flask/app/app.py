@@ -1912,6 +1912,44 @@ import uuid
 
 active_connections = {}
 
+def _cleanup_tx():
+    """session.conn_id が指す接続を安全に破棄する（存在しない/壊れてるも含めて）"""
+    conn_id = session.get('conn_id')
+    if not conn_id:
+        return
+    conn = active_connections.get(conn_id)
+    if conn:
+        try:
+            conn.close()
+        except:
+            pass
+        active_connections.pop(conn_id, None)
+    session.pop('conn_id', None)
+
+
+def _get_tx_conn():
+    """有効なトランザクション接続があれば返す。壊れてたら掃除してNone。"""
+    conn_id = session.get('conn_id')
+    if not conn_id:
+        return None
+    conn = active_connections.get(conn_id)
+    if conn is None:
+        # sessionだけ残ってるパターン
+        session.pop('conn_id', None)
+        return None
+    return conn
+
+
+def _snapshot_table(conn, table_name: str):
+    """指定connの見えている状態でスナップショットを取る（トランザクション中の差分用）"""
+    cur = conn.cursor()
+    try:
+        cur.execute(f"SELECT * FROM {table_name}")
+        return cur.fetchall()
+    finally:
+        cur.close()
+
+
 @app.route('/transaction/basic-operations/practice', methods=['GET', 'POST'])
 def transaction_basic_operations_practice():
     table_name = "accounts"
@@ -1920,163 +1958,185 @@ def transaction_basic_operations_practice():
     error_message = ""
     desc, table = [], []
 
-    # 履歴がまだない場合は初期化
-    if 'sql_history' not in session:
-        session['sql_history'] = []
+    # 履歴初期化
+    session.setdefault('sql_history', [])
+    session.setdefault('before_table', [])
 
-    # diff 用の初期値
-    diff = {}
+    # diffのデフォルト（例外でも未定義にならないように）
+    diff_cells, added_rows, removed_rows = {}, [], []
 
-    # --- 初期化ボタン ---
-    if request.method == 'POST' and request.form.get('action') == 'init':
-        message = initialize_table(table_name, this_users_dns)
+    action = request.form.get('action') if request.method == 'POST' else None
 
-        # トランザクション接続が残っていたら閉じる
-        conn_id = session.get('conn_id')
-        if conn_id and conn_id in active_connections:
-            try:
-                active_connections[conn_id].close()
-            except:
-                pass
-            del active_connections[conn_id]
-            session.pop('conn_id', None)
+    # --- 初期化 ---
+    if action == 'init':
+        try:
+            message = initialize_table(table_name, this_users_dns)
+        except Exception as e:
+            error_message = f"初期化エラー: {e}"
 
-        # 履歴もリセット
+        # トランザクションが残ってたら閉じる
+        _cleanup_tx()
+
+        # 履歴・差分用リセット
         session['sql_history'] = []
         session['before_table'] = []
 
-    # --- トランザクション開始 ---
-    elif request.method == 'POST' and request.form.get('action') == 'start':
-        conn = mysql.connector.MySQLConnection(**this_users_dns)
-        conn.start_transaction()
-        conn_id = str(uuid.uuid4())
-        active_connections[conn_id] = conn
-        session['conn_id'] = conn_id
-
-        session['sql_history'] = ["START TRANSACTION;"]
-        session['before_table'] = []
-        message = "トランザクションを開始しました。"
-
-    # --- SQL実行（UPDATE / SELECT など） ---
-    elif request.method == 'POST' and request.form.get('action') == 'execute':
-        sql = request.form.get('sql', '').strip()
-        conn_id = session.get('conn_id')
-
-        # 🔥 SQL実行前 snapshot
-        session['before_table'] = get_table_snapshot(table_name)
-
-        # === 明示的トランザクション中の場合（START済み） ===
-        if conn_id and conn_id in active_connections:
-            conn = active_connections[conn_id]
-            cursor = conn.cursor()
-            try:
-                cursor.execute(sql)
-                message = "SQLを実行しました。"
-
-                # 履歴追加
-                history = session.get('sql_history', [])
-                history.append(sql if sql.endswith(';') else sql + ';')
-                session['sql_history'] = history
-
-            except Exception as e:
-                conn.rollback()
-                error_message = f"エラー発生のためROLLBACKしました: {e}"
-                history = session.get('sql_history', [])
-                history.append("-- エラー発生のため ROLLBACK;")
-                session['sql_history'] = history
-                conn.close()
-                del active_connections[conn_id]
-                session.pop('conn_id', None)
-
-            finally:
-                cursor.close()
-
-        # === トランザクション未開始 → 暗黙的に1回のトランザクションで実行 ===
+    # --- START TRANSACTION ---
+    elif action == 'start':
+        # すでに開始済みを網羅
+        if _get_tx_conn() is not None:
+            error_message = "すでにトランザクションが開始されています。COMMIT/ROLLBACKしてから再開してください。"
         else:
             try:
                 conn = mysql.connector.MySQLConnection(**this_users_dns)
-                cursor = conn.cursor()
-                cursor.execute(sql)
-                conn.commit()  # 🔥 明示開始なしの場合は自動コミット
-                message = "SQLを実行しました。（自動コミット）"
+                conn.start_transaction()
+                conn_id = str(uuid.uuid4())
+                active_connections[conn_id] = conn
+                session['conn_id'] = conn_id
 
-                # 履歴追加（トランザクション未開始でも履歴に残したいなら）
-                history = session.get('sql_history', [])
-                history.append(sql if sql.endswith(';') else sql + ';')
-                session['sql_history'] = history
-
+                session['sql_history'] = ["START TRANSACTION;"]
+                session['before_table'] = []
+                message = "トランザクションを開始しました。"
             except Exception as e:
-                error_message = f"SQL実行時にエラー: {e}"
+                error_message = f"トランザクション開始エラー: {e}"
+                # 作成途中のものがあれば掃除
+                _cleanup_tx()
 
-            finally:
-                cursor.close()
-                conn.close()
+    # --- SQL実行（UPDATE/INSERT/DELETEのみ） ---
+    elif action == 'execute':
+        sql = request.form.get('sql', '').strip()
 
+        tx_conn = _get_tx_conn()
+
+        # SQL空を網羅
+        if not sql.strip():
+            error_message = "SQLが空です。1文入力してください。"
+        else:
+            # トランザクション中
+            if tx_conn is not None:
+                try:
+                    # 直前スナップショット（トランザクションの見え方で取る）
+                    session['before_table'] = _snapshot_table(tx_conn, table_name)
+
+                    # ✅ 同一connで安全実行（commitしない）
+                    result = safe_exec_sql(
+                        sql,
+                        allowed_tables=[table_name],
+                        commit=False,
+                        conn=tx_conn
+                    )
+                    message = f"SQLを実行しました。（影響行数: {result.get('rowcount')}）"
+
+                    history = session.get('sql_history', [])
+                    history.append(result['sql'] + ';')
+                    session['sql_history'] = history
+
+                except Exception as e:
+                    # 例外時：ロールバックしてトランザクション終了（バグらせない）
+                    try:
+                        tx_conn.rollback()
+                    except:
+                        pass
+
+                    error_message = f"エラー発生のためROLLBACKしました: {e}"
+
+                    history = session.get('sql_history', [])
+                    history.append("-- エラー発生のため ROLLBACK;")
+                    session['sql_history'] = history
+
+                    _cleanup_tx()
+                    session['before_table'] = []
+
+            # トランザクション未開始（暗黙コミットの1回実行）
+            else:
+                conn = None
+                try:
+                    conn = mysql.connector.MySQLConnection(**this_users_dns)
+
+                    # 直前スナップショット（このconnで取る）
+                    session['before_table'] = _snapshot_table(conn, table_name)
+
+                    # ✅ 安全実行 + commit
+                    result = safe_exec_sql(
+                        sql,
+                        allowed_tables=[table_name],
+                        commit=True,
+                        conn=conn
+                    )
+                    message = f"SQLを実行しました。（自動コミット / 影響行数: {result.get('rowcount')}）"
+
+                    history = session.get('sql_history', [])
+                    history.append(result['sql'] + ';')
+                    session['sql_history'] = history
+
+                except Exception as e:
+                    # 例外時のrollbackも網羅
+                    try:
+                        if conn:
+                            conn.rollback()
+                    except:
+                        pass
+                    error_message = f"SQL実行時にエラー: {e}"
+                finally:
+                    try:
+                        if conn:
+                            conn.close()
+                    except:
+                        pass
 
     # --- COMMIT ---
-    elif request.method == 'POST' and request.form.get('action') == 'commit':
-        conn_id = session.get('conn_id')
-
-        if conn_id and conn_id in active_connections:
-            conn = active_connections[conn_id]
-            conn.commit()
-            message = "COMMITしました。"
-
-            history = session.get('sql_history', [])
-            history.append("COMMIT;")
-            session['sql_history'] = history
-
-            conn.close()
-            del active_connections[conn_id]
-            session.pop('conn_id', None)
-
-            # commitしたので before_table はリセット
-            session['before_table'] = []
-
-        else:
+    elif action == 'commit':
+        tx_conn = _get_tx_conn()
+        if tx_conn is None:
             error_message = "アクティブなトランザクションがありません。"
+        else:
+            try:
+                tx_conn.commit()
+                message = "COMMITしました。"
+
+                history = session.get('sql_history', [])
+                history.append("COMMIT;")
+                session['sql_history'] = history
+            except Exception as e:
+                error_message = f"COMMITに失敗しました: {e}"
+            finally:
+                _cleanup_tx()
+                session['before_table'] = []
 
     # --- ROLLBACK ---
-    elif request.method == 'POST' and request.form.get('action') == 'rollback':
-        conn_id = session.get('conn_id')
-
-        if conn_id and conn_id in active_connections:
-            conn = active_connections[conn_id]
-            conn.rollback()
-            message = "ROLLBACKしました。"
-
-            history = session.get('sql_history', [])
-            history.append("ROLLBACK;")
-            session['sql_history'] = history
-
-            conn.close()
-            del active_connections[conn_id]
-            session.pop('conn_id', None)
-
-            # rollback したので before_table はリセット
-            session['before_table'] = []
-
-        else:
+    elif action == 'rollback':
+        tx_conn = _get_tx_conn()
+        if tx_conn is None:
             error_message = "アクティブなトランザクションがありません。"
-
-    # --- テーブル状態の取得（差分ハイライト対応） ---
-    try:
-        conn_id = session.get('conn_id')
-
-        if conn_id and conn_id in active_connections:
-            # トランザクション中 → 未コミット込みの状態を取得
-            conn = active_connections[conn_id]
-            cursor = conn.cursor()
-            cursor.execute(f"DESC {table_name}")
-            desc = cursor.fetchall()
-            cursor.execute(f"SELECT * FROM {table_name}")
-            table = cursor.fetchall()
-            cursor.close()
         else:
-            # 通常
+            try:
+                tx_conn.rollback()
+                message = "ROLLBACKしました。"
+
+                history = session.get('sql_history', [])
+                history.append("ROLLBACK;")
+                session['sql_history'] = history
+            except Exception as e:
+                error_message = f"ROLLBACKに失敗しました: {e}"
+            finally:
+                _cleanup_tx()
+                session['before_table'] = []
+
+    # === テーブル表示（トランザクション中は未コミット込み） ===
+    try:
+        tx_conn = _get_tx_conn()
+        if tx_conn is not None:
+            cur = tx_conn.cursor()
+            try:
+                cur.execute(f"DESC {table_name}")
+                desc = cur.fetchall()
+                cur.execute(f"SELECT * FROM {table_name}")
+                table = cur.fetchall()
+            finally:
+                cur.close()
+        else:
             desc, table = fetch_table_data(table_name)
 
-        # 🔥 差分比較
         before_table = session.get('before_table')
         if before_table:
             diff_cells, added_rows, removed_rows = diff_table(before_table, table)
@@ -2085,8 +2145,10 @@ def transaction_basic_operations_practice():
 
     except Exception as e:
         error_message = f"テーブル読み込みエラー: {e}"
+        # 例外でも未定義にならないように
+        desc, table = desc or [], table or []
+        diff_cells, added_rows, removed_rows = {}, [], []
 
-    # --- 完成 ---
     return render_template(
         'transaction_basic_operations_practice.html',
         desc=desc,
@@ -8218,92 +8280,127 @@ def initialize_table(table_name: str, user_dns: dict):
 
     return message
 
-def safe_exec_sql(sql: str, allowed_tables: list = None, commit: bool = False, db_config: dict = None):
+def _normalize_single_statement(sql: str) -> str:
+    """空文/多重文を防ぎつつ、末尾のセミコロン1個だけは許可して除去する。"""
+    raw = (sql or "").strip()
+    if not raw:
+        raise ValueError("SQL が空です。")
+
+    # セミコロンは末尾1個のみ許可（入力しがちなので）
+    if ';' in raw:
+        if raw.endswith(';') and raw.count(';') == 1:
+            raw = raw[:-1].rstrip()
+        else:
+            raise ValueError("複数文（または不正なセミコロン）の使用は許可されていません。")
+
+    return raw
+
+
+def _extract_target_tables(raw: str) -> set:
+    """UPDATE/INSERT/DELETEの対象テーブル名を抽出（簡易だが教育用途では十分）。"""
+    lower = raw.lower()
+    tables = set()
+
+    m = re.match(r'^\s*update\s+`?([a-zA-Z_][a-zA-Z0-9_]*)`?\b', raw, flags=re.IGNORECASE)
+    if m:
+        tables.add(m.group(1).lower())
+
+    m = re.match(r'^\s*insert\s+into\s+`?([a-zA-Z_][a-zA-Z0-9_]*)`?\b', raw, flags=re.IGNORECASE)
+    if m:
+        tables.add(m.group(1).lower())
+
+    m = re.match(r'^\s*delete\s+from\s+`?([a-zA-Z_][a-zA-Z0-9_]*)`?\b', raw, flags=re.IGNORECASE)
+    if m:
+        tables.add(m.group(1).lower())
+
+    return tables
+
+
+def _validate_sql(raw: str, allowed_tables=None) -> None:
+    """
+    危険文字列・システムスキーマ参照・禁止キーワード等をチェックする。
+    ※この演習では、ユーザー入力は UPDATE/INSERT/DELETE のみに限定。
+    """
+    lower = raw.lower()
+
+    # コメント禁止
+    if '--' in raw or '/*' in raw or '*/' in raw:
+        raise ValueError("コメントの使用は許可されていません。")
+
+    # ✅ 禁止：DDL/権限/環境変更/トランザクション制御/参照系など
+    # 重要：UPDATE の "SET col=..." は必要なので「SET」を丸ごと禁止しない
+    forbidden_patterns = [
+        r'\bdrop\b', r'\btruncate\b', r'\balter\b', r'\bgrant\b', r'\brevoke\b',
+        r'\bcreate\b', r'\bshutdown\b', r'\buse\b',
+        r'\bshow\b', r'\bdescribe\b', r'\bdesc\b', r'\bexplain\b',
+        r'\bselect\b',  # この演習ではSELECT入力は不可
+        r'\bstart\s+transaction\b', r'^\s*begin\b', r'\bcommit\b', r'\brollback\b',
+    ]
+    for pat in forbidden_patterns:
+        if re.search(pat, lower):
+            raise ValueError(f"この演習では実行できないSQLです（禁止パターン: {pat}）。")
+
+    # ✅ 「SET文（環境変更）」だけ禁止（UPDATEのSETはOK）
+    # 例: SET autocommit=0; / SET @@session.sql_safe_updates=1; / SET NAMES ...
+    if re.match(r'^\s*set\b', lower):
+        raise ValueError("SET文（環境変更）は許可されていません。")
+
+    # システムスキーマ禁止
+    forbidden_schemas = ['mysql', 'information_schema', 'performance_schema', 'sys']
+    for s in forbidden_schemas:
+        if re.search(r'\b' + re.escape(s) + r'\b', lower):
+            raise ValueError(f"システムスキーマ '{s}' へのアクセスは禁止されています。")
+
+    # 許可文種：UPDATE/INSERT/DELETEのみ
+    if not re.match(r'^\s*(update|insert|delete)\b', lower):
+        raise ValueError("この演習では UPDATE / INSERT / DELETE のみ実行できます。")
+
+    # 許可テーブル制限
+    if allowed_tables is not None:
+        allowed = {t.lower() for t in allowed_tables}
+        targets = _extract_target_tables(raw)
+        if not targets:
+            raise ValueError("対象テーブル名を特定できません（UPDATE/INSERT/DELETEの書式を確認してください）。")
+        if not targets.issubset(allowed):
+            raise ValueError(f"許可されたテーブルは {allowed_tables} のみです。")
+
+
+def safe_exec_sql(
+    sql: str,
+    allowed_tables: list = None,
+    commit: bool = False,
+    db_config: dict = None,
+    conn=None
+):
     """
     危険文字列・多重文・システムスキーマ参照などをチェックしてから SQL を実行する安全ラッパー。
     - sql: 実行するSQL (1文)
     - allowed_tables: 許可するテーブル名のリスト（Noneならテーブルチェックは行わない）
     - commit: 実行後にコミットするか
     - db_config: mysql接続情報。Noneなら既存 this_users_dns を使う想定。
+    - conn: 既存接続（トランザクション中の接続）を使いたい場合に渡す
     """
-
     if db_config is None:
         db_config = this_users_dns  # 既存の接続情報を使う
 
-    # ---- 基本的な危険チェック ----
-    raw = sql.strip()
+    raw = _normalize_single_statement(sql)
+    _validate_sql(raw, allowed_tables)
 
-    # 空文チェック
-    if not raw:
-        raise ValueError("SQL が空です。")
+    created_here = False
+    if conn is None:
+        conn = mysql.connector.MySQLConnection(**db_config)
+        created_here = True
 
-    lower = raw.lower()
-
-    # 複数文(セミコロン)の防止 — 終端の1つのセミコロンは許容する場合もあるが安全のため禁止
-    if ';' in raw and raw.rstrip().endswith(';') and raw.count(';') == 1:
-        # 末尾の1つだけならまだ良い。しかし運用上はセミコロン自体を禁止するのが簡単
-        # ここではセミコロンを禁止する（複数文が混入する可能性があるため）
-        raise ValueError("複数文またはセミコロンの使用は許可されていません。")
-
-    if ';' in raw:
-        raise ValueError("セミコロンを含むSQLは許可されていません。")
-
-    # コメントの禁止（--, /* */）
-    if '--' in raw or '/*' in raw or '*/' in raw:
-        raise ValueError("コメントの使用は許可されていません。")
-
-    # 禁止キーワード（大文字小文字混在を許容）
-    forbidden_keywords = [
-        r'\bdrop\b', r'\btruncate\b', r'\balter\b', r'\bgrant\b', r'\brevoke\b',
-        r'\bcreate\b', r'\bshutdown\b', r'\buse\b', r'\bset\s+password\b'
-    ]
-    for fk in forbidden_keywords:
-        if re.search(fk, lower):
-            raise ValueError(f"禁止されたキーワードを含むため実行不可: {fk}")
-
-    # システムスキーマへのアクセス禁止
-    forbidden_schemas = ['mysql', 'information_schema', 'performance_schema', 'sys']
-    for s in forbidden_schemas:
-        if re.search(r'\b' + re.escape(s) + r'\b', lower):
-            raise ValueError(f"システムスキーマ '{s}' へのアクセスは禁止されています。")
-
-    # テーブル名の抽出（簡易）
-    # SELECT/FROM/INTO/UPDATE/DELETE/INTO/CREATE/ALTER ... のあとに来る識別子を拾う簡易ロジック
-    identifiers = re.findall(r'\b([a-zA-Z_][a-zA-Z0-9_]*)\b', raw)
-    identifiers_lower = [x.lower() for x in identifiers]
-
-    # 許可テーブルが指定されている場合は、SQLが許可テーブルのみ参照しているか確認
-    if allowed_tables:
-        allowed_lower = [t.lower() for t in allowed_tables]
-        # 少なくとも1つは許可テーブル名がSQL中に含まれていること
-        if not any(t in identifiers_lower for t in allowed_lower):
-            raise ValueError(f"許可されたテーブル {allowed_tables} のいずれも SQL に含まれていません。")
-
-        # SQLに含まれるテーブルと思しき識別子が許可テーブルに限定されているか近似チェック
-        #（過剰検出を避けるため、識別子のうち許可リストに含まれないものが
-        # テーブル名であるとは断定しない。ここでは明示的に schema.table 形式がないかチェック）
-        # 追加の厳格チェックが必要ならここを拡張する。
-
-    # 最低限、DELETE文でないなら弾く（教育目的の範囲限定）
-    if not re.match(r'^\s*delete\b', lower):
-        raise ValueError("この実行関数は DELETE 文のみ許可されています。")
-
-    # ---- 実行 ----
-    conn = mysql.connector.MySQLConnection(**db_config)
     cursor = conn.cursor()
     try:
         cursor.execute(raw)
         if commit:
             conn.commit()
-        # 実行結果を返す（DELETE は通常行数取得）
-        try:
-            affected = cursor.rowcount
-        except:
-            affected = None
-        return {'rowcount': affected}
+        return {'rowcount': getattr(cursor, "rowcount", None), 'sql': raw}
     finally:
         cursor.close()
-        conn.close()
+        if created_here:
+            conn.close()
 
 # ==========================================================
 # 差分ハイライト共通機能（どの学習ページでも使える）
